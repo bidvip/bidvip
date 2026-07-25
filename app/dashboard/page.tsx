@@ -42,7 +42,8 @@ export default function Dashboard() {
           Bid<span className="text-violet-500">Vip</span>
         </a>
         <div className="flex items-center gap-4">
-          <span className="text-gray-400 text-sm">{user?.email}</span>
+          <a href="/piac" className="text-gray-300 text-sm hover:text-white transition font-semibold">Piactér</a>
+          <span className="text-gray-400 text-sm hidden sm:inline">{user?.email}</span>
           <button
             onClick={kilepes}
             className="border border-gray-700 hover:border-gray-500 transition px-4 py-2 rounded-full text-sm"
