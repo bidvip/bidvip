@@ -8,17 +8,22 @@ export async function POST(req: NextRequest) {
 
   const { nev, rovid_leiras, reszletes_leiras, kategoria, kepUrlok = [] } = await req.json()
 
-  const szoveg = `You are a content moderator for BidVip, a startup idea marketplace. Evaluate if this submission is a genuine business idea worth listing.
+  const szoveg = `You are a content moderator for BidVip, a startup idea marketplace. Evaluate if this submission is a genuine business idea worth listing, and classify its maturity level.
 
 Name: ${nev}
 Short description: ${rovid_leiras}
 Detailed description: ${reszletes_leiras}
 Category: ${kategoria}
-${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s) — evaluate if they look genuine and relevant.` : ''}
+${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s) — use them to better judge maturity.` : ''}
 
 Respond with JSON only. No markdown, no explanation — just the JSON object.
-If valid: {"ok": true}
-If invalid (spam, gibberish, test data, too vague, or not a real business idea): {"ok": false, "reason": "brief explanation"}`
+If valid: {"ok": true, "badge": "<level>"}
+If invalid (spam, gibberish, test data, too vague, or not a real business idea): {"ok": false, "reason": "brief explanation"}
+
+Badge levels (pick one):
+- "papir" — idea only, no code, no users, no revenue
+- "prototipus" — something tangible exists: code, mockup, domain, or early users, but no real revenue
+- "bizonyitott" — real revenue or proven measurable traction`
 
   const kepTartalom = kepUrlok.slice(0, 3).map((url: string) => ({
     type: 'image' as const,

@@ -16,12 +16,6 @@ const categories = [
   'Other',
 ]
 
-const badge_szintek = [
-  { ertek: 'papir', label: '🌱 Concept', leiras: 'Idea only — no code, no revenue yet' },
-  { ertek: 'prototipus', label: '🛠️ Prototype', leiras: 'Something tangible exists: code, mockup, domain, or early users' },
-  { ertek: 'bizonyitott', label: '✅ Proven', leiras: 'Real revenue, active users, or measurable traction' },
-]
-
 export default function Submit() {
   const router = useRouter()
   const supabase = createClient()
@@ -31,7 +25,6 @@ export default function Submit() {
     rovid_leiras: '',
     reszletes_leiras: '',
     kategoria: '',
-    badge: 'papir',
     kikialtasi_ar: '',
     idotartam_nap: '14',
     van_domain: false,
@@ -108,7 +101,7 @@ export default function Submit() {
       rovid_leiras: form.rovid_leiras,
       reszletes_leiras: form.reszletes_leiras,
       kategoria: form.kategoria,
-      badge: form.badge,
+      badge: screen.badge || 'papir',
       kikialtasi_ar: parseInt(form.kikialtasi_ar),
       lejarat: new Date(Date.now() + parseInt(form.idotartam_nap) * 24 * 60 * 60 * 1000).toISOString(),
       van_domain: form.van_domain,
@@ -202,27 +195,6 @@ export default function Submit() {
                 {categories.map(k => <option key={k} value={k}>{k}</option>)}
               </select>
             </div>
-          </div>
-
-          {/* Maturity level */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
-            <h2 className="font-semibold text-lg">Maturity Level</h2>
-            {badge_szintek.map(b => (
-              <label key={b.ertek} className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition ${form.badge === b.ertek ? 'border-violet-500 bg-violet-900/20' : 'border-gray-700 hover:border-gray-600'}`}>
-                <input
-                  type="radio"
-                  name="badge"
-                  value={b.ertek}
-                  checked={form.badge === b.ertek}
-                  onChange={() => frissit('badge', b.ertek)}
-                  className="mt-1 accent-violet-500"
-                />
-                <div>
-                  <p className="font-semibold">{b.label}</p>
-                  <p className="text-gray-400 text-sm">{b.leiras}</p>
-                </div>
-              </label>
-            ))}
           </div>
 
           {/* What's included */}
