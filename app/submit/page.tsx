@@ -5,20 +5,26 @@ import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 
 const categories = [
-  'SaaS / Software',
-  'E-commerce',
-  'Mobile App',
-  'Content / Blog',
-  'Marketplace',
-  'Fintech',
-  'Edtech',
-  'Healthtech',
-  'Other',
+  'SaaS / Software', 'E-commerce', 'Mobile App', 'Content / Blog',
+  'Marketplace', 'Fintech', 'Edtech', 'Healthtech', 'Other',
 ]
+
+const SUBMIT_COST = 10
+const FILE_COST = 2
+
+type Feedback = {
+  score: number
+  verdict: string
+  strengths: string[]
+  improvements: string[]
+  ready: boolean
+}
 
 export default function Submit() {
   const router = useRouter()
   const supabase = createClient()
+
+  const [lepes, setLepes] = useState<1 | 2>(1)
 
   const [form, setForm] = useState({
     nev: '',
@@ -32,13 +38,48 @@ export default function Submit() {
     van_feliratkozok: false,
     van_bevetel: false,
   })
+
+  const [feedback, setFeedback] = useState<Feedback | null>(null)
+  const [feedbackAllapot, setFeedbackAllapot] = useState<'idle' | 'loading'>('idle')
+
+  const [kivalasztottFajlok, setKivalasztottFajlok] = useState<File[]>([])
   const [allapot, setAllapot] = useState<'idle' | 'feltoltes' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
-  const [kivalasztottFajlok, setKivalasztottFajlok] = useState<File[]>([])
-  const [feltoltottFajlok, setFeltoltottFajlok] = useState<{nev: string; url: string; tipus: string}[]>([])
+  const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
 
   function frissit(mezo: string, ertek: string | boolean) {
     setForm(prev => ({ ...prev, [mezo]: ertek }))
+    if (feedback) setFeedback(null)
+  }
+
+  async function aiFeedback() {
+    if (!form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria) {
+      setHiba('Fill in all fields before getting AI feedback.')
+      return
+    }
+    setHiba('')
+    setFeedbackAllapot('loading')
+    const res = await fetch('/api/ai/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nev: form.nev,
+        rovid_leiras: form.rovid_leiras,
+        reszletes_leiras: form.reszletes_leiras,
+        kategoria: form.kategoria,
+      }),
+    })
+    const data = await res.json()
+    setFeedback(data)
+    setFeedbackAllapot('idle')
+  }
+
+  async function tovabb() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { router.push('/auth'); return }
+    const { data: tokenData } = await supabase.from('tokenek').select('egyenleg').eq('user_id', user.id).single()
+    setTokenEgyenleg(tokenData?.egyenleg ?? 0)
+    setLepes(2)
   }
 
   function fajlValasztas(e: React.ChangeEvent<HTMLInputElement>) {
@@ -51,14 +92,39 @@ export default function Submit() {
     setKivalasztottFajlok(prev => prev.filter((_, i) => i !== index))
   }
 
+  const totalCost = SUBMIT_COST + kivalasztottFajlok.length * FILE_COST
+
   async function beküldes(e: React.FormEvent) {
     e.preventDefault()
-    setAllapot('feltoltes')
     setHiba('')
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth'); return }
 
+    if ((tokenEgyenleg ?? 0) < totalCost) {
+      setHiba(`Not enough tokens. You need ${totalCost} tokens but have ${tokenEgyenleg}.`)
+      return
+    }
+
+    // Spend tokens first
+    const spendRes = await fetch('/api/tokens/spend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.id, amount: totalCost }),
+    })
+    const spendData = await spendRes.json()
+    if (!spendRes.ok) {
+      if (spendData.error === 'insufficient_tokens') {
+        setHiba(`Not enough tokens. You need ${totalCost} but have ${spendData.egyenleg}.`)
+      } else {
+        setHiba('Token deduction failed. Please try again.')
+      }
+      return
+    }
+
+    setAllapot('feltoltes')
+
+    // Upload files
     const ujFajlok: {nev: string; url: string; tipus: string}[] = []
     for (const fajl of kivalasztottFajlok) {
       const fd = new FormData()
@@ -69,12 +135,10 @@ export default function Submit() {
         ujFajlok.push(data)
       }
     }
-    setFeltoltottFajlok(ujFajlok)
 
     setAllapot('szures')
 
     const kepUrlok = ujFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
-
     const screenRes = await fetch('/api/ai/screen', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -88,7 +152,7 @@ export default function Submit() {
     })
     const screen = await screenRes.json()
     if (!screen.ok) {
-      setHiba(screen.reason || 'Your submission did not pass our quality check. Please add more detail and try again.')
+      setHiba(screen.reason || 'Your submission did not pass our quality check.')
       setAllapot('hiba')
       return
     }
@@ -143,161 +207,245 @@ export default function Submit() {
         <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">← Back</a>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-2">List a Project</h1>
-        <p className="text-gray-400 mb-8">The more detail you provide, the higher price you can command.</p>
+      {/* Step indicator */}
+      <div className="max-w-2xl mx-auto px-6 pt-10 pb-2 flex items-center gap-3">
+        <div className={`flex items-center gap-2 text-sm font-semibold ${lepes === 1 ? 'text-violet-400' : 'text-gray-500'}`}>
+          <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs border ${lepes === 1 ? 'border-violet-500 bg-violet-900/40' : 'border-gray-700 bg-gray-800'}`}>1</span>
+          Describe your project
+        </div>
+        <div className="h-px flex-1 bg-gray-800" />
+        <div className={`flex items-center gap-2 text-sm font-semibold ${lepes === 2 ? 'text-violet-400' : 'text-gray-500'}`}>
+          <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs border ${lepes === 2 ? 'border-violet-500 bg-violet-900/40' : 'border-gray-700 bg-gray-800'}`}>2</span>
+          Set price & submit
+        </div>
+      </div>
 
-        <form onSubmit={beküldes} className="flex flex-col gap-6">
-          {/* Basic info */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-            <h2 className="font-semibold text-lg">Basic Information</h2>
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Project name *</label>
-              <input
-                required
-                value={form.nev}
-                onChange={e => frissit('nev', e.target.value)}
-                placeholder="e.g. AI-powered customer support SaaS"
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Short description * (max 150 characters)</label>
-              <input
-                required
-                maxLength={150}
-                value={form.rovid_leiras}
-                onChange={e => frissit('rovid_leiras', e.target.value)}
-                placeholder="What does it do in one sentence?"
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Detailed description *</label>
-              <textarea
-                required
-                rows={5}
-                value={form.reszletes_leiras}
-                onChange={e => frissit('reszletes_leiras', e.target.value)}
-                placeholder="What problem does it solve? Who is the target customer? What's the competitive advantage?"
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 resize-none"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Category *</label>
-              <select
-                required
-                value={form.kategoria}
-                onChange={e => frissit('kategoria', e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-violet-500"
-              >
-                <option value="">Select a category...</option>
-                {categories.map(k => <option key={k} value={k}>{k}</option>)}
-              </select>
-            </div>
-          </div>
+      <div className="max-w-2xl mx-auto px-6 py-8">
 
-          {/* What's included */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
-            <h2 className="font-semibold text-lg">What&apos;s Included?</h2>
-            <p className="text-gray-400 text-sm">Check everything that comes with the purchase — buyers will see this.</p>
-            {[
-              { mezo: 'van_domain', label: 'Domain / URL' },
-              { mezo: 'van_kod', label: 'Source code / repository' },
-              { mezo: 'van_feliratkozok', label: 'Email list / subscribers' },
-              { mezo: 'van_bevetel', label: 'Proven revenue' },
-            ].map(item => (
-              <label key={item.mezo} className="flex items-center gap-3 cursor-pointer">
+        {lepes === 1 && (
+          <div className="flex flex-col gap-6">
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Describe your project</h1>
+              <p className="text-gray-400">Get AI feedback before submitting — improve your listing to attract more buyers.</p>
+            </div>
+
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Project name *</label>
                 <input
-                  type="checkbox"
-                  checked={form[item.mezo as keyof typeof form] as boolean}
-                  onChange={e => frissit(item.mezo, e.target.checked)}
-                  className="w-5 h-5 accent-violet-500"
+                  value={form.nev}
+                  onChange={e => frissit('nev', e.target.value)}
+                  placeholder="e.g. AI-powered customer support SaaS"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
                 />
-                <span>{item.label}</span>
-              </label>
-            ))}
-          </div>
-
-          {/* File uploads */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-            <h2 className="font-semibold text-lg">Files & Media</h2>
-            <p className="text-gray-400 text-sm">Upload screenshots, pitch deck, business plan, logo — anything that helps buyers evaluate your project. (Max 5 files, 10MB each)</p>
-            <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 hover:border-violet-500 rounded-xl py-8 cursor-pointer transition">
-              <span className="text-3xl mb-2">📎</span>
-              <span className="text-gray-400 text-sm">Click to select files</span>
-              <span className="text-gray-600 text-xs mt-1">Images, PDF, Word, Excel</span>
-              <input
-                type="file"
-                multiple
-                accept="image/*,.pdf,.docx,.xlsx"
-                onChange={fajlValasztas}
-                className="hidden"
-              />
-            </label>
-            {kivalasztottFajlok.length > 0 && (
-              <div className="flex flex-col gap-2">
-                {kivalasztottFajlok.map((f, i) => (
-                  <div key={i} className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-xl text-sm">
-                    <span className="text-gray-300 truncate">{f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}</span>
-                    <button type="button" onClick={() => fajlTorles(i)} className="text-gray-500 hover:text-red-400 ml-3 transition">✕</button>
-                  </div>
-                ))}
               </div>
-            )}
-          </div>
-
-          {/* Starting price */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
-            <h2 className="font-semibold text-lg">Starting Price</h2>
-            <p className="text-gray-400 text-sm">The minimum bid the auction starts from (EUR).</p>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-              <input
-                required
-                type="number"
-                min={1}
-                value={form.kikialtasi_ar}
-                onChange={e => frissit('kikialtasi_ar', e.target.value)}
-                placeholder="e.g. 500"
-                className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
-              />
-            </div>
-          </div>
-
-          {/* Auction duration */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
-            <h2 className="font-semibold text-lg">Auction Duration</h2>
-            <p className="text-gray-400 text-sm">How long should the auction run after it goes live?</p>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { nap: '7', label: '7 days', sub: 'Fast sale' },
-                { nap: '14', label: '14 days', sub: 'Recommended' },
-                { nap: '30', label: '30 days', sub: 'More exposure' },
-              ].map(d => (
-                <button
-                  key={d.nap}
-                  type="button"
-                  onClick={() => frissit('idotartam_nap', d.nap)}
-                  className={`flex flex-col items-center p-4 rounded-xl border transition ${form.idotartam_nap === d.nap ? 'border-violet-500 bg-violet-900/20' : 'border-gray-700 hover:border-gray-600'}`}
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Short description * (max 150 chars)</label>
+                <input
+                  maxLength={150}
+                  value={form.rovid_leiras}
+                  onChange={e => frissit('rovid_leiras', e.target.value)}
+                  placeholder="What does it do in one sentence?"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Detailed description *</label>
+                <textarea
+                  rows={6}
+                  value={form.reszletes_leiras}
+                  onChange={e => frissit('reszletes_leiras', e.target.value)}
+                  placeholder="What problem does it solve? Who is the target customer? What's the competitive advantage? What's included in the sale?"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 resize-none"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Category *</label>
+                <select
+                  value={form.kategoria}
+                  onChange={e => frissit('kategoria', e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-violet-500"
                 >
-                  <span className="font-bold">{d.label}</span>
-                  <span className="text-xs text-gray-400 mt-1">{d.sub}</span>
-                </button>
+                  <option value="">Select a category...</option>
+                  {categories.map(k => <option key={k} value={k}>{k}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* What's included */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+              <h2 className="font-semibold">What&apos;s Included?</h2>
+              <p className="text-gray-400 text-sm">Check everything that comes with the purchase.</p>
+              {[
+                { mezo: 'van_domain', label: 'Domain / URL' },
+                { mezo: 'van_kod', label: 'Source code / repository' },
+                { mezo: 'van_feliratkozok', label: 'Email list / subscribers' },
+                { mezo: 'van_bevetel', label: 'Proven revenue' },
+              ].map(item => (
+                <label key={item.mezo} className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form[item.mezo as keyof typeof form] as boolean}
+                    onChange={e => frissit(item.mezo, e.target.checked)}
+                    className="w-5 h-5 accent-violet-500"
+                  />
+                  <span>{item.label}</span>
+                </label>
               ))}
             </div>
+
+            {hiba && <p className="text-red-400 text-sm">{hiba}</p>}
+
+            {/* AI Feedback */}
+            {feedback && (
+              <div className={`rounded-2xl border p-6 flex flex-col gap-4 ${feedback.ready ? 'border-green-700 bg-green-900/10' : 'border-amber-700 bg-amber-900/10'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold">🤖 AI Feedback</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-2xl font-bold ${feedback.score >= 7 ? 'text-green-400' : feedback.score >= 5 ? 'text-amber-400' : 'text-red-400'}`}>{feedback.score}/10</span>
+                    {feedback.ready
+                      ? <span className="text-xs bg-green-900/40 text-green-400 border border-green-800 px-2 py-1 rounded-full">Ready to submit</span>
+                      : <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800 px-2 py-1 rounded-full">Needs improvement</span>
+                    }
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm italic">&quot;{feedback.verdict}&quot;</p>
+                {feedback.strengths.length > 0 && (
+                  <div>
+                    <p className="text-green-400 text-xs font-semibold mb-1 uppercase tracking-wide">Strengths</p>
+                    {feedback.strengths.map((s, i) => <p key={i} className="text-gray-300 text-sm">✓ {s}</p>)}
+                  </div>
+                )}
+                {feedback.improvements.length > 0 && (
+                  <div>
+                    <p className="text-amber-400 text-xs font-semibold mb-1 uppercase tracking-wide">Improve</p>
+                    {feedback.improvements.map((s, i) => <p key={i} className="text-gray-300 text-sm">→ {s}</p>)}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={aiFeedback}
+                disabled={feedbackAllapot === 'loading'}
+                className="flex-1 py-3 rounded-full border border-violet-700 text-violet-400 hover:bg-violet-900/20 disabled:opacity-60 transition font-semibold"
+              >
+                {feedbackAllapot === 'loading' ? '🤖 Analyzing...' : feedback ? '🔄 Re-analyze' : '🤖 Get AI Feedback (free)'}
+              </button>
+              <button
+                type="button"
+                onClick={tovabb}
+                disabled={!form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria}
+                className="flex-1 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 transition py-3 rounded-full font-semibold"
+              >
+                Continue →
+              </button>
+            </div>
           </div>
+        )}
 
-          {hiba && <p className="text-red-400 text-sm text-center">{hiba}</p>}
+        {lepes === 2 && (
+          <form onSubmit={beküldes} className="flex flex-col gap-6">
+            <div>
+              <button type="button" onClick={() => setLepes(1)} className="text-gray-500 hover:text-gray-300 text-sm mb-3 transition">← Back</button>
+              <h1 className="text-3xl font-bold mb-1">Set price & submit</h1>
+              <p className="text-gray-400">This step costs tokens. Upload files for better AI analysis.</p>
+            </div>
 
-          <button
-            type="submit"
-            disabled={allapot === 'szures' || allapot === 'loading'}
-            className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg"
-          >
-            {allapot === 'feltoltes' ? 'Uploading files...' : allapot === 'szures' ? '🤖 Checking your idea...' : allapot === 'loading' ? 'Submitting...' : 'Submit Project →'}
-          </button>
-        </form>
+            {/* Token cost info */}
+            <div className="bg-violet-900/20 border border-violet-800 rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-violet-300">Submission cost</p>
+                <p className="text-gray-400 text-sm">{SUBMIT_COST} base + {kivalasztottFajlok.length} × {FILE_COST} files</p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-violet-400">{totalCost} tokens</p>
+                <p className="text-xs text-gray-500">You have: {tokenEgyenleg ?? '...'}</p>
+              </div>
+            </div>
+
+            {/* Files */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
+              <h2 className="font-semibold">Files & Media <span className="text-gray-500 font-normal text-sm">({FILE_COST} tokens/file)</span></h2>
+              <p className="text-gray-400 text-sm">Screenshots, pitch deck, business plan, logo — helps buyers and AI analysis. Max 5 files, 10MB each.</p>
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 hover:border-violet-500 rounded-xl py-8 cursor-pointer transition">
+                <span className="text-3xl mb-2">📎</span>
+                <span className="text-gray-400 text-sm">Click to select files</span>
+                <span className="text-gray-600 text-xs mt-1">Images, PDF, Word, Excel</span>
+                <input type="file" multiple accept="image/*,.pdf,.docx,.xlsx" onChange={fajlValasztas} className="hidden" />
+              </label>
+              {kivalasztottFajlok.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {kivalasztottFajlok.map((f, i) => (
+                    <div key={i} className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-xl text-sm">
+                      <span className="text-gray-300 truncate">{f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}</span>
+                      <div className="flex items-center gap-3 ml-2">
+                        <span className="text-violet-400 text-xs shrink-0">-{FILE_COST} tokens</span>
+                        <button type="button" onClick={() => fajlTorles(i)} className="text-gray-500 hover:text-red-400 transition">✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Price */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+              <h2 className="font-semibold">Starting Price</h2>
+              <p className="text-gray-400 text-sm">The minimum bid the auction starts from (EUR).</p>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
+                <input
+                  required
+                  type="number"
+                  min={1}
+                  value={form.kikialtasi_ar}
+                  onChange={e => frissit('kikialtasi_ar', e.target.value)}
+                  placeholder="e.g. 500"
+                  className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
+                />
+              </div>
+            </div>
+
+            {/* Duration */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+              <h2 className="font-semibold">Auction Duration</h2>
+              <p className="text-gray-400 text-sm">How long should the auction run after it goes live?</p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { nap: '7', label: '7 days', sub: 'Fast sale' },
+                  { nap: '14', label: '14 days', sub: 'Recommended' },
+                  { nap: '30', label: '30 days', sub: 'More exposure' },
+                ].map(d => (
+                  <button
+                    key={d.nap}
+                    type="button"
+                    onClick={() => frissit('idotartam_nap', d.nap)}
+                    className={`flex flex-col items-center p-4 rounded-xl border transition ${form.idotartam_nap === d.nap ? 'border-violet-500 bg-violet-900/20' : 'border-gray-700 hover:border-gray-600'}`}
+                  >
+                    <span className="font-bold">{d.label}</span>
+                    <span className="text-xs text-gray-400 mt-1">{d.sub}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {hiba && <p className="text-red-400 text-sm text-center">{hiba}</p>}
+
+            <button
+              type="submit"
+              disabled={allapot !== 'idle' && allapot !== 'hiba'}
+              className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg"
+            >
+              {allapot === 'feltoltes' ? 'Uploading files...' :
+               allapot === 'szures' ? '🤖 Final AI check...' :
+               allapot === 'loading' ? 'Submitting...' :
+               `Submit Project — ${totalCost} tokens →`}
+            </button>
+          </form>
+        )}
       </div>
     </main>
   )
