@@ -144,8 +144,12 @@ export default function Dashboard() {
                       <p className="text-gray-400 text-sm">{p.rovid_leiras}</p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className={`text-xs px-2 py-1 rounded-full ${p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' : 'bg-yellow-900/40 text-yellow-400'}`}>
-                        {p.statusz === 'aktiv' ? 'Live' : 'Under Review'}
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' :
+                        p.statusz === 'elutasitva' ? 'bg-red-900/40 text-red-400' :
+                        'bg-yellow-900/40 text-yellow-400'
+                      }`}>
+                        {p.statusz === 'aktiv' ? 'Live' : p.statusz === 'elutasitva' ? 'Rejected' : 'Under Review'}
                       </span>
                       <span className="text-violet-400 font-bold">€{p.kikialtasi_ar}</span>
                       <a href={`/project/${p.id}`} className="text-gray-400 hover:text-white text-sm transition">View →</a>
