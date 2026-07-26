@@ -174,6 +174,35 @@ export default function Submit() {
     setFeedbackAllapot('idle')
   }
 
+  async function chatStream(uzenet: string, elozmenyek: ChatUzenet[], projektAdat: object, onChunk: (text: string) => void): Promise<{ score: number | null; keszen: boolean }> {
+    const res = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uzenet, elozmenyek, projekt: projektAdat }),
+    })
+    const reader = res.body!.getReader()
+    const decoder = new TextDecoder()
+    let acc = ''
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      acc += decoder.decode(value, { stream: true })
+      const metaIdx = acc.indexOf('__BIDVIP_META__')
+      if (metaIdx !== -1) {
+        const displayText = acc.substring(0, metaIdx).replace(/\{"score":\s*[\d.]+,\s*"keszen":\s*(true|false)\}/g, '').trim()
+        onChunk(displayText)
+        try {
+          const meta = JSON.parse(acc.substring(metaIdx + '__BIDVIP_META__'.length))
+          return { score: meta.score, keszen: meta.keszen ?? false }
+        } catch { return { score: null, keszen: false } }
+      } else {
+        const display = acc.replace(/\{"score":\s*[\d.]+,\s*"keszen":\s*(true|false)\}/g, '').trim()
+        onChunk(display)
+      }
+    }
+    return { score: null, keszen: false }
+  }
+
   async function lepés1Tovabb() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth'); return }
@@ -207,20 +236,17 @@ export default function Submit() {
         fajlok: feltoltottFajlok,
       }).eq('id', draftId)
     }
+    setChatUzenetek([{ role: 'assistant', content: '' }])
     try {
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uzenet: 'Hello! I just passed the initial screening. Can you help me refine my idea further?',
-          elozmenyek: [],
-          projekt: { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras },
-        }),
-      })
-      const data = await res.json()
-      setChatUzenetek([{ role: 'assistant', content: data.valasz }])
-      setChatKeszen(data.keszen ?? false)
-      setChatScore(data.score ?? null)
+      const projektAdat = { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras }
+      const { score, keszen } = await chatStream(
+        'Hello! I just passed the initial screening. Can you help me refine my idea further?',
+        [],
+        projektAdat,
+        (text) => setChatUzenetek([{ role: 'assistant', content: text }])
+      )
+      setChatKeszen(keszen)
+      setChatScore(score)
     } catch (e) {
       setChatUzenetek([{ role: 'assistant', content: 'Failed to connect to AI. Please try again.' }])
     } finally {
@@ -251,22 +277,19 @@ export default function Submit() {
     setChatInput('')
     setChatAllapot('loading')
 
+    const ujValasz: ChatUzenet = { role: 'assistant', content: '' }
+    setChatUzenetek([...ujUzenetek, ujValasz])
     try {
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uzenet: chatInput,
-          elozmenyek: chatUzenetek,
-          projekt: { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras },
-        }),
-      })
-      const data = await res.json()
-      setChatUzenetek([...ujUzenetek, { role: 'assistant', content: data.valasz }])
-      setChatKeszen(data.keszen ?? false)
-      setChatScore(data.score ?? null)
+      const projektAdat = { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras }
+      const { score, keszen } = await chatStream(
+        chatInput,
+        chatUzenetek,
+        projektAdat,
+        (text) => setChatUzenetek([...ujUzenetek, { role: 'assistant', content: text }])
+      )
+      setChatKeszen(keszen)
+      setChatScore(score)
     } catch (e) {
-      // Refund token on error
       await fetch('/api/tokens/spend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

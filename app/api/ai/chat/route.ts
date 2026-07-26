@@ -1,12 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
+const BADGE_LABELS: Record<string, string> = {
+  papir: 'Concept (idea only)',
+  prototipus: 'Prototype (tangible exists)',
+  bizonyitott: 'Proven (real revenue/users)',
+}
+
 export async function POST(req: NextRequest) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-
   const { uzenet, elozmenyek, projekt } = await req.json()
 
   const rendszerPrompt = `You are a senior startup advisor and investor on BidVip, a marketplace where startup ideas are auctioned. You have reviewed hundreds of startups. Your job is to help the seller turn their rough idea into a compelling, market-ready listing that buyers will actually bid on.
@@ -37,22 +42,45 @@ Score criteria:
 
 Be strict. Most ideas need 3-5 rounds to reach 8.5.`
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-5',
-    max_tokens: 1024,
-    system: rendszerPrompt,
-    messages: [
-      ...elozmenyek,
-      { role: 'user', content: uzenet },
-    ],
+  const encoder = new TextEncoder()
+  let fullText = ''
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        const messageStream = client.messages.stream({
+          model: 'claude-sonnet-5',
+          max_tokens: 1024,
+          system: rendszerPrompt,
+          messages: [
+            ...elozmenyek,
+            { role: 'user', content: uzenet },
+          ],
+        })
+
+        for await (const event of messageStream) {
+          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            fullText += event.delta.text
+            controller.enqueue(encoder.encode(event.delta.text))
+          }
+        }
+
+        const jsonMatch = fullText.match(/\{"score":\s*([\d.]+),\s*"keszen":\s*(true|false)\}/)
+        const score = jsonMatch ? parseFloat(jsonMatch[1]) : null
+        const keszen = jsonMatch ? jsonMatch[2] === 'true' : false
+        controller.enqueue(encoder.encode(`\n\n__BIDVIP_META__${JSON.stringify({ score, keszen })}`))
+      } catch (e) {
+        controller.enqueue(encoder.encode(`\n\n__BIDVIP_META__${JSON.stringify({ score: null, keszen: false, error: true })}`))
+      } finally {
+        controller.close()
+      }
+    },
   })
 
-  const teljesValasz = message.content[0].type === 'text' ? message.content[0].text : ''
-
-  const jsonMatch = teljesValasz.match(/\{"score":\s*([\d.]+),\s*"keszen":\s*(true|false)\}/)
-  const score = jsonMatch ? parseFloat(jsonMatch[1]) : null
-  const keszen = jsonMatch ? jsonMatch[2] === 'true' : false
-  const valasz = teljesValasz.replace(/\{"score":\s*[\d.]+,\s*"keszen":\s*(true|false)\}/g, '').trim()
-
-  return NextResponse.json({ valasz, score, keszen })
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Transfer-Encoding': 'chunked',
+    },
+  })
 }
