@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase-browser'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const categories = [
   'SaaS / Software', 'E-commerce', 'Mobile App', 'Content / Blog',
@@ -63,10 +63,64 @@ export default function Submit() {
 
   const [allapot, setAllapot] = useState<'idle' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
+  const [draftId, setDraftId] = useState<string | null>(null)
+
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     if (chatVegRef.current) chatVegRef.current.scrollIntoView({ behavior: 'smooth' })
   }, [chatUzenetek])
+
+  useEffect(() => {
+    const draft = searchParams.get('draft')
+    if (!draft) return
+    async function betoltDraft() {
+      const supabaseClient = createClient()
+      const { data } = await supabaseClient.from('projektek').select('*').eq('id', draft).eq('statusz', 'draft').single()
+      if (!data) return
+      setForm(prev => ({
+        ...prev,
+        nev: data.nev || '',
+        rovid_leiras: data.rovid_leiras || '',
+        reszletes_leiras: data.reszletes_leiras || '',
+        kategoria: data.kategoria || '',
+        van_domain: data.van_domain || false,
+        van_kod: data.van_kod || false,
+        van_feliratkozok: data.van_feliratkozok || false,
+        van_bevetel: data.van_bevetel || false,
+      }))
+      if (data.fajlok) setFeltoltottFajlok(data.fajlok)
+      setDraftId(draft)
+      const { data: { user } } = await supabaseClient.auth.getUser()
+      if (user) {
+        setUserId(user.id)
+        const { data: tokenData } = await supabaseClient.from('tokenek').select('egyenleg').eq('user_id', user.id).single()
+        setTokenEgyenleg(tokenData?.egyenleg ?? 0)
+      }
+      setLepes(2)
+      setChatAllapot('loading')
+      try {
+        const res = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uzenet: 'Hello! I am continuing to refine my idea. Can you help me make it market-ready?',
+            elozmenyek: [],
+            projekt: { nev: data.nev, kategoria: data.kategoria, rovid_leiras: data.rovid_leiras, reszletes_leiras: data.reszletes_leiras },
+          }),
+        })
+        const aiData = await res.json()
+        setChatUzenetek([{ role: 'assistant', content: aiData.valasz }])
+        setChatKeszen(aiData.keszen ?? false)
+        setChatScore(aiData.score ?? null)
+      } catch {
+        setChatUzenetek([{ role: 'assistant', content: 'Welcome back! Let\'s continue refining your idea.' }])
+      } finally {
+        setChatAllapot('idle')
+      }
+    }
+    betoltDraft()
+  }, [])
 
   function frissit(mezo: string, ertek: string | boolean) {
     setForm(prev => ({ ...prev, [mezo]: ertek }))
@@ -128,6 +182,31 @@ export default function Submit() {
     setUserId(user.id)
     setChatAllapot('loading')
     setLepes(2)
+    // Save draft
+    if (!draftId) {
+      const { data: draft } = await supabase.from('projektek').insert([{
+        user_id: user.id,
+        nev: form.nev,
+        rovid_leiras: form.rovid_leiras,
+        reszletes_leiras: form.reszletes_leiras,
+        kategoria: form.kategoria,
+        badge: 'papir',
+        kikialtasi_ar: 0,
+        lejarat: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        statusz: 'draft',
+        user_email: user.email,
+        fajlok: feltoltottFajlok,
+      }]).select().single()
+      if (draft) setDraftId(draft.id)
+    } else {
+      await supabase.from('projektek').update({
+        nev: form.nev,
+        rovid_leiras: form.rovid_leiras,
+        reszletes_leiras: form.reszletes_leiras,
+        kategoria: form.kategoria,
+        fajlok: feltoltottFajlok,
+      }).eq('id', draftId)
+    }
     try {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
@@ -259,8 +338,7 @@ export default function Submit() {
     })
     const deepData = deepRes.ok ? await deepRes.json() : { analysis: '' }
 
-    const { error } = await supabase.from('projektek').insert([{
-      user_id: user.id,
+    const projektAdat = {
       nev: form.nev,
       rovid_leiras: form.rovid_leiras,
       reszletes_leiras: form.reszletes_leiras,
@@ -273,10 +351,13 @@ export default function Submit() {
       van_feliratkozok: form.van_feliratkozok,
       van_bevetel: form.van_bevetel,
       statusz: 'aktiv',
-      user_email: user.email,
       fajlok: feltoltottFajlok,
       ai_elemzes: deepData.analysis || null,
-    }])
+    }
+
+    const { error } = draftId
+      ? await supabase.from('projektek').update(projektAdat).eq('id', draftId)
+      : await supabase.from('projektek').insert([{ ...projektAdat, user_id: user.id, user_email: user.email }])
 
     if (error) {
       setHiba('Something went wrong. Please try again.')

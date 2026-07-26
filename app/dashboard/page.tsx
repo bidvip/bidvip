@@ -123,7 +123,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                 <p className="text-gray-400 text-sm mb-1">Total</p>
-                <p className="text-3xl font-bold">{sajatProjektek.length}</p>
+                <p className="text-3xl font-bold">{sajatProjektek.filter(p => p.statusz !== 'draft').length}</p>
               </div>
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                 <p className="text-gray-400 text-sm mb-1">Live</p>
@@ -167,11 +167,12 @@ export default function Dashboard() {
                         p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' :
                         p.statusz === 'elutasitva' ? 'bg-red-900/40 text-red-400' :
                         p.statusz === 'lezart' ? 'bg-gray-800 text-gray-500' :
+                        p.statusz === 'draft' ? 'bg-blue-900/40 text-blue-400' :
                         'bg-yellow-900/40 text-yellow-400'
                       }`}>
-                        {p.statusz === 'aktiv' ? 'Live' : p.statusz === 'elutasitva' ? 'Rejected' : p.statusz === 'lezart' ? 'Closed' : 'Under Review'}
+                        {p.statusz === 'aktiv' ? 'Live' : p.statusz === 'elutasitva' ? 'Rejected' : p.statusz === 'lezart' ? 'Closed' : p.statusz === 'draft' ? 'Draft' : 'Under Review'}
                       </span>
-                      <span className="text-violet-400 font-bold">€{p.kikialtasi_ar}</span>
+                      {p.statusz !== 'draft' && <span className="text-violet-400 font-bold">€{p.kikialtasi_ar}</span>}
                       {p.statusz === 'elutasitva' && (
                         <button
                           onClick={() => ujraBekuldes(p.id)}
@@ -181,7 +182,13 @@ export default function Dashboard() {
                           {ujrakuldes === p.id ? '...' : 'Resubmit'}
                         </button>
                       )}
-                      <a href={`/project/${p.id}`} className="text-gray-400 hover:text-white text-sm transition">View →</a>
+                      {p.statusz === 'draft' ? (
+                        <a href={`/submit?draft=${p.id}`} className="text-xs bg-violet-600 hover:bg-violet-700 transition px-3 py-1 rounded-full font-semibold">
+                          Continue →
+                        </a>
+                      ) : (
+                        <a href={`/project/${p.id}`} className="text-gray-400 hover:text-white text-sm transition">View →</a>
+                      )}
                     </div>
                   </div>
                 ))}
