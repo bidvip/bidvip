@@ -63,7 +63,8 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true)
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null)
   const [aiElemzes, setAiElemzes] = useState('')
-  const [aiAllapot, setAiAllapot] = useState<'idle' | 'loading' | 'kesz'>('idle')
+  const [aiAllapot, setAiAllapot] = useState<'idle' | 'loading' | 'kesz' | 'nincs_token'>('idle')
+  const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -88,9 +89,27 @@ export default function ProjectDetail() {
   const legmagasabb = licitek[0]?.osszeg || projekt?.kikialtasi_ar || 0
   const minimumLicit = legmagasabb + 1
 
+  const AI_ELEMZES_COST = 5
+
   async function aiElemzesKer() {
     if (!projekt) return
+    if (!user) { router.push('/auth'); return }
+
     setAiAllapot('loading')
+
+    const spendRes = await fetch('/api/tokens/spend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.id, amount: AI_ELEMZES_COST }),
+    })
+    const spendData = await spendRes.json()
+    if (!spendRes.ok) {
+      setTokenEgyenleg(spendData.egyenleg ?? 0)
+      setAiAllapot('nincs_token')
+      return
+    }
+    setTokenEgyenleg(spendData.uj_egyenleg)
+
     const kepUrlok = (projekt.fajlok || []).filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const res = await fetch('/api/ai/analyze', {
       method: 'POST',
@@ -270,8 +289,14 @@ export default function ProjectDetail() {
                 onClick={aiElemzesKer}
                 className="w-full py-3 rounded-xl border border-violet-700 text-violet-400 hover:bg-violet-900/20 transition font-semibold"
               >
-                🤖 Analyze with AI
+                🤖 Analyze with AI — 5 tokens
               </button>
+            )}
+            {aiAllapot === 'nincs_token' && (
+              <div className="text-center py-4">
+                <p className="text-red-400 text-sm mb-2">Not enough tokens. You have {tokenEgyenleg ?? 0}, need 5.</p>
+                <a href="/tokens" className="text-violet-400 text-sm hover:underline">Buy tokens →</a>
+              </div>
             )}
             {aiAllapot === 'loading' && (
               <div className="text-center text-gray-400 py-4 text-sm animate-pulse">Analyzing...</div>
