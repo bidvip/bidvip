@@ -27,12 +27,23 @@ export default function AuthPage() {
         setAllapot('siker')
       }
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password: jelszo })
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password: jelszo })
       if (error) {
         setHibaUzenet('Hibás email vagy jelszó.')
         setAllapot('hiba')
       } else {
-        router.push('/dashboard')
+        // Ellenőrizzük van-e már szerepkör beállítva
+        const { data: profil } = await supabase
+          .from('profiles')
+          .select('szerepkor')
+          .eq('id', data.user.id)
+          .single()
+
+        if (!profil) {
+          router.push('/szerepvalasztas')
+        } else {
+          router.push('/dashboard')
+        }
       }
     }
   }
