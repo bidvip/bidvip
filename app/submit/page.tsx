@@ -11,6 +11,7 @@ const categories = [
 
 const SUBMIT_COST = 10
 const FILE_COST = 2
+const DURATION_COST: Record<string, number> = { '7': 0, '14': 5, '30': 15 }
 
 type Feedback = {
   score: number
@@ -92,7 +93,7 @@ export default function Submit() {
     setKivalasztottFajlok(prev => prev.filter((_, i) => i !== index))
   }
 
-  const totalCost = SUBMIT_COST + kivalasztottFajlok.length * FILE_COST
+  const totalCost = SUBMIT_COST + kivalasztottFajlok.length * FILE_COST + (DURATION_COST[form.idotartam_nap] ?? 0)
 
   async function beküldes(e: React.FormEvent) {
     e.preventDefault()
@@ -358,7 +359,7 @@ export default function Submit() {
             <div className="bg-violet-900/20 border border-violet-800 rounded-2xl p-4 flex items-center justify-between">
               <div>
                 <p className="font-semibold text-violet-300">Submission cost</p>
-                <p className="text-gray-400 text-sm">{SUBMIT_COST} base + {kivalasztottFajlok.length} × {FILE_COST} files</p>
+                <p className="text-gray-400 text-sm">{SUBMIT_COST} base + {kivalasztottFajlok.length} × {FILE_COST} files + {DURATION_COST[form.idotartam_nap] ?? 0} duration</p>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold text-violet-400">{totalCost} tokens</p>
@@ -415,9 +416,9 @@ export default function Submit() {
               <p className="text-gray-400 text-sm">How long should the auction run after it goes live?</p>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { nap: '7', label: '7 days', sub: 'Fast sale' },
-                  { nap: '14', label: '14 days', sub: 'Recommended' },
-                  { nap: '30', label: '30 days', sub: 'More exposure' },
+                  { nap: '7', label: '7 days', sub: 'Fast sale', token: 0 },
+                  { nap: '14', label: '14 days', sub: 'Recommended', token: 5 },
+                  { nap: '30', label: '30 days', sub: 'More exposure', token: 15 },
                 ].map(d => (
                   <button
                     key={d.nap}
@@ -427,6 +428,7 @@ export default function Submit() {
                   >
                     <span className="font-bold">{d.label}</span>
                     <span className="text-xs text-gray-400 mt-1">{d.sub}</span>
+                    <span className="text-xs text-violet-400 mt-1">{d.token === 0 ? 'included' : `+${d.token} tokens`}</span>
                   </button>
                 ))}
               </div>
