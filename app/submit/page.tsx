@@ -205,7 +205,7 @@ export default function Submit() {
       van_kod: form.van_kod,
       van_feliratkozok: form.van_feliratkozok,
       van_bevetel: form.van_bevetel,
-      statusz: 'felulvizsgalat',
+      statusz: 'aktiv',
       user_email: user.email,
       fajlok: feltoltottFajlok,
       ai_elemzes: deepData.analysis || null,
