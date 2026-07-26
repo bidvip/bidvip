@@ -57,6 +57,7 @@ export default function Submit() {
   const [chatInput, setChatInput] = useState('')
   const [chatAllapot, setChatAllapot] = useState<'idle' | 'loading'>('idle')
   const [chatKeszen, setChatKeszen] = useState(false)
+  const [chatScore, setChatScore] = useState<number | null>(null)
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
 
@@ -139,6 +140,7 @@ export default function Submit() {
     const data = await res.json()
     setChatUzenetek([{ role: 'assistant', content: data.valasz }])
     setChatKeszen(data.keszen ?? false)
+    setChatScore(data.score ?? null)
     setChatAllapot('idle')
     setLepes(2)
   }
@@ -178,6 +180,7 @@ export default function Submit() {
     const data = await res.json()
     setChatUzenetek([...ujUzenetek, { role: 'assistant', content: data.valasz }])
     setChatKeszen(data.keszen ?? false)
+    setChatScore(data.score ?? null)
     setChatAllapot('idle')
   }
 
@@ -437,6 +440,15 @@ export default function Submit() {
               <button type="button" onClick={() => setLepes(1)} className="text-gray-500 hover:text-gray-300 text-sm mb-3 transition">← Back</button>
               <h1 className="text-3xl font-bold mb-1">Refine with AI Mentor</h1>
               <p className="text-gray-400">Chat with Sonnet 5 to make your idea market-ready. <span className="text-violet-400">{CHAT_COST} tokens/message</span> · Balance: <span className={`font-semibold ${(tokenEgyenleg ?? 0) < CHAT_COST ? 'text-red-400' : 'text-white'}`}>{tokenEgyenleg ?? '...'}</span></p>
+            {chatScore !== null && (
+              <div className="flex items-center gap-3 mt-2">
+                <div className="flex-1 bg-gray-800 rounded-full h-2">
+                  <div className={`h-2 rounded-full transition-all ${chatScore >= 8.5 ? 'bg-green-500' : chatScore >= 7 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${chatScore * 10}%` }} />
+                </div>
+                <span className={`text-sm font-bold ${chatScore >= 8.5 ? 'text-green-400' : chatScore >= 7 ? 'text-amber-400' : 'text-red-400'}`}>{chatScore}/10</span>
+                <span className="text-xs text-gray-500">need 8.5</span>
+              </div>
+            )}
             </div>
 
             {/* Chat messages */}
