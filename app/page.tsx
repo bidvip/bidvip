@@ -103,7 +103,7 @@ export default function Home() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <div className="text-violet-500 text-3xl mb-4">03</div>
             <h3 className="font-bold text-lg mb-2">Biztonságos átadás</h3>
-            <p className="text-gray-400 text-sm">A pénz escrow-ban van, az infók csak fizetés után kerülnek átadásra.</p>
+            <p className="text-gray-400 text-sm">A vevő fizet, mi tároljuk a pénzt. Az eladó csak akkor kapja meg, ha az összes dokumentációt, kódot és hozzáférést átadta.</p>
           </div>
         </div>
       </section>
