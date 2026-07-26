@@ -15,9 +15,8 @@ export async function POST(req: NextRequest) {
   const { nev, rovid_leiras, reszletes_leiras, kategoria, badge, kikialtasi_ar } = await req.json()
 
   const message = await client.messages.create({
-    model: 'claude-sonnet-5',
-    max_tokens: 2048,
-    thinking: { type: 'adaptive' },
+    model: 'claude-haiku-4-5',
+    max_tokens: 1024,
     messages: [{
       role: 'user',
       content: `You are an experienced startup analyst reviewing a project listed on BidVip, a marketplace where startup ideas and projects are auctioned to buyers.

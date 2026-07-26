@@ -59,6 +59,8 @@ export default function ProjectDetail() {
   const [hiba, setHiba] = useState('')
   const [loading, setLoading] = useState(true)
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null)
+  const [aiElemzes, setAiElemzes] = useState('')
+  const [aiAllapot, setAiAllapot] = useState<'idle' | 'loading' | 'kesz'>('idle')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -82,6 +84,26 @@ export default function ProjectDetail() {
 
   const legmagasabb = licitek[0]?.osszeg || projekt?.kikialtasi_ar || 0
   const minimumLicit = legmagasabb + 1
+
+  async function aiElemzesKer() {
+    if (!projekt) return
+    setAiAllapot('loading')
+    const res = await fetch('/api/ai/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nev: projekt.nev,
+        rovid_leiras: projekt.rovid_leiras,
+        reszletes_leiras: projekt.reszletes_leiras,
+        kategoria: projekt.kategoria,
+        badge: projekt.badge,
+        kikialtasi_ar: projekt.kikialtasi_ar,
+      }),
+    })
+    const data = await res.json()
+    setAiElemzes(data.analysis || '')
+    setAiAllapot('kesz')
+  }
 
   async function vasarlas() {
     if (!user) { router.push('/auth'); return }
@@ -187,6 +209,38 @@ export default function ProjectDetail() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <h2 className="font-semibold mb-3">About this project</h2>
             <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{projekt.reszletes_leiras}</p>
+          </div>
+
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold">AI Quick Analysis</h2>
+              {aiAllapot === 'kesz' && (
+                <button onClick={aiElemzesKer} className="text-xs text-gray-500 hover:text-gray-300 transition">
+                  Refresh
+                </button>
+              )}
+            </div>
+            {aiAllapot === 'idle' && (
+              <button
+                onClick={aiElemzesKer}
+                className="w-full py-3 rounded-xl border border-violet-700 text-violet-400 hover:bg-violet-900/20 transition font-semibold"
+              >
+                🤖 Analyze with AI
+              </button>
+            )}
+            {aiAllapot === 'loading' && (
+              <div className="text-center text-gray-400 py-4 text-sm animate-pulse">Analyzing...</div>
+            )}
+            {aiAllapot === 'kesz' && (
+              <div className="text-sm text-gray-300 leading-relaxed flex flex-col gap-3">
+                {aiElemzes.split('\n').map((sor, i) => {
+                  if (sor.startsWith('## ')) return <h3 key={i} className="font-bold text-white text-base mt-2">{sor.slice(3)}</h3>
+                  if (sor.startsWith('- ')) return <p key={i} className="text-gray-400 pl-3 border-l border-gray-700">• {sor.slice(2)}</p>
+                  if (sor.trim() === '') return null
+                  return <p key={i} className="text-gray-400">{sor}</p>
+                })}
+              </div>
+            )}
           </div>
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
