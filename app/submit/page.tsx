@@ -326,24 +326,28 @@ export default function Submit() {
               </div>
             )}
 
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={aiFeedback}
-                disabled={feedbackAllapot === 'loading'}
-                className="flex-1 py-3 rounded-full border border-violet-700 text-violet-400 hover:bg-violet-900/20 disabled:opacity-60 transition font-semibold"
-              >
-                {feedbackAllapot === 'loading' ? '🤖 Analyzing...' : feedback ? '🔄 Re-analyze' : '🤖 Get AI Feedback (free)'}
-              </button>
+            <button
+              type="button"
+              onClick={aiFeedback}
+              disabled={feedbackAllapot === 'loading' || !form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria}
+              className="w-full py-3 rounded-full border border-violet-700 text-violet-400 hover:bg-violet-900/20 disabled:opacity-60 transition font-semibold"
+            >
+              {feedbackAllapot === 'loading' ? '🤖 Analyzing...' : feedback ? '🔄 Re-analyze' : '🤖 Get AI Feedback (free)'}
+            </button>
+
+            {feedback && !feedback.ready && (
+              <p className="text-amber-400 text-sm text-center">Improve your listing based on the feedback above, then re-analyze.</p>
+            )}
+
+            {feedback?.ready && (
               <button
                 type="button"
                 onClick={tovabb}
-                disabled={!form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria}
-                className="flex-1 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 transition py-3 rounded-full font-semibold"
+                className="w-full bg-violet-600 hover:bg-violet-700 transition py-3 rounded-full font-semibold"
               >
-                Continue →
+                ✓ Looks good — Continue →
               </button>
-            </div>
+            )}
           </div>
         )}
 
