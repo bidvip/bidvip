@@ -12,14 +12,9 @@ const BADGE_LABELS: Record<string, string> = {
 export async function POST(req: NextRequest) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-  const { nev, rovid_leiras, reszletes_leiras, kategoria, badge, kikialtasi_ar } = await req.json()
+  const { nev, rovid_leiras, reszletes_leiras, kategoria, badge, kikialtasi_ar, kepUrlok = [] } = await req.json()
 
-  const message = await client.messages.create({
-    model: 'claude-haiku-4-5',
-    max_tokens: 1024,
-    messages: [{
-      role: 'user',
-      content: `You are an experienced startup analyst reviewing a project listed on BidVip, a marketplace where startup ideas and projects are auctioned to buyers.
+  const szoveg = `You are an experienced startup analyst reviewing a project listed on BidVip, a marketplace where startup ideas and projects are auctioned to buyers.
 
 Project details:
 - Name: ${nev}
@@ -28,6 +23,7 @@ Project details:
 - Starting bid: €${kikialtasi_ar}
 - Short description: ${rovid_leiras}
 - Detailed description: ${reszletes_leiras}
+${kepUrlok.length > 0 ? `\nThe seller has uploaded ${kepUrlok.length} image(s) — take them into account in your analysis.` : ''}
 
 Provide a thorough, honest analysis with these sections (use markdown headers):
 
@@ -37,7 +33,22 @@ Provide a thorough, honest analysis with these sections (use markdown headers):
 ## Suggestions for Improvement
 ## Valuation Assessment
 
-Be direct, specific, and constructive. Consider the stage and starting price in your valuation assessment.`,
+Be direct, specific, and constructive. Consider the stage and starting price in your valuation assessment.`
+
+  const kepTartalom = kepUrlok.slice(0, 4).map((url: string) => ({
+    type: 'image' as const,
+    source: { type: 'url' as const, url },
+  }))
+
+  const message = await client.messages.create({
+    model: 'claude-haiku-4-5',
+    max_tokens: 1024,
+    messages: [{
+      role: 'user',
+      content: [
+        ...kepTartalom,
+        { type: 'text' as const, text: szoveg },
+      ],
     }],
   })
 

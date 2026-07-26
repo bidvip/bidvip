@@ -39,20 +39,48 @@ export default function Submit() {
     van_feliratkozok: false,
     van_bevetel: false,
   })
-  const [allapot, setAllapot] = useState<'idle' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
+  const [allapot, setAllapot] = useState<'idle' | 'feltoltes' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
+  const [kivalasztottFajlok, setKivalasztottFajlok] = useState<File[]>([])
+  const [feltoltottFajlok, setFeltoltottFajlok] = useState<{nev: string; url: string; tipus: string}[]>([])
 
   function frissit(mezo: string, ertek: string | boolean) {
     setForm(prev => ({ ...prev, [mezo]: ertek }))
   }
 
+  function fajlValasztas(e: React.ChangeEvent<HTMLInputElement>) {
+    const fajlok = Array.from(e.target.files || [])
+    setKivalasztottFajlok(prev => [...prev, ...fajlok].slice(0, 5))
+    e.target.value = ''
+  }
+
+  function fajlTorles(index: number) {
+    setKivalasztottFajlok(prev => prev.filter((_, i) => i !== index))
+  }
+
   async function beküldes(e: React.FormEvent) {
     e.preventDefault()
-    setAllapot('szures')
+    setAllapot('feltoltes')
     setHiba('')
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth'); return }
+
+    const ujFajlok: {nev: string; url: string; tipus: string}[] = []
+    for (const fajl of kivalasztottFajlok) {
+      const fd = new FormData()
+      fd.append('fajl', fajl)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      if (res.ok) {
+        const data = await res.json()
+        ujFajlok.push(data)
+      }
+    }
+    setFeltoltottFajlok(ujFajlok)
+
+    setAllapot('szures')
+
+    const kepUrlok = ujFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
 
     const screenRes = await fetch('/api/ai/screen', {
       method: 'POST',
@@ -62,6 +90,7 @@ export default function Submit() {
         rovid_leiras: form.rovid_leiras,
         reszletes_leiras: form.reszletes_leiras,
         kategoria: form.kategoria,
+        kepUrlok,
       }),
     })
     const screen = await screenRes.json()
@@ -88,6 +117,7 @@ export default function Submit() {
       van_bevetel: form.van_bevetel,
       statusz: 'felulvizsgalat',
       user_email: user.email,
+      fajlok: ujFajlok,
     }])
 
     if (error) {
@@ -217,6 +247,34 @@ export default function Submit() {
             ))}
           </div>
 
+          {/* File uploads */}
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
+            <h2 className="font-semibold text-lg">Files & Media</h2>
+            <p className="text-gray-400 text-sm">Upload screenshots, pitch deck, business plan, logo — anything that helps buyers evaluate your project. (Max 5 files, 10MB each)</p>
+            <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 hover:border-violet-500 rounded-xl py-8 cursor-pointer transition">
+              <span className="text-3xl mb-2">📎</span>
+              <span className="text-gray-400 text-sm">Click to select files</span>
+              <span className="text-gray-600 text-xs mt-1">Images, PDF, Word, Excel</span>
+              <input
+                type="file"
+                multiple
+                accept="image/*,.pdf,.docx,.xlsx"
+                onChange={fajlValasztas}
+                className="hidden"
+              />
+            </label>
+            {kivalasztottFajlok.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {kivalasztottFajlok.map((f, i) => (
+                  <div key={i} className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-xl text-sm">
+                    <span className="text-gray-300 truncate">{f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}</span>
+                    <button type="button" onClick={() => fajlTorles(i)} className="text-gray-500 hover:text-red-400 ml-3 transition">✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Starting price */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
             <h2 className="font-semibold text-lg">Starting Price</h2>
@@ -265,7 +323,7 @@ export default function Submit() {
             disabled={allapot === 'szures' || allapot === 'loading'}
             className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg"
           >
-            {allapot === 'szures' ? '🤖 Checking your idea...' : allapot === 'loading' ? 'Submitting...' : 'Submit Project →'}
+            {allapot === 'feltoltes' ? 'Uploading files...' : allapot === 'szures' ? '🤖 Checking your idea...' : allapot === 'loading' ? 'Submitting...' : 'Submit Project →'}
           </button>
         </form>
       </div>

@@ -11,6 +11,8 @@ const badge_info: Record<string, { label: string; szin: string }> = {
   bizonyitott: { label: '✅ Proven', szin: 'bg-violet-900/40 text-violet-400 border-violet-800' },
 }
 
+type Fajl = { nev: string; url: string; tipus: string }
+
 type Projekt = {
   id: string
   user_id: string
@@ -26,6 +28,7 @@ type Projekt = {
   van_bevetel: boolean
   letrehozva: string
   lejarat: string | null
+  fajlok: Fajl[] | null
 }
 
 function timeLeft(lejarat: string | null): string {
@@ -88,6 +91,7 @@ export default function ProjectDetail() {
   async function aiElemzesKer() {
     if (!projekt) return
     setAiAllapot('loading')
+    const kepUrlok = (projekt.fajlok || []).filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const res = await fetch('/api/ai/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -98,6 +102,7 @@ export default function ProjectDetail() {
         kategoria: projekt.kategoria,
         badge: projekt.badge,
         kikialtasi_ar: projekt.kikialtasi_ar,
+        kepUrlok,
       }),
     })
     const data = await res.json()
@@ -215,6 +220,41 @@ export default function ProjectDetail() {
             <h2 className="font-semibold mb-3">About this project</h2>
             <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{projekt.reszletes_leiras}</p>
           </div>
+
+          {projekt.fajlok && projekt.fajlok.length > 0 && (
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+              <h2 className="font-semibold mb-4">Files & Media</h2>
+              {/* Image gallery */}
+              {projekt.fajlok.some(f => f.tipus.startsWith('image/')) && (
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {projekt.fajlok.filter(f => f.tipus.startsWith('image/')).map((f, i) => (
+                    <a key={i} href={f.url} target="_blank" rel="noopener noreferrer">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={f.url}
+                        alt={f.nev}
+                        className="w-full h-40 object-cover rounded-xl border border-gray-700 hover:border-violet-500 transition cursor-pointer"
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
+              {/* Non-image files */}
+              {projekt.fajlok.filter(f => !f.tipus.startsWith('image/')).map((f, i) => (
+                <a
+                  key={i}
+                  href={f.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-violet-500 rounded-xl transition mb-2"
+                >
+                  <span className="text-xl">{f.tipus === 'application/pdf' ? '📄' : f.tipus.includes('word') ? '📝' : '📊'}</span>
+                  <span className="text-sm text-gray-300 truncate">{f.nev}</span>
+                  <span className="ml-auto text-xs text-gray-500 shrink-0">Download ↓</span>
+                </a>
+              ))}
+            </div>
+          )}
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
