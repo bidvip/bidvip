@@ -39,7 +39,7 @@ export default function Submit() {
     van_feliratkozok: false,
     van_bevetel: false,
   })
-  const [allapot, setAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
+  const [allapot, setAllapot] = useState<'idle' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
 
   function frissit(mezo: string, ertek: string | boolean) {
@@ -48,11 +48,30 @@ export default function Submit() {
 
   async function beküldes(e: React.FormEvent) {
     e.preventDefault()
-    setAllapot('loading')
+    setAllapot('szures')
     setHiba('')
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth'); return }
+
+    const screenRes = await fetch('/api/ai/screen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nev: form.nev,
+        rovid_leiras: form.rovid_leiras,
+        reszletes_leiras: form.reszletes_leiras,
+        kategoria: form.kategoria,
+      }),
+    })
+    const screen = await screenRes.json()
+    if (!screen.ok) {
+      setHiba(screen.reason || 'Your submission did not pass our quality check. Please add more detail and try again.')
+      setAllapot('hiba')
+      return
+    }
+
+    setAllapot('loading')
 
     const { error } = await supabase.from('projektek').insert([{
       user_id: user.id,
@@ -242,10 +261,10 @@ export default function Submit() {
 
           <button
             type="submit"
-            disabled={allapot === 'loading'}
+            disabled={allapot === 'szures' || allapot === 'loading'}
             className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg"
           >
-            {allapot === 'loading' ? 'Submitting...' : 'Submit Project →'}
+            {allapot === 'szures' ? '🤖 Checking your idea...' : allapot === 'loading' ? 'Submitting...' : 'Submit Project →'}
           </button>
         </form>
       </div>
