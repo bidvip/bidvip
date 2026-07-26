@@ -49,7 +49,6 @@ type Licit = {
 export default function ProjectDetail() {
   const { id } = useParams()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const [projekt, setProjekt] = useState<Projekt | null>(null)
