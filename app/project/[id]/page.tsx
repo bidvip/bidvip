@@ -90,7 +90,7 @@ export default function ProjectDetail() {
   const legmagasabb = licitek[0]?.osszeg || projekt?.kikialtasi_ar || 0
   const minimumLicit = legmagasabb + 1
 
-  const AI_ELEMZES_COST = 5
+  const AI_ELEMZES_COST = 1
 
   async function aiElemzesKer() {
     if (!projekt) return
@@ -302,7 +302,7 @@ export default function ProjectDetail() {
                     onClick={aiElemzesKer}
                     className="w-full py-3 rounded-xl border border-violet-700 text-violet-400 hover:bg-violet-900/20 transition font-semibold"
                   >
-                    🤖 Quick Analysis — 5 tokens (Haiku)
+                    🤖 Quick Analysis — 1 token (Haiku)
                   </button>
                 )}
                 {aiAllapot === 'nincs_token' && (
