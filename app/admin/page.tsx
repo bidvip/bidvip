@@ -49,8 +49,7 @@ export default function AdminPage() {
       const { data } = await supabase
         .from('projektek')
         .select('*')
-        .eq('statusz', 'felulvizsgalat')
-        .order('letrehozva', { ascending: true })
+        .order('letrehozva', { ascending: false })
 
       setProjektek(data || [])
       setLoading(false)
@@ -84,6 +83,14 @@ export default function AdminPage() {
     setAktiv(null)
   }
 
+  async function torles(id: string) {
+    if (!confirm('Are you sure you want to permanently delete this project?')) return
+    setAktiv(id)
+    await supabase.from('projektek').delete().eq('id', id)
+    setProjektek(prev => prev.filter(p => p.id !== id))
+    setAktiv(null)
+  }
+
   if (!hozzaferes) return null
 
   if (loading) {
@@ -105,12 +112,8 @@ export default function AdminPage() {
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-2">Review Queue</h1>
-        <p className="text-gray-400 mb-10">
-          {projektek.length === 0
-            ? 'No projects pending review.'
-            : `${projektek.length} project${projektek.length > 1 ? 's' : ''} waiting for approval.`}
-        </p>
+        <h1 className="text-3xl font-bold mb-2">Admin Panel</h1>
+        <p className="text-gray-400 mb-10">{projektek.length} project{projektek.length !== 1 ? 's' : ''} total</p>
 
         {projektek.length === 0 ? (
           <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
@@ -127,6 +130,9 @@ export default function AdminPage() {
                       <span className="text-xs text-gray-500">{badge_info[p.badge]}</span>
                       <span className="text-xs text-gray-600">·</span>
                       <span className="text-xs text-gray-500">{p.kategoria}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' : p.statusz === 'felulvizsgalat' ? 'bg-amber-900/40 text-amber-400' : 'bg-red-900/40 text-red-400'}`}>
+                        {p.statusz}
+                      </span>
                     </div>
                     <h2 className="text-xl font-bold">{p.nev}</h2>
                     <p className="text-gray-400 text-sm mt-1">{p.rovid_leiras}</p>
@@ -167,6 +173,13 @@ export default function AdminPage() {
                   >
                     Preview →
                   </a>
+                  <button
+                    onClick={() => torles(p.id)}
+                    disabled={aktiv === p.id}
+                    className="border border-gray-800 text-gray-600 hover:text-red-400 hover:border-red-900 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm"
+                  >
+                    🗑 Delete
+                  </button>
                 </div>
               </div>
             ))}
