@@ -172,20 +172,25 @@ export default function Submit() {
     setChatInput('')
     setChatAllapot('loading')
 
-    const res = await fetch('/api/ai/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uzenet: chatInput,
-        elozmenyek: chatUzenetek,
-        projekt: { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras },
-      }),
-    })
-    const data = await res.json()
-    setChatUzenetek([...ujUzenetek, { role: 'assistant', content: data.valasz }])
-    setChatKeszen(data.keszen ?? false)
-    setChatScore(data.score ?? null)
-    setChatAllapot('idle')
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uzenet: chatInput,
+          elozmenyek: chatUzenetek,
+          projekt: { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras },
+        }),
+      })
+      const data = await res.json()
+      setChatUzenetek([...ujUzenetek, { role: 'assistant', content: data.valasz }])
+      setChatKeszen(data.keszen ?? false)
+      setChatScore(data.score ?? null)
+    } catch (e) {
+      setChatUzenetek([...ujUzenetek, { role: 'assistant', content: 'Connection error. Please try again.' }])
+    } finally {
+      setChatAllapot('idle')
+    }
   }
 
   async function lepés2Tovabb() {
