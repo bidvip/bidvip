@@ -21,6 +21,18 @@ type Projekt = {
   van_feliratkozok: boolean
   van_bevetel: boolean
   letrehozva: string
+  lejarat: string | null
+}
+
+function timeLeft(lejarat: string | null): string {
+  if (!lejarat) return ''
+  const diff = new Date(lejarat).getTime() - Date.now()
+  if (diff <= 0) return 'Ended'
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  if (days > 0) return `${days}d ${hours}h left`
+  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  return `${hours}h ${mins}m left`
 }
 
 export default function Marketplace() {
@@ -112,6 +124,11 @@ export default function Marketplace() {
                   <div>
                     <p className="text-xs text-gray-500">Starting bid</p>
                     <p className="text-xl font-bold text-violet-400">€{p.kikialtasi_ar.toLocaleString()}</p>
+                    {p.lejarat && (
+                      <p className={`text-xs mt-1 ${new Date(p.lejarat) < new Date() ? 'text-red-400' : 'text-amber-400'}`}>
+                        ⏱ {timeLeft(p.lejarat)}
+                      </p>
+                    )}
                   </div>
                   <a href={`/project/${p.id}`} className="bg-violet-600 hover:bg-violet-700 transition px-4 py-2 rounded-full text-sm font-semibold">
                     View Details →

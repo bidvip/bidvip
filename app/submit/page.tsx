@@ -33,6 +33,7 @@ export default function Submit() {
     kategoria: '',
     badge: 'papir',
     kikialtasi_ar: '',
+    idotartam_nap: '14',
     van_domain: false,
     van_kod: false,
     van_feliratkozok: false,
@@ -61,6 +62,7 @@ export default function Submit() {
       kategoria: form.kategoria,
       badge: form.badge,
       kikialtasi_ar: parseInt(form.kikialtasi_ar),
+      lejarat: new Date(Date.now() + parseInt(form.idotartam_nap) * 24 * 60 * 60 * 1000).toISOString(),
       van_domain: form.van_domain,
       van_kod: form.van_kod,
       van_feliratkozok: form.van_feliratkozok,
@@ -210,6 +212,29 @@ export default function Submit() {
                 placeholder="e.g. 500"
                 className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
               />
+            </div>
+          </div>
+
+          {/* Auction duration */}
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+            <h2 className="font-semibold text-lg">Auction Duration</h2>
+            <p className="text-gray-400 text-sm">How long should the auction run after it goes live?</p>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { nap: '7', label: '7 days', sub: 'Fast sale' },
+                { nap: '14', label: '14 days', sub: 'Recommended' },
+                { nap: '30', label: '30 days', sub: 'More exposure' },
+              ].map(d => (
+                <button
+                  key={d.nap}
+                  type="button"
+                  onClick={() => frissit('idotartam_nap', d.nap)}
+                  className={`flex flex-col items-center p-4 rounded-xl border transition ${form.idotartam_nap === d.nap ? 'border-violet-500 bg-violet-900/20' : 'border-gray-700 hover:border-gray-600'}`}
+                >
+                  <span className="font-bold">{d.label}</span>
+                  <span className="text-xs text-gray-400 mt-1">{d.sub}</span>
+                </button>
+              ))}
             </div>
           </div>
 

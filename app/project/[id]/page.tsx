@@ -25,6 +25,18 @@ type Projekt = {
   van_feliratkozok: boolean
   van_bevetel: boolean
   letrehozva: string
+  lejarat: string | null
+}
+
+function timeLeft(lejarat: string | null): string {
+  if (!lejarat) return ''
+  const diff = new Date(lejarat).getTime() - Date.now()
+  if (diff <= 0) return 'Auction ended'
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  if (days > 0) return `${days}d ${hours}h ${mins}m remaining`
+  return `${hours}h ${mins}m remaining`
 }
 
 type Licit = {
@@ -198,9 +210,19 @@ export default function ProjectDetail() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sticky top-6">
             <p className="text-gray-400 text-sm mb-1">Current highest bid</p>
             <p className="text-4xl font-bold text-violet-400 mb-1">€{legmagasabb.toLocaleString()}</p>
-            <p className="text-gray-500 text-xs mb-6">Starting price: €{projekt.kikialtasi_ar.toLocaleString()}</p>
+            <p className="text-gray-500 text-xs">Starting price: €{projekt.kikialtasi_ar.toLocaleString()}</p>
+            {projekt.lejarat && (
+              <p className={`text-sm font-semibold mt-2 mb-4 ${new Date(projekt.lejarat) < new Date() ? 'text-red-400' : 'text-amber-400'}`}>
+                ⏱ {timeLeft(projekt.lejarat)}
+              </p>
+            )}
+            {!projekt.lejarat && <div className="mb-6" />}
 
-            {user?.id === projekt.user_id ? (
+            {projekt.lejarat && new Date(projekt.lejarat) < new Date() ? (
+              <div className="text-center text-red-400 text-sm py-4 border border-red-900 rounded-xl bg-red-900/10">
+                This auction has ended. No more bids accepted.
+              </div>
+            ) : user?.id === projekt.user_id ? (
               <div className="text-center text-gray-400 text-sm py-4">
                 This is your project — you cannot bid on it.
               </div>
