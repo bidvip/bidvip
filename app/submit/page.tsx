@@ -187,7 +187,14 @@ export default function Submit() {
       setChatKeszen(data.keszen ?? false)
       setChatScore(data.score ?? null)
     } catch (e) {
-      setChatUzenetek([...ujUzenetek, { role: 'assistant', content: 'Connection error. Please try again.' }])
+      // Refund token on error
+      await fetch('/api/tokens/spend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, amount: -CHAT_COST }),
+      })
+      setTokenEgyenleg((prev) => (prev ?? 0) + CHAT_COST)
+      setChatUzenetek([...ujUzenetek, { role: 'assistant', content: 'Connection error. Your token was refunded. Please try again.' }])
     } finally {
       setChatAllapot('idle')
     }
