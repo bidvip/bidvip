@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 
-const ADMIN_EMAIL = 'nemesszilard2005@gmail.com'
+const ADMIN_EMAIL = 'info.webbloki@gmail.com'
 
 const badge_info: Record<string, string> = {
   papir: '🌱 Concept',
