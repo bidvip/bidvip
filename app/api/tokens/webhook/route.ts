@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { sendEmail, purchaseSellerEmail, purchaseBuyerEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +24,31 @@ export async function POST(req: NextRequest) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
+    const projekt_id = session.metadata?.projekt_id
+    const vevo_email = session.metadata?.vevo_email
+
+    if (projekt_id) {
+      const { data: projekt } = await supabase
+        .from('projektek')
+        .select('nev, user_id, kikialtasi_ar')
+        .eq('id', projekt_id)
+        .single()
+
+      if (projekt) {
+        const { data: { user: elado } } = await supabase.auth.admin.getUserById(projekt.user_id)
+        const osszeg = (session.amount_total || 0) / 100
+
+        if (elado?.email) {
+          const { subject, html } = purchaseSellerEmail(projekt.nev, osszeg, vevo_email || '')
+          await sendEmail(elado.email, subject, html)
+        }
+        if (vevo_email) {
+          const { subject, html } = purchaseBuyerEmail(projekt.nev, osszeg)
+          await sendEmail(vevo_email, subject, html)
+        }
+      }
+    }
+
     const user_id = session.metadata?.user_id
     const tokens = parseInt(session.metadata?.tokens || '0')
 

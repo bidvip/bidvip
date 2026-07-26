@@ -60,12 +60,12 @@ export default function AdminPage() {
 
   async function jovahagyas(id: string) {
     setAktiv(id)
-    const { error } = await supabase
-      .from('projektek')
-      .update({ statusz: 'aktiv' })
-      .eq('id', id)
-
-    if (!error) {
+    const res = await fetch('/api/admin/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projekt_id: id }),
+    })
+    if (res.ok) {
       setProjektek(prev => prev.filter(p => p.id !== id))
     }
     setAktiv(null)
@@ -73,12 +73,12 @@ export default function AdminPage() {
 
   async function elutasitas(id: string) {
     setAktiv(id)
-    const { error } = await supabase
-      .from('projektek')
-      .update({ statusz: 'elutasitva' })
-      .eq('id', id)
-
-    if (!error) {
+    const res = await fetch('/api/admin/reject', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projekt_id: id }),
+    })
+    if (res.ok) {
       setProjektek(prev => prev.filter(p => p.id !== id))
     }
     setAktiv(null)

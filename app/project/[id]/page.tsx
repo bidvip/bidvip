@@ -153,6 +153,11 @@ export default function ProjectDetail() {
       const { data: lics } = await supabase.from('licitek').select('*').eq('projekt_id', id).order('osszeg', { ascending: false })
       setLicitek(lics || [])
       setTimeout(() => setAllapot('idle'), 3000)
+      fetch('/api/bid-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projekt_id: id, osszeg: parseInt(licitOsszeg) }),
+      }).catch(() => {})
     }
   }
 

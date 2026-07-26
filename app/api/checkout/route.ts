@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
           platform: 'bidvip',
         },
       },
+      metadata: { projekt_id, vevo_email },
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/project/${projekt_id}?fizetes=siker`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/project/${projekt_id}?fizetes=megszakitva`,
     })
