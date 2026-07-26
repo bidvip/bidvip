@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [sajatLicitek, setSajatLicitek] = useState<any[]>([])
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
+  const [ujrakuldes, setUjrakuldes] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -57,6 +58,20 @@ export default function Dashboard() {
     }
     betolt()
   }, [])
+
+  async function ujraBekuldes(projekt_id: string) {
+    if (!user) return
+    setUjrakuldes(projekt_id)
+    const res = await fetch('/api/project/resubmit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projekt_id, user_id: user.id }),
+    })
+    if (res.ok) {
+      setSajatProjektek(prev => prev.map(p => p.id === projekt_id ? { ...p, statusz: 'felulvizsgalat' } : p))
+    }
+    setUjrakuldes(null)
+  }
 
   async function kilepes() {
     await supabase.auth.signOut()
@@ -105,18 +120,22 @@ export default function Dashboard() {
 
         {szerepkor === 'elado' ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                <p className="text-gray-400 text-sm mb-1">My Projects</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                <p className="text-gray-400 text-sm mb-1">Total</p>
                 <p className="text-3xl font-bold">{sajatProjektek.length}</p>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                <p className="text-gray-400 text-sm mb-1">Live Auctions</p>
-                <p className="text-3xl font-bold">{sajatProjektek.filter(p => p.statusz === 'aktiv').length}</p>
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                <p className="text-gray-400 text-sm mb-1">Live</p>
+                <p className="text-3xl font-bold text-green-400">{sajatProjektek.filter(p => p.statusz === 'aktiv').length}</p>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                 <p className="text-gray-400 text-sm mb-1">Under Review</p>
-                <p className="text-3xl font-bold">{sajatProjektek.filter(p => p.statusz === 'felulvizsgalat').length}</p>
+                <p className="text-3xl font-bold text-yellow-400">{sajatProjektek.filter(p => p.statusz === 'felulvizsgalat').length}</p>
+              </div>
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                <p className="text-gray-400 text-sm mb-1">Closed</p>
+                <p className="text-3xl font-bold text-gray-500">{sajatProjektek.filter(p => p.statusz === 'lezart').length}</p>
               </div>
             </div>
 
@@ -147,11 +166,21 @@ export default function Dashboard() {
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' :
                         p.statusz === 'elutasitva' ? 'bg-red-900/40 text-red-400' :
+                        p.statusz === 'lezart' ? 'bg-gray-800 text-gray-500' :
                         'bg-yellow-900/40 text-yellow-400'
                       }`}>
-                        {p.statusz === 'aktiv' ? 'Live' : p.statusz === 'elutasitva' ? 'Rejected' : 'Under Review'}
+                        {p.statusz === 'aktiv' ? 'Live' : p.statusz === 'elutasitva' ? 'Rejected' : p.statusz === 'lezart' ? 'Closed' : 'Under Review'}
                       </span>
                       <span className="text-violet-400 font-bold">€{p.kikialtasi_ar}</span>
+                      {p.statusz === 'elutasitva' && (
+                        <button
+                          onClick={() => ujraBekuldes(p.id)}
+                          disabled={ujrakuldes === p.id}
+                          className="text-xs border border-violet-700 text-violet-400 hover:bg-violet-900/20 disabled:opacity-50 transition px-3 py-1 rounded-full"
+                        >
+                          {ujrakuldes === p.id ? '...' : 'Resubmit'}
+                        </button>
+                      )}
                       <a href={`/project/${p.id}`} className="text-gray-400 hover:text-white text-sm transition">View →</a>
                     </div>
                   </div>
