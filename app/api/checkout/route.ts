@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { projekt_id, projekt_nev, osszeg, vevo_email } = await req.json()
 
-    const platformJutalek = Math.round(osszeg * 0.12) // 12% jutalék
+    const platformFee = Math.round(osszeg * 0.12) // 12% platform fee
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -19,27 +19,27 @@ export async function POST(req: NextRequest) {
             currency: 'eur',
             product_data: {
               name: projekt_nev,
-              description: `BidVip projekt vásárlás — ID: ${projekt_id}`,
+              description: `BidVip project purchase — ID: ${projekt_id}`,
             },
-            unit_amount: osszeg * 100, // EUR centben
+            unit_amount: osszeg * 100,
           },
           quantity: 1,
         },
       ],
       payment_intent_data: {
-        application_fee_amount: platformJutalek * 100,
+        application_fee_amount: platformFee * 100,
         metadata: {
           projekt_id,
           platform: 'bidvip',
         },
       },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/projekt/${projekt_id}?fizetes=siker`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/projekt/${projekt_id}?fizetes=megszakitva`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/project/${projekt_id}?fizetes=siker`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/project/${projekt_id}?fizetes=megszakitva`,
     })
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
-    console.error('Stripe checkout hiba:', error)
-    return NextResponse.json({ error: 'Fizetési hiba' }, { status: 500 })
+    console.error('Stripe checkout error:', error)
+    return NextResponse.json({ error: 'Payment error' }, { status: 500 })
   }
 }

@@ -4,25 +4,25 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 
-const kategoriak = [
-  'SaaS / Szoftver',
-  'E-kereskedelem',
-  'Mobil app',
-  'Tartalomoldal / Blog',
+const categories = [
+  'SaaS / Software',
+  'E-commerce',
+  'Mobile App',
+  'Content / Blog',
   'Marketplace',
   'Fintech',
   'Edtech',
   'Healthtech',
-  'Egyéb',
+  'Other',
 ]
 
 const badge_szintek = [
-  { ertek: 'papir', label: '🌱 Papír / Koncepció', leiras: 'Csak az ötlet létezik, nincs kód vagy bevétel' },
-  { ertek: 'prototipus', label: '🛠️ Prototípus', leiras: 'Van valami kézzel fogható: kód, mockup, domain, feliratkozók' },
-  { ertek: 'bizonyitott', label: '✅ Bizonyított', leiras: 'Valós bevétel, aktív felhasználók vagy mérhető traction' },
+  { ertek: 'papir', label: '🌱 Concept', leiras: 'Idea only — no code, no revenue yet' },
+  { ertek: 'prototipus', label: '🛠️ Prototype', leiras: 'Something tangible exists: code, mockup, domain, or early users' },
+  { ertek: 'bizonyitott', label: '✅ Proven', leiras: 'Real revenue, active users, or measurable traction' },
 ]
 
-export default function ProjektFeltoltes() {
+export default function Submit() {
   const router = useRouter()
   const supabase = createClient()
 
@@ -69,7 +69,7 @@ export default function ProjektFeltoltes() {
     }])
 
     if (error) {
-      setHiba('Hiba történt, próbáld újra.')
+      setHiba('Something went wrong. Please try again.')
       setAllapot('hiba')
     } else {
       setAllapot('siker')
@@ -80,10 +80,10 @@ export default function ProjektFeltoltes() {
     return (
       <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
         <div className="text-5xl mb-4">🎉</div>
-        <h2 className="text-2xl font-bold mb-2">Projekt beküldve!</h2>
-        <p className="text-gray-400 mb-6 text-center">Felülvizsgáljuk és hamarosan megjelenik a piactéren.</p>
+        <h2 className="text-2xl font-bold mb-2">Project submitted!</h2>
+        <p className="text-gray-400 mb-6 text-center">We&apos;ll review it and publish it to the marketplace shortly.</p>
         <button onClick={() => router.push('/dashboard')} className="bg-violet-600 hover:bg-violet-700 transition px-6 py-3 rounded-full font-semibold">
-          Vissza a dashboardra
+          Back to Dashboard
         </button>
       </main>
     )
@@ -95,66 +95,66 @@ export default function ProjektFeltoltes() {
         <a href="/" className="text-2xl font-bold tracking-tight">
           Bid<span className="text-violet-500">Vip</span>
         </a>
-        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">← Vissza</a>
+        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">← Back</a>
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-2">Projekt feltöltése</h1>
-        <p className="text-gray-400 mb-8">Töltsd ki az alábbi mezőket — minél több infót adsz meg, annál magasabb árat érhetsz el.</p>
+        <h1 className="text-3xl font-bold mb-2">List a Project</h1>
+        <p className="text-gray-400 mb-8">The more detail you provide, the higher price you can command.</p>
 
         <form onSubmit={beküldes} className="flex flex-col gap-6">
-          {/* Alapadatok */}
+          {/* Basic info */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-            <h2 className="font-semibold text-lg">Alapadatok</h2>
+            <h2 className="font-semibold text-lg">Basic Information</h2>
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Projekt neve *</label>
+              <label className="text-sm text-gray-400 mb-1 block">Project name *</label>
               <input
                 required
                 value={form.nev}
                 onChange={e => frissit('nev', e.target.value)}
-                placeholder="pl. AI alapú ügyfélszolgálat SaaS"
+                placeholder="e.g. AI-powered customer support SaaS"
                 className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
               />
             </div>
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Rövid leírás * (max 150 karakter)</label>
+              <label className="text-sm text-gray-400 mb-1 block">Short description * (max 150 characters)</label>
               <input
                 required
                 maxLength={150}
                 value={form.rovid_leiras}
                 onChange={e => frissit('rovid_leiras', e.target.value)}
-                placeholder="Egy mondatban miről szól a projekt?"
+                placeholder="What does it do in one sentence?"
                 className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
               />
             </div>
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Részletes leírás *</label>
+              <label className="text-sm text-gray-400 mb-1 block">Detailed description *</label>
               <textarea
                 required
                 rows={5}
                 value={form.reszletes_leiras}
                 onChange={e => frissit('reszletes_leiras', e.target.value)}
-                placeholder="Mi a probléma amit megold? Ki a célcsoport? Mi a versenyelőny?"
+                placeholder="What problem does it solve? Who is the target customer? What's the competitive advantage?"
                 className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 resize-none"
               />
             </div>
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Kategória *</label>
+              <label className="text-sm text-gray-400 mb-1 block">Category *</label>
               <select
                 required
                 value={form.kategoria}
                 onChange={e => frissit('kategoria', e.target.value)}
                 className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-violet-500"
               >
-                <option value="">Válassz kategóriát...</option>
-                {kategoriak.map(k => <option key={k} value={k}>{k}</option>)}
+                <option value="">Select a category...</option>
+                {categories.map(k => <option key={k} value={k}>{k}</option>)}
               </select>
             </div>
           </div>
 
-          {/* Badge szint */}
+          {/* Maturity level */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
-            <h2 className="font-semibold text-lg">Érettségi szint</h2>
+            <h2 className="font-semibold text-lg">Maturity Level</h2>
             {badge_szintek.map(b => (
               <label key={b.ertek} className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition ${form.badge === b.ertek ? 'border-violet-500 bg-violet-900/20' : 'border-gray-700 hover:border-gray-600'}`}>
                 <input
@@ -173,15 +173,15 @@ export default function ProjektFeltoltes() {
             ))}
           </div>
 
-          {/* Mit tartalmaz */}
+          {/* What's included */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
-            <h2 className="font-semibold text-lg">Mit tartalmaz a csomag?</h2>
-            <p className="text-gray-400 text-sm">Jelöld be ami megvan — ez látható lesz a vevőknek.</p>
+            <h2 className="font-semibold text-lg">What&apos;s Included?</h2>
+            <p className="text-gray-400 text-sm">Check everything that comes with the purchase — buyers will see this.</p>
             {[
-              { mezo: 'van_domain', label: 'Van domain / URL' },
-              { mezo: 'van_kod', label: 'Van forráskód / kódrepó' },
-              { mezo: 'van_feliratkozok', label: 'Van email lista / feliratkozók' },
-              { mezo: 'van_bevetel', label: 'Van valós bevétel' },
+              { mezo: 'van_domain', label: 'Domain / URL' },
+              { mezo: 'van_kod', label: 'Source code / repository' },
+              { mezo: 'van_feliratkozok', label: 'Email list / subscribers' },
+              { mezo: 'van_bevetel', label: 'Proven revenue' },
             ].map(item => (
               <label key={item.mezo} className="flex items-center gap-3 cursor-pointer">
                 <input
@@ -195,10 +195,10 @@ export default function ProjektFeltoltes() {
             ))}
           </div>
 
-          {/* Kikiáltási ár */}
+          {/* Starting price */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
-            <h2 className="font-semibold text-lg">Kikiáltási ár</h2>
-            <p className="text-gray-400 text-sm">Ez az a minimális összeg amitől az aukció indul (EUR).</p>
+            <h2 className="font-semibold text-lg">Starting Price</h2>
+            <p className="text-gray-400 text-sm">The minimum bid the auction starts from (EUR).</p>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
               <input
@@ -207,7 +207,7 @@ export default function ProjektFeltoltes() {
                 min={1}
                 value={form.kikialtasi_ar}
                 onChange={e => frissit('kikialtasi_ar', e.target.value)}
-                placeholder="pl. 500"
+                placeholder="e.g. 500"
                 className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
               />
             </div>
@@ -220,7 +220,7 @@ export default function ProjektFeltoltes() {
             disabled={allapot === 'loading'}
             className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg"
           >
-            {allapot === 'loading' ? 'Beküldés...' : 'Projekt beküldése →'}
+            {allapot === 'loading' ? 'Submitting...' : 'Submit Project →'}
           </button>
         </form>
       </div>

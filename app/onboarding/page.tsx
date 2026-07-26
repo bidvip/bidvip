@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 
-export default function SzerepValasztas() {
+export default function Onboarding() {
   const [valasztott, setValasztott] = useState<'vevo' | 'elado' | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -39,8 +39,8 @@ export default function SzerepValasztas() {
 
       <div className="flex flex-1 items-center justify-center px-6">
         <div className="w-full max-w-lg">
-          <h1 className="text-3xl font-bold text-center mb-2">Hogyan szeretnéd használni a BidVip-et?</h1>
-          <p className="text-gray-400 text-center mb-10">Később bármikor megváltoztathatod a beállításokban.</p>
+          <h1 className="text-3xl font-bold text-center mb-2">How do you want to use BidVip?</h1>
+          <p className="text-gray-400 text-center mb-10">You can change this anytime in your settings.</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <button
@@ -53,8 +53,8 @@ export default function SzerepValasztas() {
             >
               <span className="text-5xl">🛒</span>
               <div className="text-center">
-                <p className="font-bold text-lg mb-1">Vevő vagyok</p>
-                <p className="text-gray-400 text-sm">Projekteket keresek, licitálok és megvásárolom a legjobb ötleteket.</p>
+                <p className="font-bold text-lg mb-1">I&apos;m a Buyer</p>
+                <p className="text-gray-400 text-sm">I&apos;m looking for projects to acquire — I browse, bid, and buy.</p>
               </div>
             </button>
 
@@ -68,8 +68,8 @@ export default function SzerepValasztas() {
             >
               <span className="text-5xl">💡</span>
               <div className="text-center">
-                <p className="font-bold text-lg mb-1">Eladó vagyok</p>
-                <p className="text-gray-400 text-sm">Projektemet, ötletemet vagy startup-omat szeretném eladni aukción.</p>
+                <p className="font-bold text-lg mb-1">I&apos;m a Seller</p>
+                <p className="text-gray-400 text-sm">I want to sell my project, idea, or startup through an open auction.</p>
               </div>
             </button>
           </div>
@@ -79,7 +79,7 @@ export default function SzerepValasztas() {
             disabled={!valasztott || loading}
             className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition py-4 rounded-full font-semibold text-lg"
           >
-            {loading ? 'Mentés...' : 'Tovább →'}
+            {loading ? 'Saving...' : 'Continue →'}
           </button>
         </div>
       </div>

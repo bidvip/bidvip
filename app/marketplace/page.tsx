@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 
 const badge_info: Record<string, { label: string; szin: string }> = {
-  papir: { label: '🌱 Papír', szin: 'bg-green-900/40 text-green-400 border-green-800' },
-  prototipus: { label: '🛠️ Prototípus', szin: 'bg-blue-900/40 text-blue-400 border-blue-800' },
-  bizonyitott: { label: '✅ Bizonyított', szin: 'bg-violet-900/40 text-violet-400 border-violet-800' },
+  papir: { label: '🌱 Concept', szin: 'bg-green-900/40 text-green-400 border-green-800' },
+  prototipus: { label: '🛠️ Prototype', szin: 'bg-blue-900/40 text-blue-400 border-blue-800' },
+  bizonyitott: { label: '✅ Proven', szin: 'bg-violet-900/40 text-violet-400 border-violet-800' },
 }
 
 type Projekt = {
@@ -23,7 +23,7 @@ type Projekt = {
   letrehozva: string
 }
 
-export default function Piac() {
+export default function Marketplace() {
   const [projektek, setProjektek] = useState<Projekt[]>([])
   const [loading, setLoading] = useState(true)
   const [szuro, setSzuro] = useState('mind')
@@ -51,23 +51,22 @@ export default function Piac() {
         </a>
         <div className="flex items-center gap-4">
           <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">Dashboard</a>
-          <a href="/projekt-feltoltes" className="bg-violet-600 hover:bg-violet-700 transition px-4 py-2 rounded-full text-sm font-semibold">
-            + Feltöltés
+          <a href="/submit" className="bg-violet-600 hover:bg-violet-700 transition px-4 py-2 rounded-full text-sm font-semibold">
+            + List Project
           </a>
         </div>
       </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-2">Piactér</h1>
-        <p className="text-gray-400 mb-8">Böngéssz a feltöltött projektek között és tedd meg az ajánlatod.</p>
+        <h1 className="text-3xl font-bold mb-2">Marketplace</h1>
+        <p className="text-gray-400 mb-8">Browse verified projects and place your bid on the ones you want to acquire.</p>
 
-        {/* Szűrők */}
         <div className="flex gap-2 mb-8 flex-wrap">
           {[
-            { ertek: 'mind', label: 'Mind' },
-            { ertek: 'papir', label: '🌱 Papír' },
-            { ertek: 'prototipus', label: '🛠️ Prototípus' },
-            { ertek: 'bizonyitott', label: '✅ Bizonyított' },
+            { ertek: 'mind', label: 'All' },
+            { ertek: 'papir', label: '🌱 Concept' },
+            { ertek: 'prototipus', label: '🛠️ Prototype' },
+            { ertek: 'bizonyitott', label: '✅ Proven' },
           ].map(s => (
             <button
               key={s.ertek}
@@ -80,11 +79,11 @@ export default function Piac() {
         </div>
 
         {loading ? (
-          <div className="text-gray-400">Betöltés...</div>
+          <div className="text-gray-400">Loading...</div>
         ) : szurt.length === 0 ? (
           <div className="text-center py-24">
             <div className="text-5xl mb-4">🔍</div>
-            <p className="text-gray-400">Még nincsenek projektek ebben a kategóriában.</p>
+            <p className="text-gray-400">No projects in this category yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -104,18 +103,18 @@ export default function Piac() {
 
                 <div className="flex gap-2 flex-wrap">
                   {p.van_domain && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">🌐 Domain</span>}
-                  {p.van_kod && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💻 Kód</span>}
-                  {p.van_feliratkozok && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">📧 Feliratkozók</span>}
-                  {p.van_bevetel && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💰 Bevétel</span>}
+                  {p.van_kod && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💻 Source Code</span>}
+                  {p.van_feliratkozok && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">📧 Email List</span>}
+                  {p.van_bevetel && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💰 Revenue</span>}
                 </div>
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-800">
                   <div>
-                    <p className="text-xs text-gray-500">Kikiáltási ár</p>
+                    <p className="text-xs text-gray-500">Starting bid</p>
                     <p className="text-xl font-bold text-violet-400">€{p.kikialtasi_ar.toLocaleString()}</p>
                   </div>
-                  <a href={`/projekt/${p.id}`} className="bg-violet-600 hover:bg-violet-700 transition px-4 py-2 rounded-full text-sm font-semibold">
-                    Részletek →
+                  <a href={`/project/${p.id}`} className="bg-violet-600 hover:bg-violet-700 transition px-4 py-2 rounded-full text-sm font-semibold">
+                    View Details →
                   </a>
                 </div>
               </div>
