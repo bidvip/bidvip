@@ -21,6 +21,8 @@ type Feedback = {
   ready: boolean
 }
 
+type Fajl = { nev: string; url: string; tipus: string }
+
 export default function Submit() {
   const router = useRouter()
   const supabase = createClient()
@@ -40,16 +42,33 @@ export default function Submit() {
     van_bevetel: false,
   })
 
+  // Step 1: files selected locally + already uploaded to storage
+  const [kivalasztottFajlok, setKivalasztottFajlok] = useState<File[]>([])
+  const [feltoltottFajlok, setFeltoltottFajlok] = useState<Fajl[]>([])
+  const [feltoltesAllapot, setFeltoltesAllapot] = useState<'idle' | 'loading'>('idle')
+
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [feedbackAllapot, setFeedbackAllapot] = useState<'idle' | 'loading'>('idle')
 
-  const [kivalasztottFajlok, setKivalasztottFajlok] = useState<File[]>([])
-  const [allapot, setAllapot] = useState<'idle' | 'feltoltes' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
+  const [allapot, setAllapot] = useState<'idle' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
 
   function frissit(mezo: string, ertek: string | boolean) {
     setForm(prev => ({ ...prev, [mezo]: ertek }))
+    if (feedback) setFeedback(null)
+  }
+
+  function fajlValasztas(e: React.ChangeEvent<HTMLInputElement>) {
+    const fajlok = Array.from(e.target.files || [])
+    setKivalasztottFajlok(prev => [...prev, ...fajlok].slice(0, 5))
+    e.target.value = ''
+    if (feedback) setFeedback(null)
+  }
+
+  function fajlTorles(index: number) {
+    setKivalasztottFajlok(prev => prev.filter((_, i) => i !== index))
+    setFeltoltottFajlok(prev => prev.filter((_, i) => i !== index))
     if (feedback) setFeedback(null)
   }
 
@@ -60,6 +79,28 @@ export default function Submit() {
     }
     setHiba('')
     setFeedbackAllapot('loading')
+
+    // Upload any new files first so AI can see them
+    let kepUrlok: string[] = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
+
+    const ujFajlok: Fajl[] = [...feltoltottFajlok]
+    const ujak = kivalasztottFajlok.slice(feltoltottFajlok.length)
+    if (ujak.length > 0) {
+      setFeltoltesAllapot('loading')
+      for (const fajl of ujak) {
+        const fd = new FormData()
+        fd.append('fajl', fajl)
+        const res = await fetch('/api/upload', { method: 'POST', body: fd })
+        if (res.ok) {
+          const data = await res.json()
+          ujFajlok.push(data)
+        }
+      }
+      setFeltoltottFajlok(ujFajlok)
+      setFeltoltesAllapot('idle')
+      kepUrlok = ujFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
+    }
+
     const res = await fetch('/api/ai/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -68,6 +109,7 @@ export default function Submit() {
         rovid_leiras: form.rovid_leiras,
         reszletes_leiras: form.reszletes_leiras,
         kategoria: form.kategoria,
+        kepUrlok,
       }),
     })
     const data = await res.json()
@@ -83,17 +125,7 @@ export default function Submit() {
     setLepes(2)
   }
 
-  function fajlValasztas(e: React.ChangeEvent<HTMLInputElement>) {
-    const fajlok = Array.from(e.target.files || [])
-    setKivalasztottFajlok(prev => [...prev, ...fajlok].slice(0, 5))
-    e.target.value = ''
-  }
-
-  function fajlTorles(index: number) {
-    setKivalasztottFajlok(prev => prev.filter((_, i) => i !== index))
-  }
-
-  const totalCost = SUBMIT_COST + kivalasztottFajlok.length * FILE_COST + (DURATION_COST[form.idotartam_nap] ?? 0)
+  const totalCost = SUBMIT_COST + feltoltottFajlok.length * FILE_COST + (DURATION_COST[form.idotartam_nap] ?? 0)
 
   async function beküldes(e: React.FormEvent) {
     e.preventDefault()
@@ -103,11 +135,10 @@ export default function Submit() {
     if (!user) { router.push('/auth'); return }
 
     if ((tokenEgyenleg ?? 0) < totalCost) {
-      setHiba(`Not enough tokens. You need ${totalCost} tokens but have ${tokenEgyenleg}.`)
+      setHiba(`Not enough tokens. You need ${totalCost} but have ${tokenEgyenleg}.`)
       return
     }
 
-    // Spend tokens first
     const spendRes = await fetch('/api/tokens/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -115,31 +146,15 @@ export default function Submit() {
     })
     const spendData = await spendRes.json()
     if (!spendRes.ok) {
-      if (spendData.error === 'insufficient_tokens') {
-        setHiba(`Not enough tokens. You need ${totalCost} but have ${spendData.egyenleg}.`)
-      } else {
-        setHiba('Token deduction failed. Please try again.')
-      }
+      setHiba(spendData.error === 'insufficient_tokens'
+        ? `Not enough tokens. You need ${totalCost} but have ${spendData.egyenleg}.`
+        : 'Token deduction failed. Please try again.')
       return
-    }
-
-    setAllapot('feltoltes')
-
-    // Upload files
-    const ujFajlok: {nev: string; url: string; tipus: string}[] = []
-    for (const fajl of kivalasztottFajlok) {
-      const fd = new FormData()
-      fd.append('fajl', fajl)
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      if (res.ok) {
-        const data = await res.json()
-        ujFajlok.push(data)
-      }
     }
 
     setAllapot('szures')
 
-    const kepUrlok = ujFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
+    const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const screenRes = await fetch('/api/ai/screen', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -175,7 +190,7 @@ export default function Submit() {
       van_bevetel: form.van_bevetel,
       statusz: 'felulvizsgalat',
       user_email: user.email,
-      fajlok: ujFajlok,
+      fajlok: feltoltottFajlok,
     }])
 
     if (error) {
@@ -227,9 +242,10 @@ export default function Submit() {
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl font-bold mb-1">Describe your project</h1>
-              <p className="text-gray-400">Get AI feedback before submitting — improve your listing to attract more buyers.</p>
+              <p className="text-gray-400">Get AI feedback before submitting — the AI also reviews your uploaded images.</p>
             </div>
 
+            {/* Basic info */}
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Project name *</label>
@@ -295,9 +311,36 @@ export default function Submit() {
               ))}
             </div>
 
+            {/* File upload — step 1, free, for AI analysis */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
+              <h2 className="font-semibold">Files & Media <span className="text-gray-500 font-normal text-sm">(optional — AI will analyze images)</span></h2>
+              <p className="text-gray-400 text-sm">Upload screenshots, mockups, pitch deck, or logo. The AI feedback will take them into account. Max 5 files, 10MB each.</p>
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 hover:border-violet-500 rounded-xl py-6 cursor-pointer transition">
+                <span className="text-3xl mb-2">📎</span>
+                <span className="text-gray-400 text-sm">Click to select files</span>
+                <span className="text-gray-600 text-xs mt-1">Images, PDF, Word, Excel</span>
+                <input type="file" multiple accept="image/*,.pdf,.docx,.xlsx" onChange={fajlValasztas} className="hidden" />
+              </label>
+              {kivalasztottFajlok.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {kivalasztottFajlok.map((f, i) => (
+                    <div key={i} className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-xl text-sm">
+                      <span className="text-gray-300 truncate">
+                        {f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}
+                      </span>
+                      <div className="flex items-center gap-2 ml-2 shrink-0">
+                        {feltoltottFajlok[i] ? <span className="text-green-400 text-xs">✓ uploaded</span> : <span className="text-gray-500 text-xs">pending</span>}
+                        <button type="button" onClick={() => fajlTorles(i)} className="text-gray-500 hover:text-red-400 transition">✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {hiba && <p className="text-red-400 text-sm">{hiba}</p>}
 
-            {/* AI Feedback */}
+            {/* AI Feedback result */}
             {feedback && (
               <div className={`rounded-2xl border p-6 flex flex-col gap-4 ${feedback.ready ? 'border-green-700 bg-green-900/10' : 'border-amber-700 bg-amber-900/10'}`}>
                 <div className="flex items-center justify-between">
@@ -329,10 +372,10 @@ export default function Submit() {
             <button
               type="button"
               onClick={aiFeedback}
-              disabled={feedbackAllapot === 'loading' || !form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria}
+              disabled={feedbackAllapot === 'loading' || feltoltesAllapot === 'loading' || !form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria}
               className="w-full py-3 rounded-full border border-violet-700 text-violet-400 hover:bg-violet-900/20 disabled:opacity-60 transition font-semibold"
             >
-              {feedbackAllapot === 'loading' ? '🤖 Analyzing...' : feedback ? '🔄 Re-analyze' : '🤖 Get AI Feedback (free)'}
+              {feltoltesAllapot === 'loading' ? '📎 Uploading files...' : feedbackAllapot === 'loading' ? '🤖 Analyzing...' : feedback ? '🔄 Re-analyze' : '🤖 Get AI Feedback (free)'}
             </button>
 
             {feedback && !feedback.ready && (
@@ -356,45 +399,34 @@ export default function Submit() {
             <div>
               <button type="button" onClick={() => setLepes(1)} className="text-gray-500 hover:text-gray-300 text-sm mb-3 transition">← Back</button>
               <h1 className="text-3xl font-bold mb-1">Set price & submit</h1>
-              <p className="text-gray-400">This step costs tokens. Upload files for better AI analysis.</p>
+              <p className="text-gray-400">This step costs tokens.</p>
             </div>
 
-            {/* Token cost info */}
+            {/* Token cost */}
             <div className="bg-violet-900/20 border border-violet-800 rounded-2xl p-4 flex items-center justify-between">
               <div>
                 <p className="font-semibold text-violet-300">Submission cost</p>
-                <p className="text-gray-400 text-sm">{SUBMIT_COST} base + {kivalasztottFajlok.length} × {FILE_COST} files + {DURATION_COST[form.idotartam_nap] ?? 0} duration</p>
+                <p className="text-gray-400 text-sm">{SUBMIT_COST} base + {feltoltottFajlok.length} × {FILE_COST} files + {DURATION_COST[form.idotartam_nap] ?? 0} duration</p>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold text-violet-400">{totalCost} tokens</p>
-                <p className="text-xs text-gray-500">You have: {tokenEgyenleg ?? '...'}</p>
+                <p className={`text-xs ${(tokenEgyenleg ?? 0) < totalCost ? 'text-red-400' : 'text-gray-500'}`}>You have: {tokenEgyenleg ?? '...'}</p>
               </div>
             </div>
 
-            {/* Files */}
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-              <h2 className="font-semibold">Files & Media <span className="text-gray-500 font-normal text-sm">({FILE_COST} tokens/file)</span></h2>
-              <p className="text-gray-400 text-sm">Screenshots, pitch deck, business plan, logo — helps buyers and AI analysis. Max 5 files, 10MB each.</p>
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 hover:border-violet-500 rounded-xl py-8 cursor-pointer transition">
-                <span className="text-3xl mb-2">📎</span>
-                <span className="text-gray-400 text-sm">Click to select files</span>
-                <span className="text-gray-600 text-xs mt-1">Images, PDF, Word, Excel</span>
-                <input type="file" multiple accept="image/*,.pdf,.docx,.xlsx" onChange={fajlValasztas} className="hidden" />
-              </label>
-              {kivalasztottFajlok.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  {kivalasztottFajlok.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-xl text-sm">
-                      <span className="text-gray-300 truncate">{f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}</span>
-                      <div className="flex items-center gap-3 ml-2">
-                        <span className="text-violet-400 text-xs shrink-0">-{FILE_COST} tokens</span>
-                        <button type="button" onClick={() => fajlTorles(i)} className="text-gray-500 hover:text-red-400 transition">✕</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Uploaded files summary */}
+            {feltoltottFajlok.length > 0 && (
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col gap-2">
+                <p className="text-sm text-gray-400 font-semibold">{feltoltottFajlok.length} file(s) attached</p>
+                {feltoltottFajlok.map((f, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                    <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>
+                    <span className="truncate">{f.nev}</span>
+                    <span className="ml-auto text-violet-400 text-xs shrink-0">-{FILE_COST} tokens</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Price */}
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
@@ -445,8 +477,7 @@ export default function Submit() {
               disabled={allapot !== 'idle' && allapot !== 'hiba'}
               className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg"
             >
-              {allapot === 'feltoltes' ? 'Uploading files...' :
-               allapot === 'szures' ? '🤖 Final AI check...' :
+              {allapot === 'szures' ? '🤖 Final AI check...' :
                allapot === 'loading' ? 'Submitting...' :
                `Submit Project — ${totalCost} tokens →`}
             </button>
