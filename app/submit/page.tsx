@@ -126,23 +126,27 @@ export default function Submit() {
     const { data: tokenData } = await supabase.from('tokenek').select('egyenleg').eq('user_id', user.id).single()
     setTokenEgyenleg(tokenData?.egyenleg ?? 0)
     setUserId(user.id)
-    // Start chat with initial AI message
     setChatAllapot('loading')
-    const res = await fetch('/api/ai/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uzenet: 'Hello! I just passed the initial screening. Can you help me refine my idea further?',
-        elozmenyek: [],
-        projekt: { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras },
-      }),
-    })
-    const data = await res.json()
-    setChatUzenetek([{ role: 'assistant', content: data.valasz }])
-    setChatKeszen(data.keszen ?? false)
-    setChatScore(data.score ?? null)
-    setChatAllapot('idle')
     setLepes(2)
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uzenet: 'Hello! I just passed the initial screening. Can you help me refine my idea further?',
+          elozmenyek: [],
+          projekt: { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras },
+        }),
+      })
+      const data = await res.json()
+      setChatUzenetek([{ role: 'assistant', content: data.valasz }])
+      setChatKeszen(data.keszen ?? false)
+      setChatScore(data.score ?? null)
+    } catch (e) {
+      setChatUzenetek([{ role: 'assistant', content: 'Failed to connect to AI. Please try again.' }])
+    } finally {
+      setChatAllapot('idle')
+    }
   }
 
   async function chatKuldes() {
