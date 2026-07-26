@@ -175,6 +175,23 @@ export default function Submit() {
 
     setAllapot('loading')
 
+    // Sonnet 5 deep analysis — runs at submit time, saved to DB
+    const kepUrlok2 = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
+    const deepRes = await fetch('/api/ai/deep-analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nev: form.nev,
+        rovid_leiras: form.rovid_leiras,
+        reszletes_leiras: form.reszletes_leiras,
+        kategoria: form.kategoria,
+        badge: screen.badge || 'papir',
+        kikialtasi_ar: parseInt(form.kikialtasi_ar),
+        kepUrlok: kepUrlok2,
+      }),
+    })
+    const deepData = deepRes.ok ? await deepRes.json() : { analysis: '' }
+
     const { error } = await supabase.from('projektek').insert([{
       user_id: user.id,
       nev: form.nev,
@@ -191,6 +208,7 @@ export default function Submit() {
       statusz: 'felulvizsgalat',
       user_email: user.email,
       fajlok: feltoltottFajlok,
+      ai_elemzes: deepData.analysis || null,
     }])
 
     if (error) {

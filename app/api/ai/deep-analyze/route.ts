@@ -14,26 +14,26 @@ export async function POST(req: NextRequest) {
 
   const { nev, rovid_leiras, reszletes_leiras, kategoria, badge, kikialtasi_ar, kepUrlok = [] } = await req.json()
 
-  const szoveg = `You are an experienced startup analyst reviewing a project listed on BidVip, a marketplace where startup ideas and projects are auctioned to buyers.
+  const szoveg = `You are a senior startup analyst writing a comprehensive market analysis for a project listed on BidVip, a startup idea marketplace. This analysis will be shown to potential buyers to help them make an informed bidding decision.
 
-Project details:
+Project:
 - Name: ${nev}
 - Category: ${kategoria}
 - Stage: ${BADGE_LABELS[badge] || badge}
 - Starting bid: €${kikialtasi_ar}
 - Short description: ${rovid_leiras}
 - Detailed description: ${reszletes_leiras}
-${kepUrlok.length > 0 ? `\nThe seller has uploaded ${kepUrlok.length} image(s) — take them into account in your analysis.` : ''}
+${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s) — factor them into your analysis.` : ''}
 
-Provide a thorough, honest analysis with these sections (use markdown headers):
+Write a thorough, honest, professional analysis with these sections (use ## markdown headers):
 
 ## Market Opportunity
 ## Strengths
 ## Weaknesses / Risks
-## Suggestions for Improvement
+## Suggestions for the Buyer
 ## Valuation Assessment
 
-Be direct, specific, and constructive. Consider the stage and starting price in your valuation assessment.`
+Be specific, direct, and data-driven where possible. Consider the stage and starting price in your valuation. This is a Sonnet-level deep analysis — go beyond surface observations.`
 
   const kepTartalom = kepUrlok.slice(0, 4).map((url: string) => ({
     type: 'image' as const,
@@ -41,8 +41,8 @@ Be direct, specific, and constructive. Consider the stage and starting price in 
   }))
 
   const message = await client.messages.create({
-    model: 'claude-haiku-4-5',
-    max_tokens: 1024,
+    model: 'claude-sonnet-5',
+    max_tokens: 2048,
     messages: [{
       role: 'user',
       content: [

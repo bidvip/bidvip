@@ -29,6 +29,7 @@ type Projekt = {
   letrehozva: string
   lejarat: string | null
   fajlok: Fajl[] | null
+  ai_elemzes: string | null
 }
 
 function timeLeft(lejarat: string | null): string {
@@ -277,29 +278,43 @@ export default function ProjectDetail() {
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">AI Quick Analysis</h2>
-              {aiAllapot === 'kesz' && (
-                <button onClick={aiElemzesKer} className="text-xs text-gray-500 hover:text-gray-300 transition">
-                  Refresh
-                </button>
+              <h2 className="font-semibold">AI Analysis</h2>
+              {projekt.ai_elemzes && <span className="text-xs text-violet-400 border border-violet-800 px-2 py-1 rounded-full">Sonnet 5 · Deep</span>}
+              {aiAllapot === 'kesz' && !projekt.ai_elemzes && (
+                <button onClick={aiElemzesKer} className="text-xs text-gray-500 hover:text-gray-300 transition">Refresh</button>
               )}
             </div>
-            {aiAllapot === 'idle' && (
-              <button
-                onClick={aiElemzesKer}
-                className="w-full py-3 rounded-xl border border-violet-700 text-violet-400 hover:bg-violet-900/20 transition font-semibold"
-              >
-                🤖 Analyze with AI — 5 tokens
-              </button>
-            )}
-            {aiAllapot === 'nincs_token' && (
-              <div className="text-center py-4">
-                <p className="text-red-400 text-sm mb-2">Not enough tokens. You have {tokenEgyenleg ?? 0}, need 5.</p>
-                <a href="/tokens" className="text-violet-400 text-sm hover:underline">Buy tokens →</a>
+
+            {/* Show saved Sonnet 5 analysis (free for buyers) */}
+            {projekt.ai_elemzes ? (
+              <div className="text-sm text-gray-300 leading-relaxed flex flex-col gap-3">
+                {projekt.ai_elemzes.split('\n').map((sor, i) => {
+                  if (sor.startsWith('## ')) return <h3 key={i} className="font-bold text-white text-base mt-2">{sor.slice(3)}</h3>
+                  if (sor.startsWith('- ')) return <p key={i} className="text-gray-400 pl-3 border-l border-gray-700">• {sor.slice(2)}</p>
+                  if (sor.trim() === '') return null
+                  return <p key={i} className="text-gray-400">{sor}</p>
+                })}
               </div>
-            )}
-            {aiAllapot === 'loading' && (
-              <div className="text-center text-gray-400 py-4 text-sm animate-pulse">Analyzing...</div>
+            ) : (
+              <>
+                {aiAllapot === 'idle' && (
+                  <button
+                    onClick={aiElemzesKer}
+                    className="w-full py-3 rounded-xl border border-violet-700 text-violet-400 hover:bg-violet-900/20 transition font-semibold"
+                  >
+                    🤖 Quick Analysis — 5 tokens (Haiku)
+                  </button>
+                )}
+                {aiAllapot === 'nincs_token' && (
+                  <div className="text-center py-4">
+                    <p className="text-red-400 text-sm mb-2">Not enough tokens. You have {tokenEgyenleg ?? 0}, need 5.</p>
+                    <a href="/tokens" className="text-violet-400 text-sm hover:underline">Buy tokens →</a>
+                  </div>
+                )}
+                {aiAllapot === 'loading' && (
+                  <div className="text-center text-gray-400 py-4 text-sm animate-pulse">Analyzing...</div>
+                )}
+              </>
             )}
             {aiAllapot === 'kesz' && (
               <div className="text-sm text-gray-300 leading-relaxed flex flex-col gap-3">
