@@ -10,6 +10,7 @@ export default function AuthPage() {
   const [jelszo, setJelszo] = useState('')
   const [allapot, setAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hibaUzenet, setHibaUzenet] = useState('')
+  const [jelszoLatszik, setJelszoLatszik] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -88,15 +89,24 @@ export default function AuthPage() {
                 placeholder="Email address"
                 className="px-5 py-3 rounded-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
               />
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={jelszo}
-                onChange={(e) => setJelszo(e.target.value)}
-                placeholder="Password (min. 6 characters)"
-                className="px-5 py-3 rounded-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
-              />
+              <div className="relative">
+                <input
+                  type={jelszoLatszik ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={jelszo}
+                  onChange={(e) => setJelszo(e.target.value)}
+                  placeholder="Password (min. 6 characters)"
+                  className="w-full px-5 py-3 pr-12 rounded-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setJelszoLatszik(v => !v)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition text-sm"
+                >
+                  {jelszoLatszik ? '🙈' : '👁️'}
+                </button>
+              </div>
               {allapot === 'hiba' && (
                 <p className="text-red-400 text-sm text-center">{hibaUzenet}</p>
               )}
