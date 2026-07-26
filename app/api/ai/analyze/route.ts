@@ -41,7 +41,7 @@ Be direct, specific, and constructive. Consider the stage and starting price in 
   }))
 
   const message = await client.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-5',
     max_tokens: 1024,
     messages: [{
       role: 'user',
