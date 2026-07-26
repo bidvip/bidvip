@@ -175,10 +175,11 @@ export default function Submit() {
   }
 
   async function chatStream(uzenet: string, elozmenyek: ChatUzenet[], projektAdat: object, onChunk: (text: string) => void): Promise<{ score: number | null; keszen: boolean }> {
+    const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const res = await fetch('/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uzenet, elozmenyek, projekt: projektAdat }),
+      body: JSON.stringify({ uzenet, elozmenyek, projekt: projektAdat, kepUrlok }),
     })
     const reader = res.body!.getReader()
     const decoder = new TextDecoder()

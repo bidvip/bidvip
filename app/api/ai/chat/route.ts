@@ -12,7 +12,7 @@ const BADGE_LABELS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-  const { uzenet, elozmenyek, projekt } = await req.json()
+  const { uzenet, elozmenyek, projekt, kepUrlok = [] } = await req.json()
 
   const rendszerPrompt = `You are a senior startup advisor and investor on BidVip, a marketplace where startup ideas are auctioned. You have reviewed hundreds of startups. Your job is to help the seller turn their rough idea into a compelling, market-ready listing that buyers will actually bid on.
 
@@ -48,13 +48,22 @@ Be strict. Most ideas need 3-5 rounds to reach 8.5.`
   const stream = new ReadableStream({
     async start(controller) {
       try {
+        const kepTartalom = kepUrlok.slice(0, 4).map((url: string) => ({
+          type: 'image' as const,
+          source: { type: 'url' as const, url },
+        }))
+
+        const elsoUzenet = kepTartalom.length > 0
+          ? { role: 'user' as const, content: [...kepTartalom, { type: 'text' as const, text: uzenet }] }
+          : { role: 'user' as const, content: uzenet }
+
         const messageStream = client.messages.stream({
           model: 'claude-sonnet-5',
           max_tokens: 1024,
           system: rendszerPrompt,
           messages: [
             ...elozmenyek,
-            { role: 'user', content: uzenet },
+            elsoUzenet,
           ],
         })
 
