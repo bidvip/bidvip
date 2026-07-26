@@ -87,6 +87,7 @@ export default function Submit() {
       van_feliratkozok: form.van_feliratkozok,
       van_bevetel: form.van_bevetel,
       statusz: 'felulvizsgalat',
+      user_email: user.email,
     }])
 
     if (error) {

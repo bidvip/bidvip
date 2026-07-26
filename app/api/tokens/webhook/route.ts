@@ -30,17 +30,16 @@ export async function POST(req: NextRequest) {
     if (projekt_id) {
       const { data: projekt } = await supabase
         .from('projektek')
-        .select('nev, user_id, kikialtasi_ar')
+        .select('nev, user_email, kikialtasi_ar')
         .eq('id', projekt_id)
         .single()
 
       if (projekt) {
-        const { data: { user: elado } } = await supabase.auth.admin.getUserById(projekt.user_id)
         const osszeg = (session.amount_total || 0) / 100
 
-        if (elado?.email) {
+        if (projekt.user_email) {
           const { subject, html } = purchaseSellerEmail(projekt.nev, osszeg, vevo_email || '')
-          await sendEmail(elado.email, subject, html)
+          await sendEmail(projekt.user_email, subject, html)
         }
         if (vevo_email) {
           const { subject, html } = purchaseBuyerEmail(projekt.nev, osszeg)

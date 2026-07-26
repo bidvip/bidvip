@@ -14,17 +14,14 @@ export async function POST(req: NextRequest) {
 
   const { data: projekt } = await supabase
     .from('projektek')
-    .select('nev, user_id')
+    .select('nev, user_email')
     .eq('id', projekt_id)
     .single()
 
-  if (!projekt) return NextResponse.json({ ok: false })
-
-  const { data: { user } } = await supabase.auth.admin.getUserById(projekt.user_id)
-  if (!user?.email) return NextResponse.json({ ok: false })
+  if (!projekt?.user_email) return NextResponse.json({ ok: false })
 
   const { subject, html } = bidEmail(projekt.nev, osszeg)
-  await sendEmail(user.email, subject, html)
+  await sendEmail(projekt.user_email, subject, html)
 
   return NextResponse.json({ ok: true })
 }
