@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 
 const badge_info: Record<string, { label: string; szin: string }> = {
@@ -59,8 +59,12 @@ export default function ProjectDetail() {
   const [allapot, setAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
   const [loading, setLoading] = useState(true)
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null)
 
-  const paymentStatus = searchParams?.get('fizetes')
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setPaymentStatus(params.get('fizetes'))
+  }, [])
 
   useEffect(() => {
     async function betolt() {
