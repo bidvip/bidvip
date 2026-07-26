@@ -56,6 +56,7 @@ export default function Submit() {
   const [chatUzenetek, setChatUzenetek] = useState<ChatUzenet[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatAllapot, setChatAllapot] = useState<'idle' | 'loading'>('idle')
+  const [chatKeszen, setChatKeszen] = useState(false)
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
 
@@ -137,6 +138,7 @@ export default function Submit() {
     })
     const data = await res.json()
     setChatUzenetek([{ role: 'assistant', content: data.valasz }])
+    setChatKeszen(data.keszen ?? false)
     setChatAllapot('idle')
     setLepes(2)
   }
@@ -175,6 +177,7 @@ export default function Submit() {
     })
     const data = await res.json()
     setChatUzenetek([...ujUzenetek, { role: 'assistant', content: data.valasz }])
+    setChatKeszen(data.keszen ?? false)
     setChatAllapot('idle')
   }
 
@@ -476,10 +479,14 @@ export default function Submit() {
             )}
 
             <div className="border-t border-gray-800 pt-4">
-              <button type="button" onClick={lepés2Tovabb}
-                className="w-full bg-violet-600 hover:bg-violet-700 transition py-3 rounded-full font-semibold">
-                I&apos;m ready — Set price & submit →
-              </button>
+              {chatKeszen ? (
+                <button type="button" onClick={lepés2Tovabb}
+                  className="w-full bg-violet-600 hover:bg-violet-700 transition py-3 rounded-full font-semibold">
+                  ✓ Market-ready — Set price & submit →
+                </button>
+              ) : (
+                <p className="text-center text-gray-500 text-sm py-2">The AI will unlock this button when your idea is market-ready.</p>
+              )}
             </div>
           </div>
         )}
