@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [szerepkor, setSzerepkor] = useState<string | null>(null)
   const [sajatProjektek, setSajatProjektek] = useState<any[]>([])
   const [sajatLicitek, setSajatLicitek] = useState<any[]>([])
+  const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -45,6 +46,13 @@ export default function Dashboard() {
         setSajatLicitek(licitek || [])
       }
 
+      const { data: tokenData } = await supabase
+        .from('tokenek')
+        .select('egyenleg')
+        .eq('user_id', u.id)
+        .single()
+      setTokenEgyenleg(tokenData?.egyenleg ?? 0)
+
       setLoading(false)
     }
     betolt()
@@ -71,6 +79,9 @@ export default function Dashboard() {
         </a>
         <div className="flex items-center gap-4">
           <a href="/marketplace" className="text-gray-300 text-sm hover:text-white transition font-semibold">Marketplace</a>
+          <a href="/tokens" className="text-gray-300 text-sm hover:text-white transition font-semibold">
+            ⚡ {tokenEgyenleg ?? '...'} tokens
+          </a>
           <span className="text-gray-400 text-sm hidden sm:inline">{user?.email}</span>
           <button
             onClick={kilepes}
