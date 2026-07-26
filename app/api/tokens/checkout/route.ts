@@ -4,9 +4,9 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const PACKAGES: Record<string, { tokens: number; amount: number; name: string }> = {
-  small:  { tokens: 100, amount: 500,  name: '100 Tokens' },
-  medium: { tokens: 300, amount: 1300, name: '300 Tokens' },
-  large:  { tokens: 700, amount: 2700, name: '700 Tokens' },
+  small:  { tokens: 100, amount: 5,  name: '100 Tokens' },
+  medium: { tokens: 300, amount: 13, name: '300 Tokens' },
+  large:  { tokens: 700, amount: 27, name: '700 Tokens' },
 }
 
 export async function POST(req: NextRequest) {
