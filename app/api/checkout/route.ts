@@ -7,8 +7,6 @@ export async function POST(req: NextRequest) {
   try {
     const { projekt_id, projekt_nev, osszeg, vevo_email } = await req.json()
 
-    const platformFee = Math.round(osszeg * 0.12) // 12% platform fee
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -27,11 +25,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       payment_intent_data: {
-        application_fee_amount: platformFee * 100,
-        metadata: {
-          projekt_id,
-          platform: 'bidvip',
-        },
+        metadata: { projekt_id, platform: 'bidvip' },
       },
       metadata: { projekt_id, vevo_email },
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/project/${projekt_id}?fizetes=siker`,
