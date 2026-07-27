@@ -13,6 +13,11 @@ export async function POST(req: NextRequest) {
 
   if (!user_id) return NextResponse.json({ error: 'Missing user_id' }, { status: 400 })
 
+  const ip_cim = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('x-real-ip')
+    || 'unknown'
+  const user_agent = req.headers.get('user-agent') || 'unknown'
+
   await supabase.from('reports').insert([{
     user_id,
     user_email,
@@ -22,6 +27,8 @@ export async function POST(req: NextRequest) {
     kategoria,
     block_reason,
     fajlok,
+    ip_cim,
+    user_agent,
     statusz: 'pending',
   }])
 

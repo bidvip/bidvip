@@ -39,6 +39,8 @@ type Report = {
   kategoria: string
   block_reason: string
   fajlok: { nev: string; url: string; tipus: string }[]
+  ip_cim: string
+  user_agent: string
   created_at: string
   statusz: string
 }
@@ -173,12 +175,17 @@ export default function AdminPage() {
             ) : reportok.map(r => (
               <div key={r.id} className={`bg-gray-900 border rounded-2xl p-6 ${r.statusz === 'pending' ? 'border-red-800' : 'border-gray-800 opacity-70'}`}>
                 <div className="flex items-start justify-between gap-4 mb-3">
-                  <div>
+                  <div className="flex-1">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${r.statusz === 'pending' ? 'bg-red-900/40 text-red-400' : r.statusz === 'feloldva' ? 'bg-green-900/40 text-green-400' : 'bg-gray-800 text-gray-500'}`}>
                       {r.statusz === 'pending' ? '⚠️ Pending review' : r.statusz === 'feloldva' ? '✓ Lifted' : '🚫 Permanently banned'}
                     </span>
                     <h2 className="text-lg font-bold mt-2">{r.nev || '(no name)'}</h2>
-                    <p className="text-xs text-gray-500 mt-0.5">{r.user_email} · {new Date(r.created_at).toLocaleString()}</p>
+                    <div className="flex flex-col gap-0.5 mt-1">
+                      <p className="text-xs text-gray-500">👤 {r.user_email} · {new Date(r.created_at).toLocaleString()}</p>
+                      <p className="text-xs text-gray-600 font-mono">🆔 Report ID: {r.id}</p>
+                      {r.ip_cim && <p className="text-xs text-gray-600 font-mono">🌐 IP: {r.ip_cim}</p>}
+                      {r.user_agent && <p className="text-xs text-gray-600 font-mono truncate">💻 {r.user_agent}</p>}
+                    </div>
                   </div>
                 </div>
 
