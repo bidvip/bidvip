@@ -69,6 +69,8 @@ function SubmitInner() {
   const chatFajlInputRef = useRef<HTMLInputElement>(null)
   const [step3FajlAllapot, setStep3FajlAllapot] = useState<'idle' | 'loading'>('idle')
   const step3FajlInputRef = useRef<HTMLInputElement>(null)
+  const [aiErtekeles, setAiErtekeles] = useState<{ estimated_value: number; reasoning: string } | null>(null)
+  const [ertekelesAllapot, setErtekelesAllapot] = useState<'idle' | 'loading'>('idle')
 
   const searchParams = useSearchParams()
 
@@ -457,6 +459,36 @@ function SubmitInner() {
     const { data: tokenData } = await supabase.from('tokenek').select('egyenleg').eq('user_id', user.id).single()
     setTokenEgyenleg(tokenData?.egyenleg ?? 0)
     setLepes(3)
+
+    // AI valuation in background
+    setErtekelesAllapot('loading')
+    try {
+      const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
+      const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
+      const res = await fetch('/api/ai/valuation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nev: form.nev,
+          rovid_leiras: form.rovid_leiras,
+          reszletes_leiras: form.reszletes_leiras,
+          kategoria: form.kategoria,
+          badge,
+          fajlSzovegek,
+          chat_score: chatScore,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAiErtekeles(data)
+        // Pre-fill starting price with AI estimate if empty
+        if (!form.kikialtasi_ar) {
+          setForm(prev => ({ ...prev, kikialtasi_ar: String(data.estimated_value) }))
+        }
+      }
+    } catch { /* ignore */ } finally {
+      setErtekelesAllapot('idle')
+    }
   }
 
   const totalCost = SUBMIT_COST + feltoltottFajlok.length * FILE_COST + (DURATION_COST[form.idotartam_nap] ?? 0)
@@ -572,6 +604,7 @@ function SubmitInner() {
       van_bevetel: form.van_bevetel,
       statusz: 'aktiv',
       fajlok: feltoltottFajlok,
+      ai_ertekeles: aiErtekeles?.estimated_value ?? null,
     }
 
     const { error } = draftId
@@ -927,14 +960,53 @@ function SubmitInner() {
               )}
             </div>
 
+            {/* AI valuation */}
+            {ertekelesAllapot === 'loading' && (
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl px-5 py-4 flex items-center gap-3">
+                <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin shrink-0" />
+                <p className="text-gray-400 text-sm">AI is estimating your project's value...</p>
+              </div>
+            )}
+            {aiErtekeles && (
+              <div className="bg-violet-900/20 border border-violet-700 rounded-2xl px-5 py-4">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-violet-300 font-semibold text-sm">🤖 AI Valuation</p>
+                  <p className="text-violet-400 font-bold text-xl">€{aiErtekeles.estimated_value.toLocaleString()}</p>
+                </div>
+                <p className="text-gray-400 text-xs">{aiErtekeles.reasoning}</p>
+                <p className="text-gray-500 text-xs mt-2">Starting price must be between €{aiErtekeles.estimated_value.toLocaleString()} and €{Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} (max 1.5×)</p>
+              </div>
+            )}
+
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
               <h2 className="font-semibold">Starting Price</h2>
-              <p className="text-gray-400 text-sm">The minimum bid the auction starts from (EUR).</p>
+              <p className="text-gray-400 text-sm">
+                {aiErtekeles
+                  ? `Set between €${aiErtekeles.estimated_value.toLocaleString()} and €${Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} — buyers can bid higher during the auction.`
+                  : 'The minimum bid the auction starts from (EUR).'}
+              </p>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-                <input required type="number" min={1} value={form.kikialtasi_ar} onChange={e => frissit('kikialtasi_ar', e.target.value)}
-                  placeholder="e.g. 500"
-                  className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
+                <input
+                  required
+                  type="number"
+                  min={aiErtekeles ? aiErtekeles.estimated_value : 1}
+                  max={aiErtekeles ? Math.round(aiErtekeles.estimated_value * 1.5) : undefined}
+                  value={form.kikialtasi_ar}
+                  onChange={e => {
+                    const val = e.target.value
+                    if (aiErtekeles) {
+                      const num = parseInt(val)
+                      const max = Math.round(aiErtekeles.estimated_value * 1.5)
+                      if (num > max) { setHiba(`Maximum starting price is €${max.toLocaleString()} (1.5× AI estimate)`); return }
+                      if (num < aiErtekeles.estimated_value) { setHiba(`Minimum starting price is €${aiErtekeles.estimated_value.toLocaleString()} (AI estimate)`); return }
+                      setHiba('')
+                    }
+                    frissit('kikialtasi_ar', val)
+                  }}
+                  placeholder={aiErtekeles ? `e.g. ${aiErtekeles.estimated_value}` : 'e.g. 500'}
+                  className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
+                />
               </div>
             </div>
 

@@ -31,6 +31,7 @@ type Projekt = {
   user_id: string
   user_email: string
   vevo_email: string
+  ai_ertekeles: number | null
 }
 
 type Report = {
@@ -350,7 +351,8 @@ export default function AdminPage() {
                   <p className="text-gray-400">No completed transactions yet.</p>
                 </div>
               ) : eladt.map(p => {
-                const magas_ar = p.kikialtasi_ar > (GYANUS_AR[p.badge] ?? 5000)
+                const max_ar = p.ai_ertekeles ? Math.round(p.ai_ertekeles * 1.5) : (GYANUS_AR[p.badge] ?? 5000)
+                const magas_ar = p.kikialtasi_ar > max_ar
                 const par = p.user_email && p.vevo_email ? [p.user_email, p.vevo_email].sort().join('|') : null
                 const ismetlo_par = par && parok[par] > 1
                 const gyanus = magas_ar || ismetlo_par
@@ -367,7 +369,7 @@ export default function AdminPage() {
                       </div>
                       <div className="text-right shrink-0">
                         <p className={`text-2xl font-bold ${magas_ar ? 'text-amber-400' : 'text-green-400'}`}>€{p.kikialtasi_ar.toLocaleString()}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">limit: €{(GYANUS_AR[p.badge] ?? 5000).toLocaleString()}</p>
+                        {p.ai_ertekeles && <p className="text-xs text-gray-500 mt-0.5">AI value: €{p.ai_ertekeles.toLocaleString()} · max: €{max_ar.toLocaleString()}</p>}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-sm">
