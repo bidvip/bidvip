@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 export default function Onboarding() {
   const [valasztott, setValasztott] = useState<'vevo' | 'elado' | null>(null)
   const [loading, setLoading] = useState(false)
+  const [bonuszKapott, setBonuszKapott] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -22,10 +23,20 @@ export default function Onboarding() {
       szerepkor: valasztott,
     })
 
-    if (!error) {
-      router.push('/dashboard')
+    if (error) { setLoading(false); return }
+
+    // Welcome bonus for first 2000 users
+    const bonuszRes = await fetch('/api/tokens/welcome-bonus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.id }),
+    })
+    const bonuszAdat = await bonuszRes.json()
+    if (bonuszAdat.ok) {
+      setBonuszKapott(true)
+      setTimeout(() => router.push('/dashboard'), 2500)
     } else {
-      setLoading(false)
+      router.push('/dashboard')
     }
   }
 
@@ -73,6 +84,13 @@ export default function Onboarding() {
               </div>
             </button>
           </div>
+
+          {bonuszKapott && (
+            <div className="mb-4 bg-violet-900/40 border border-violet-600 rounded-2xl px-6 py-4 text-center">
+              <p className="text-violet-300 font-semibold text-lg">🎉 You received 50 free tokens!</p>
+              <p className="text-gray-400 text-sm mt-1">Early access reward — use them to submit your ideas.</p>
+            </div>
+          )}
 
           <button
             onClick={mentes}
