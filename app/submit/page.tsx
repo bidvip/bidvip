@@ -65,12 +65,19 @@ function SubmitInner() {
   const [hiba, setHiba] = useState('')
   const [draftId, setDraftId] = useState<string | null>(null)
   const [felfuggesztve, setFelfuggesztve] = useState<string | null>(null)
+  const [chatFajlAllapot, setChatFajlAllapot] = useState<'idle' | 'loading'>('idle')
+  const chatFajlInputRef = useRef<HTMLInputElement>(null)
 
   const searchParams = useSearchParams()
 
   useEffect(() => {
     if (chatVegRef.current) chatVegRef.current.scrollIntoView({ behavior: 'smooth' })
   }, [chatUzenetek])
+
+  useEffect(() => {
+    if (!draftId || chatScore === null) return
+    localStorage.setItem(`bv_score_${draftId}`, JSON.stringify({ score: chatScore, keszen: chatKeszen }))
+  }, [chatScore, chatKeszen, draftId])
 
   useEffect(() => {
     async function ellenorizFelfuggesztes() {
@@ -109,11 +116,24 @@ function SubmitInner() {
         const { data: tokenData } = await supabaseClient.from('tokenek').select('egyenleg').eq('user_id', user.id).single()
         setTokenEgyenleg(tokenData?.egyenleg ?? 0)
       }
+      const stepParam = new URLSearchParams(window.location.search).get('step')
+      if (stepParam === '3') {
+        setLepes(3)
+        return
+      }
       setLepes(2)
 
       if (data.chat_elozmenyek && data.chat_elozmenyek.length > 0) {
         setChatUzenetek(data.chat_elozmenyek)
         setChatAllapot('idle')
+        const savedScore = localStorage.getItem(`bv_score_${draft}`)
+        if (savedScore) {
+          try {
+            const { score, keszen } = JSON.parse(savedScore)
+            setChatScore(score)
+            setChatKeszen(keszen)
+          } catch { /* ignore */ }
+        }
       } else {
         setChatAllapot('loading')
         try {
@@ -211,9 +231,10 @@ function SubmitInner() {
     setFeedbackAllapot('idle')
   }
 
-  async function chatStream(uzenet: string, elozmenyek: ChatUzenet[], projektAdat: object, onChunk: (text: string) => void): Promise<{ score: number | null; keszen: boolean }> {
-    const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
-    const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
+  async function chatStream(uzenet: string, elozmenyek: ChatUzenet[], projektAdat: object, onChunk: (text: string) => void, fajlokParam?: Fajl[]): Promise<{ score: number | null; keszen: boolean }> {
+    const fajlok = fajlokParam ?? feltoltottFajlok
+    const kepUrlok = fajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
+    const fajlSzovegek = fajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
     const res = await fetch('/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -242,6 +263,63 @@ function SubmitInner() {
     return { score: null, keszen: false }
   }
 
+  async function chatFajlFeltoltes(e: React.ChangeEvent<HTMLInputElement>) {
+    const fajl = e.target.files?.[0]
+    if (!fajl) return
+    e.target.value = ''
+    if (feltoltottFajlok.length >= 5) { setHiba('Maximum 5 files allowed.'); return }
+    if ((tokenEgyenleg ?? 0) < CHAT_COST) { setHiba('Not enough tokens to send a message.'); return }
+
+    setChatFajlAllapot('loading')
+    const fd = new FormData()
+    fd.append('fajl', fajl)
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    if (!res.ok) { setChatFajlAllapot('idle'); setHiba('File upload failed.'); return }
+    const ujFajl: Fajl = await res.json()
+    const ujFajlok = [...feltoltottFajlok, ujFajl]
+    setFeltoltottFajlok(ujFajlok)
+    setChatFajlAllapot('idle')
+    if (draftId) {
+      await supabase.from('projektek').update({ fajlok: ujFajlok }).eq('id', draftId)
+    }
+
+    const spendRes = await fetch('/api/tokens/spend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, amount: CHAT_COST }),
+    })
+    if (!spendRes.ok) { setHiba('Token deduction failed.'); return }
+    const spendData = await spendRes.json()
+    setTokenEgyenleg(spendData.uj_egyenleg)
+    setHiba('')
+
+    const uzenet = `I've uploaded a file: "${fajl.name}". Please review its contents and tell me how it supports my listing and what could be improved.`
+    const ujUzenet: ChatUzenet = { role: 'user', content: uzenet }
+    const ujUzenetek = [...chatUzenetek, ujUzenet]
+    setChatUzenetek([...ujUzenetek, { role: 'assistant', content: '' }])
+    setChatAllapot('loading')
+
+    try {
+      const projektAdat = { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras }
+      let vegsoValasz = ''
+      const { score, keszen } = await chatStream(uzenet, chatUzenetek, projektAdat,
+        (text) => { vegsoValasz = text; setChatUzenetek([...ujUzenetek, { role: 'assistant', content: text }]) },
+        ujFajlok
+      )
+      setChatKeszen(keszen)
+      setChatScore(score)
+      if (draftId && vegsoValasz) {
+        const mentendoUzenetek = [...ujUzenetek, { role: 'assistant', content: vegsoValasz }]
+        await supabase.from('projektek').update({ chat_elozmenyek: mentendoUzenetek }).eq('id', draftId)
+      }
+    } catch {
+      setChatUzenetek([...ujUzenetek, { role: 'assistant', content: 'Connection error. Your token was refunded. Please try again.' }])
+      setTokenEgyenleg(prev => (prev ?? 0) + CHAT_COST)
+    } finally {
+      setChatAllapot('idle')
+    }
+  }
+
   async function lepés1Tovabb() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth'); return }
@@ -265,7 +343,10 @@ function SubmitInner() {
         user_email: user.email,
         fajlok: feltoltottFajlok,
       }]).select().single()
-      if (draft) setDraftId(draft.id)
+      if (draft) {
+        setDraftId(draft.id)
+        window.history.replaceState(null, '', `/submit?draft=${draft.id}`)
+      }
     } else {
       await supabase.from('projektek').update({
         nev: form.nev,
@@ -389,10 +470,11 @@ function SubmitInner() {
     setAllapot('szures')
 
     const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
+    const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const validateRes = await fetch('/api/ai/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, fajlSzovegek }),
+      body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, fajlSzovegek, kepUrlok }),
     })
     const validateData = validateRes.ok ? await validateRes.json() : { ok: true }
     if (!validateData.ok) {
@@ -664,6 +746,19 @@ function SubmitInner() {
 
             {hiba && <p className="text-red-400 text-sm">{hiba}</p>}
 
+            {/* Attached files in chat */}
+            {feltoltottFajlok.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {feltoltottFajlok.map((f, i) => (
+                  <div key={i} className="flex items-center gap-1.5 bg-gray-800 border border-gray-700 px-3 py-1.5 rounded-full text-xs text-gray-300">
+                    <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>
+                    <span className="max-w-[120px] truncate">{f.nev}</span>
+                    <span className="text-green-400 text-xs">✓</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Input */}
             <div className="flex gap-2">
               <input
@@ -671,10 +766,18 @@ function SubmitInner() {
                 onChange={e => setChatInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatKuldes() } }}
                 placeholder="Ask the AI mentor anything about your idea..."
-                disabled={chatAllapot === 'loading'}
+                disabled={chatAllapot === 'loading' || chatFajlAllapot === 'loading'}
                 className="flex-1 px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 disabled:opacity-60"
               />
-              <button onClick={chatKuldes} disabled={!chatInput.trim() || chatAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST}
+              <button
+                type="button"
+                onClick={() => chatFajlInputRef.current?.click()}
+                disabled={chatAllapot === 'loading' || chatFajlAllapot === 'loading' || feltoltottFajlok.length >= 5}
+                className="shrink-0 px-3 py-3 rounded-xl bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white disabled:opacity-40 transition font-bold text-base whitespace-nowrap">
+                {chatFajlAllapot === 'loading' ? '...' : '+ File'}
+              </button>
+              <input ref={chatFajlInputRef} type="file" className="hidden" accept="image/*,.pdf,.docx,.xlsx" onChange={chatFajlFeltoltes} />
+              <button onClick={chatKuldes} disabled={!chatInput.trim() || chatAllapot === 'loading' || chatFajlAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST}
                 className="bg-violet-600 hover:bg-violet-700 disabled:opacity-40 transition px-4 py-3 rounded-xl font-semibold text-sm shrink-0">
                 Send
               </button>
@@ -719,7 +822,10 @@ function SubmitInner() {
 
             {feltoltottFajlok.length > 0 && (
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col gap-2">
-                <p className="text-sm text-gray-400 font-semibold">{feltoltottFajlok.length} file(s) attached</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-400 font-semibold">{feltoltottFajlok.length} file(s) attached</p>
+                  <span className="text-xs text-amber-400 flex items-center gap-1">🔒 Locked — cannot be removed after submit</span>
+                </div>
                 {feltoltottFajlok.map((f, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
                     <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>

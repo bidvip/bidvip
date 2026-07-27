@@ -154,7 +154,54 @@ export default function AdminPage() {
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
+        <h1 className="text-3xl font-bold mb-4">Admin Panel</h1>
+
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 mb-8 flex flex-col gap-4">
+          <div>
+            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Pages</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: '🏠 Home', href: '/' },
+                { label: '📊 Dashboard', href: '/dashboard' },
+                { label: '🛒 Marketplace', href: '/marketplace' },
+                { label: '🪙 Tokens', href: '/tokens' },
+                { label: '🔐 Auth', href: '/auth' },
+              ].map(link => (
+                <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition text-sm">
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Submit Flow</p>
+            <div className="flex flex-wrap gap-2">
+              <a href="/submit" target="_blank" rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg bg-blue-900/30 border border-blue-800 text-blue-300 hover:text-white hover:border-blue-500 transition text-sm">
+                📝 Step 1 — Describe
+              </a>
+              {projektek.filter(p => p.statusz === 'draft').slice(0, 5).map(p => (
+                <div key={p.id} className="flex gap-1 items-center">
+                  <a href={`/submit?draft=${p.id}`} target="_blank" rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-lg bg-violet-900/30 border border-violet-800 text-violet-300 hover:text-white hover:border-violet-500 transition text-sm max-w-[160px] truncate"
+                    title={`Step 2 — ${p.nev}`}>
+                    🤖 Step 2
+                  </a>
+                  <a href={`/submit?draft=${p.id}&step=3`} target="_blank" rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-lg bg-green-900/30 border border-green-800 text-green-300 hover:text-white hover:border-green-500 transition text-sm"
+                    title={`Step 3 — ${p.nev}`}>
+                    💸 Step 3
+                  </a>
+                  <span className="text-xs text-gray-500 max-w-[120px] truncate">{p.nev || 'Unnamed'}</span>
+                </div>
+              ))}
+              {projektek.filter(p => p.statusz === 'draft').length === 0 && (
+                <span className="text-xs text-gray-600 py-1.5">No drafts in progress</span>
+              )}
+            </div>
+          </div>
+        </div>
 
         <div className="flex gap-2 mb-8">
           <button onClick={() => setTab('projektek')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'projektek' ? 'bg-violet-600 border-violet-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
