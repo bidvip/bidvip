@@ -160,27 +160,6 @@ export default function ProjectDetail() {
     setAiAllapot('kesz')
   }
 
-  async function vasarlas() {
-    if (!user) { router.push('/auth'); return }
-    setAllapot('loading')
-    const res = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        projekt_id: projekt?.id,
-        projekt_nev: projekt?.nev,
-        osszeg: legmagasabb,
-        vevo_email: user.email,
-      }),
-    })
-    const { url, error } = await res.json()
-    if (error || !url) {
-      setHiba('Payment error. Please try again.')
-      setAllapot('hiba')
-    } else {
-      window.location.href = url
-    }
-  }
 
   async function licitBeküldes(e: React.FormEvent) {
     e.preventDefault()
@@ -449,21 +428,6 @@ export default function ProjectDetail() {
               </form>
             )}
 
-            {licitek.length > 0 && user?.id !== projekt.user_id && (
-              <div className="mt-4 pt-4 border-t border-gray-800">
-                <p className="text-xs text-gray-400 mb-3">If you&apos;re the highest bidder, you can purchase this project:</p>
-                <button
-                  onClick={vasarlas}
-                  disabled={licitek[0]?.user_id !== user?.id || allapot === 'loading'}
-                  className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition py-3 rounded-full font-semibold text-sm"
-                >
-                  💳 Buy Now — €{legmagasabb.toLocaleString()}
-                </button>
-                {licitek[0]?.user_id !== user?.id && user && (
-                  <p className="text-gray-500 text-xs text-center mt-2">Only the highest bidder can purchase.</p>
-                )}
-              </div>
-            )}
 
             {licitek.length > 0 && (
               <div className="mt-6 pt-6 border-t border-gray-800">
