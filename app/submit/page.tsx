@@ -268,15 +268,24 @@ function SubmitInner() {
     if (!fajl) return
     e.target.value = ''
     if (feltoltottFajlok.length >= 5) { setHiba('Maximum 5 files allowed.'); return }
+    if (fajl.size > 10 * 1024 * 1024) { setHiba('File too large (max 10MB).'); return }
     if ((tokenEgyenleg ?? 0) < CHAT_COST) { setHiba('Not enough tokens to send a message.'); return }
 
     setChatFajlAllapot('loading')
-    const fd = new FormData()
-    fd.append('fajl', fajl)
-    const res = await fetch('/api/upload', { method: 'POST', body: fd })
-    const resData = await res.json()
-    if (!res.ok) { setChatFajlAllapot('idle'); setHiba(`Upload failed: ${resData.error || res.status}`); return }
-    const ujFajl: Fajl = resData
+    let ujFajl: Fajl
+    try {
+      const fd = new FormData()
+      fd.append('fajl', fajl)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const resData = await res.json()
+      if (!res.ok) { setHiba(`Upload failed: ${resData.error || res.status}`); return }
+      ujFajl = resData
+    } catch {
+      setHiba('Upload failed: network error.')
+      return
+    } finally {
+      setChatFajlAllapot('idle')
+    }
     const ujFajlok = [...feltoltottFajlok, ujFajl]
     setFeltoltottFajlok(ujFajlok)
     setChatFajlAllapot('idle')
