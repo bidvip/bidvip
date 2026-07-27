@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
-import { sendEmail, purchaseSellerEmail, purchaseBuyerEmail } from '@/lib/email'
+import { sendEmail, purchaseSellerEmail, purchaseBuyerDetailedEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,21 +28,29 @@ export async function POST(req: NextRequest) {
     const vevo_email = session.metadata?.vevo_email
 
     if (projekt_id) {
+      const osszeg = (session.amount_total || 0) / 100
+
+      // Mark project as sold
       const { data: projekt } = await supabase
         .from('projektek')
-        .select('nev, user_email, kikialtasi_ar')
+        .update({ statusz: 'sold', vevo_email })
         .eq('id', projekt_id)
+        .select('nev, user_email, reszletes_leiras, fajlok')
         .single()
 
       if (projekt) {
-        const osszeg = (session.amount_total || 0) / 100
-
+        // Email seller
         if (projekt.user_email) {
           const { subject, html } = purchaseSellerEmail(projekt.nev, osszeg, vevo_email || '')
           await sendEmail(projekt.user_email, subject, html)
         }
+        // Email buyer with full details
         if (vevo_email) {
-          const { subject, html } = purchaseBuyerEmail(projekt.nev, osszeg)
+          const { subject, html } = purchaseBuyerDetailedEmail(
+            projekt.nev,
+            projekt.reszletes_leiras || '',
+            projekt.fajlok || []
+          )
           await sendEmail(vevo_email, subject, html)
         }
       }

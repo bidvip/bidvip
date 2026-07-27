@@ -67,3 +67,37 @@ export function purchaseBuyerEmail(projektNev: string, osszeg: number) {
     `,
   }
 }
+
+export function auctionWinnerEmail(projektNev: string, osszeg: number, paymentUrl: string) {
+  return {
+    subject: `You won the auction: ${projektNev}`,
+    html: `
+      <p>Hi,</p>
+      <p>Congratulations — you placed the winning bid on <strong>${projektNev}</strong> for <strong>€${osszeg.toLocaleString()}</strong>!</p>
+      <p>To receive the full project details and files, complete your payment:</p>
+      <p><a href="${paymentUrl}" style="background:#7c3aed;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Pay Now →</a></p>
+      <p style="color:#888;font-size:12px;">This payment link expires in 24 hours. If you have any questions, reply to this email.</p>
+      <p>— BidVip Team</p>
+    `,
+  }
+}
+
+export function purchaseBuyerDetailedEmail(projektNev: string, reszletesLeiras: string, fajlok: Array<{nev: string; url: string; tipus: string}>) {
+  const fajlListHTML = fajlok.length > 0
+    ? `<h3>Files & Documents</h3><ul>${fajlok.map(f => `<li><a href="${f.url}">${f.nev}</a></li>`).join('')}</ul>`
+    : ''
+  return {
+    subject: `Project unlocked: ${projektNev}`,
+    html: `
+      <p>Hi,</p>
+      <p>Your payment was confirmed. Here are the full details for <strong>${projektNev}</strong>:</p>
+      <hr/>
+      <h3>Full Description</h3>
+      <p style="white-space:pre-wrap">${reszletesLeiras}</p>
+      ${fajlListHTML}
+      <hr/>
+      <p>The seller has been notified of your purchase and will reach out to arrange the handover.</p>
+      <p>— BidVip Team</p>
+    `,
+  }
+}

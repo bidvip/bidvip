@@ -30,6 +30,8 @@ type Projekt = {
   lejarat: string | null
   fajlok: Fajl[] | null
   ai_elemzes: string | null
+  statusz: string | null
+  vevo_email: string | null
 }
 
 function timeLeft(lejarat: string | null): string {
@@ -236,45 +238,50 @@ export default function ProjectDetail() {
             <p className="text-gray-400">{projekt.rovid_leiras}</p>
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <h2 className="font-semibold mb-3">About this project</h2>
-            <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{projekt.reszletes_leiras}</p>
-          </div>
+          {(() => {
+            const isSeller = user?.id === projekt.user_id
+            const isBuyer = projekt.statusz === 'sold' && user?.email === projekt.vevo_email
+            const canSeeDetails = isSeller || isBuyer
 
-          {projekt.fajlok && projekt.fajlok.length > 0 && (
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-              <h2 className="font-semibold mb-4">Files & Media</h2>
-              {/* Image gallery */}
-              {projekt.fajlok.some(f => f.tipus.startsWith('image/')) && (
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {projekt.fajlok.filter(f => f.tipus.startsWith('image/')).map((f, i) => (
-                    <a key={i} href={f.url} target="_blank" rel="noopener noreferrer">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={f.url}
-                        alt={f.nev}
-                        className="w-full h-40 object-cover rounded-xl border border-gray-700 hover:border-violet-500 transition cursor-pointer"
-                      />
-                    </a>
-                  ))}
+            return canSeeDetails ? (
+              <>
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+                  <h2 className="font-semibold mb-3">About this project</h2>
+                  <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{projekt.reszletes_leiras}</p>
                 </div>
-              )}
-              {/* Non-image files */}
-              {projekt.fajlok.filter(f => !f.tipus.startsWith('image/')).map((f, i) => (
-                <a
-                  key={i}
-                  href={f.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-violet-500 rounded-xl transition mb-2"
-                >
-                  <span className="text-xl">{f.tipus === 'application/pdf' ? '📄' : f.tipus.includes('word') ? '📝' : '📊'}</span>
-                  <span className="text-sm text-gray-300 truncate">{f.nev}</span>
-                  <span className="ml-auto text-xs text-gray-500 shrink-0">Download ↓</span>
-                </a>
-              ))}
-            </div>
-          )}
+
+                {projekt.fajlok && projekt.fajlok.length > 0 && (
+                  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+                    <h2 className="font-semibold mb-4">Files & Media</h2>
+                    {projekt.fajlok.some(f => f.tipus.startsWith('image/')) && (
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        {projekt.fajlok.filter(f => f.tipus.startsWith('image/')).map((f, i) => (
+                          <a key={i} href={f.url} target="_blank" rel="noopener noreferrer">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={f.url} alt={f.nev} className="w-full h-40 object-cover rounded-xl border border-gray-700 hover:border-violet-500 transition cursor-pointer" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                    {projekt.fajlok.filter(f => !f.tipus.startsWith('image/')).map((f, i) => (
+                      <a key={i} href={f.url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-3 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-violet-500 rounded-xl transition mb-2">
+                        <span className="text-xl">{f.tipus === 'application/pdf' ? '📄' : f.tipus.includes('word') ? '📝' : '📊'}</span>
+                        <span className="text-sm text-gray-300 truncate">{f.nev}</span>
+                        <span className="ml-auto text-xs text-gray-500 shrink-0">Download ↓</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-8 text-center">
+                <div className="text-3xl mb-3">🔒</div>
+                <h2 className="font-semibold mb-2">Full details locked</h2>
+                <p className="text-gray-400 text-sm">The detailed description and files are only available to the winning buyer after payment.</p>
+              </div>
+            )
+          })()}
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
