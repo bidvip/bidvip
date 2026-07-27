@@ -274,8 +274,9 @@ function SubmitInner() {
     const fd = new FormData()
     fd.append('fajl', fajl)
     const res = await fetch('/api/upload', { method: 'POST', body: fd })
-    if (!res.ok) { setChatFajlAllapot('idle'); setHiba('File upload failed.'); return }
-    const ujFajl: Fajl = await res.json()
+    const resData = await res.json()
+    if (!res.ok) { setChatFajlAllapot('idle'); setHiba(`Upload failed: ${resData.error || res.status}`); return }
+    const ujFajl: Fajl = resData
     const ujFajlok = [...feltoltottFajlok, ujFajl]
     setFeltoltottFajlok(ujFajlok)
     setChatFajlAllapot('idle')
