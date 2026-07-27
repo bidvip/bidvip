@@ -14,20 +14,26 @@ export async function POST(req: NextRequest) {
 
   const szoveg = `You are a content moderator and startup mentor for BidVip, an idea auction marketplace.
 
-STEP 1 — SAFETY CHECK (do this first, before anything else):
-Does the submission describe ANY of the following?
+SCORING RULES — read carefully:
+
+Score -1 (BLOCKED) — use this if the content contains ANY of:
 - Weapons manufacturing, bomb making, explosives, firearms trafficking
 - Illegal drugs production or distribution
-- Hacking tools, malware, cyberattacks
+- Hacking tools, malware, cyberattacks for harm
 - Fraud, scams, phishing, counterfeit goods
 - Human trafficking, exploitation, child abuse
 - Violence, terrorism, self-harm promotion
 - Hate speech or discrimination
-- Pure gibberish or test data with no real content (e.g. "asdf", "bomb")
+A score of -1 means automatic account suspension. Use it ONLY for genuinely dangerous or illegal content.
 
-If YES to any of the above: you MUST respond with blocked=true. Do NOT give normal feedback. Do NOT give a score. Just block it.
+Score 1-3 — weak or meaningless idea:
+- Pure gibberish, random words, or test data ("asdf", "test 123")
+- No real business concept at all
+- Extremely vague with zero substance
+These are bad ideas but NOT illegal — give normal improvement feedback.
 
-STEP 2 — Only if NOT blocked: evaluate the business idea as a startup mentor.
+Score 4-6 — has potential but incomplete
+Score 7-10 — strong idea, ready to proceed
 
 Project:
 - Name: ${nev}
@@ -38,10 +44,9 @@ ${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s).` : '
 
 Respond ONLY with this exact JSON (no markdown):
 {
-  "blocked": <true or false>,
-  "block_reason": "<why blocked, or empty string>",
-  "score": <1-10, or 0 if blocked>,
-  "verdict": "<one sentence, or empty if blocked>",
+  "score": <-1 if blocked, 1-10 otherwise>,
+  "block_reason": "<short reason if score is -1, else empty string>",
+  "verdict": "<one sentence summary, empty if score is -1>",
   "strengths": ["<point>"],
   "improvements": ["<point>"],
   "ready": <true if score >= 7, false otherwise>
@@ -66,27 +71,17 @@ Respond ONLY with this exact JSON (no markdown):
 
   const text = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
 
-  const VESZELYES_SZAVAK = ['illegal', 'dangerous', 'weapons', 'bomb', 'explosive', 'drug', 'harm', 'violence', 'trafficking', 'malware', 'fraud', 'scam']
-
   try {
     const match = text.match(/\{[\s\S]*\}/)
     const result = JSON.parse(match ? match[0] : text)
 
-    // Fallback: ha score <= 2 és a szöveg veszélyes kulcsszavakat tartalmaz, force block
-    if (!result.blocked && result.score <= 2) {
-      const szovegEgyutt = `${result.verdict} ${(result.improvements || []).join(' ')}`.toLowerCase()
-      const veszelyes = VESZELYES_SZAVAK.some(sz => szovegEgyutt.includes(sz))
-      if (veszelyes) {
-        return NextResponse.json({
-          blocked: true,
-          block_reason: result.verdict || 'Content violates marketplace policies.',
-          score: 0, verdict: '', strengths: [], improvements: [], ready: false,
-        })
-      }
+    // Normalize: ha a Haiku mégis blocked mezőt adott vissza (régi formátum)
+    if (result.blocked === true && result.score !== -1) {
+      result.score = -1
     }
 
     return NextResponse.json(result)
   } catch {
-    return NextResponse.json({ blocked: false, score: 5, verdict: 'Could not analyze.', strengths: [], improvements: ['Add more detail to your description.'], ready: false })
+    return NextResponse.json({ score: 5, verdict: 'Could not analyze.', strengths: [], improvements: ['Add more detail to your description.'], ready: false })
   }
 }

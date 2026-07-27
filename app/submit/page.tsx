@@ -185,7 +185,7 @@ function SubmitInner() {
       body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, kepUrlok, fajlSzovegek }),
     })
     const data = await res.json()
-    if (data.blocked) {
+    if (data.score === -1) {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         await fetch('/api/report', {
@@ -572,28 +572,38 @@ function SubmitInner() {
             {hiba && <p className="text-red-400 text-sm">{hiba}</p>}
 
             {feedback && (
-              <div className={`rounded-2xl border p-6 flex flex-col gap-4 ${feedback.ready ? 'border-green-700 bg-green-900/10' : 'border-amber-700 bg-amber-900/10'}`}>
+              <div className={`rounded-2xl border p-6 flex flex-col gap-4 ${feedback.score === -1 ? 'border-red-700 bg-red-900/10' : feedback.ready ? 'border-green-700 bg-green-900/10' : 'border-amber-700 bg-amber-900/10'}`}>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">🤖 AI Feedback</span>
                   <div className="flex items-center gap-2">
-                    <span className={`text-2xl font-bold ${feedback.score >= 7 ? 'text-green-400' : feedback.score >= 5 ? 'text-amber-400' : 'text-red-400'}`}>{feedback.score}/10</span>
-                    {feedback.ready
-                      ? <span className="text-xs bg-green-900/40 text-green-400 border border-green-800 px-2 py-1 rounded-full">Ready</span>
-                      : <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800 px-2 py-1 rounded-full">Needs improvement</span>}
+                    <span className={`text-2xl font-bold ${feedback.score === -1 ? 'text-red-500' : feedback.score >= 7 ? 'text-green-400' : feedback.score >= 5 ? 'text-amber-400' : 'text-red-400'}`}>
+                      {feedback.score === -1 ? '-1' : feedback.score}/10
+                    </span>
+                    {feedback.score === -1
+                      ? <span className="text-xs bg-red-900/40 text-red-400 border border-red-800 px-2 py-1 rounded-full">🚫 Blocked</span>
+                      : feedback.ready
+                        ? <span className="text-xs bg-green-900/40 text-green-400 border border-green-800 px-2 py-1 rounded-full">Ready</span>
+                        : <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800 px-2 py-1 rounded-full">Needs improvement</span>}
                   </div>
                 </div>
-                <p className="text-gray-300 text-sm italic">&quot;{feedback.verdict}&quot;</p>
-                {feedback.strengths.length > 0 && (
-                  <div>
-                    <p className="text-green-400 text-xs font-semibold mb-1 uppercase tracking-wide">Strengths</p>
-                    {feedback.strengths.map((s, i) => <p key={i} className="text-gray-300 text-sm">✓ {s}</p>)}
-                  </div>
-                )}
-                {feedback.improvements.length > 0 && (
-                  <div>
-                    <p className="text-amber-400 text-xs font-semibold mb-1 uppercase tracking-wide">Improve</p>
-                    {feedback.improvements.map((s, i) => <p key={i} className="text-gray-300 text-sm">→ {s}</p>)}
-                  </div>
+                {feedback.score === -1 ? (
+                  <p className="text-red-300 text-sm">Your content violates marketplace policies. Your account has been suspended pending admin review.</p>
+                ) : (
+                  <>
+                    <p className="text-gray-300 text-sm italic">&quot;{feedback.verdict}&quot;</p>
+                    {feedback.strengths.length > 0 && (
+                      <div>
+                        <p className="text-green-400 text-xs font-semibold mb-1 uppercase tracking-wide">Strengths</p>
+                        {feedback.strengths.map((s, i) => <p key={i} className="text-gray-300 text-sm">✓ {s}</p>)}
+                      </div>
+                    )}
+                    {feedback.improvements.length > 0 && (
+                      <div>
+                        <p className="text-amber-400 text-xs font-semibold mb-1 uppercase tracking-wide">Improve</p>
+                        {feedback.improvements.map((s, i) => <p key={i} className="text-gray-300 text-sm">→ {s}</p>)}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
