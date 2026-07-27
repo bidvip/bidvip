@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation'
 const ADMIN_EMAIL = 'info.webbloki@gmail.com'
 
 const badge_info: Record<string, string> = {
-  papir: '🌱 Concept',
-  prototipus: '🛠️ Prototype',
-  bizonyitott: '✅ Proven',
+  idea: '🌱 Concept',
+  prototype: '🛠️ Prototype',
+  proven: '✅ Proven',
 }
 
 type Projekt = {
@@ -29,11 +29,27 @@ type Projekt = {
   user_id: string
 }
 
+type Report = {
+  id: string
+  user_id: string
+  user_email: string
+  nev: string
+  rovid_leiras: string
+  reszletes_leiras: string
+  kategoria: string
+  block_reason: string
+  fajlok: { nev: string; url: string; tipus: string }[]
+  created_at: string
+  statusz: string
+}
+
 export default function AdminPage() {
   const [projektek, setProjektek] = useState<Projekt[]>([])
+  const [reportok, setReportok] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
   const [hozzaferes, setHozzaferes] = useState(false)
   const [aktiv, setAktiv] = useState<string | null>(null)
+  const [tab, setTab] = useState<'projektek' | 'reportok'>('projektek')
   const router = useRouter()
   const supabase = createClient()
 
@@ -46,12 +62,13 @@ export default function AdminPage() {
       }
       setHozzaferes(true)
 
-      const { data } = await supabase
-        .from('projektek')
-        .select('*')
-        .order('letrehozva', { ascending: false })
+      const [{ data: proj }, { data: rep }] = await Promise.all([
+        supabase.from('projektek').select('*').order('letrehozva', { ascending: false }),
+        fetch('/api/admin/reports').then(r => r.json()),
+      ])
 
-      setProjektek(data || [])
+      setProjektek(proj || [])
+      setReportok(rep || [])
       setLoading(false)
     }
     betolt()
@@ -91,6 +108,29 @@ export default function AdminPage() {
     setAktiv(null)
   }
 
+  async function feloldasReport(report: Report) {
+    setAktiv(report.id)
+    await fetch('/api/admin/lift-suspension', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_id: report.id, user_id: report.user_id }),
+    })
+    setReportok(prev => prev.map(r => r.id === report.id ? { ...r, statusz: 'feloldva' } : r))
+    setAktiv(null)
+  }
+
+  async function vegelegesTiltas(report: Report) {
+    if (!confirm(`Permanently ban ${report.user_email}?`)) return
+    setAktiv(report.id)
+    await fetch('/api/admin/permanent-ban', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_id: report.id, user_id: report.user_id }),
+    })
+    setReportok(prev => prev.map(r => r.id === report.id ? { ...r, statusz: 'vegleges_tiltás' } : r))
+    setAktiv(null)
+  }
+
   if (!hozzaferes) return null
 
   if (loading) {
@@ -112,15 +152,85 @@ export default function AdminPage() {
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-2">Admin Panel</h1>
-        <p className="text-gray-400 mb-10">{projektek.length} project{projektek.length !== 1 ? 's' : ''} total</p>
+        <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
 
-        {projektek.length === 0 ? (
+        <div className="flex gap-2 mb-8">
+          <button onClick={() => setTab('projektek')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'projektek' ? 'bg-violet-600 border-violet-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+            Projects ({projektek.length})
+          </button>
+          <button onClick={() => setTab('reportok')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'reportok' ? 'bg-red-700 border-red-700 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+            Reports {reportok.filter(r => r.statusz === 'pending').length > 0 && <span className="ml-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">{reportok.filter(r => r.statusz === 'pending').length}</span>}
+          </button>
+        </div>
+
+        {tab === 'reportok' && (
+          <div className="flex flex-col gap-6">
+            {reportok.length === 0 ? (
+              <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
+                <div className="text-5xl mb-4">✅</div>
+                <p className="text-gray-400">No reports yet.</p>
+              </div>
+            ) : reportok.map(r => (
+              <div key={r.id} className={`bg-gray-900 border rounded-2xl p-6 ${r.statusz === 'pending' ? 'border-red-800' : 'border-gray-800 opacity-70'}`}>
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${r.statusz === 'pending' ? 'bg-red-900/40 text-red-400' : r.statusz === 'feloldva' ? 'bg-green-900/40 text-green-400' : 'bg-gray-800 text-gray-500'}`}>
+                      {r.statusz === 'pending' ? '⚠️ Pending review' : r.statusz === 'feloldva' ? '✓ Lifted' : '🚫 Permanently banned'}
+                    </span>
+                    <h2 className="text-lg font-bold mt-2">{r.nev || '(no name)'}</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">{r.user_email} · {new Date(r.created_at).toLocaleString()}</p>
+                  </div>
+                </div>
+
+                <div className="bg-red-900/10 border border-red-900/40 rounded-xl px-4 py-2 mb-3 text-sm text-red-300">
+                  <strong>Block reason:</strong> {r.block_reason}
+                </div>
+
+                {r.rovid_leiras && <p className="text-gray-300 text-sm mb-1"><span className="text-gray-500">Short:</span> {r.rovid_leiras}</p>}
+                {r.reszletes_leiras && (
+                  <p className="text-gray-400 text-sm leading-relaxed mb-3 border-l-2 border-gray-700 pl-4 whitespace-pre-line">
+                    {r.reszletes_leiras}
+                  </p>
+                )}
+
+                {r.fajlok?.length > 0 && (
+                  <div className="flex flex-col gap-1 mb-4">
+                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Evidence files</p>
+                    {r.fajlok.map((f, i) => (
+                      <a key={i} href={f.url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition">
+                        <span>{f.tipus?.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>
+                        <span className="underline">{f.nev}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                {r.statusz === 'pending' && (
+                  <div className="flex gap-3 mt-4">
+                    <button onClick={() => feloldasReport(r)} disabled={aktiv === r.id}
+                      className="bg-green-600 hover:bg-green-700 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm font-semibold">
+                      {aktiv === r.id ? '...' : '✓ Lift suspension'}
+                    </button>
+                    <button onClick={() => vegelegesTiltas(r)} disabled={aktiv === r.id}
+                      className="bg-red-700 hover:bg-red-800 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm font-semibold">
+                      🚫 Permanent ban
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === 'projektek' && projektek.length === 0 && (
           <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
             <div className="text-5xl mb-4">✅</div>
             <p className="text-gray-400">All caught up — no projects pending review.</p>
           </div>
-        ) : (
+        )}
+
+        {tab === 'projektek' && projektek.length > 0 && (
           <div className="flex flex-col gap-6">
             {projektek.map(p => (
               <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
@@ -186,6 +296,7 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
     </main>
   )
 }

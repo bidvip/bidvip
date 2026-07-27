@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 
 const badge_info: Record<string, { label: string; szin: string }> = {
-  papir: { label: '🌱 Concept', szin: 'bg-green-900/40 text-green-400 border-green-800' },
-  prototipus: { label: '🛠️ Prototype', szin: 'bg-blue-900/40 text-blue-400 border-blue-800' },
-  bizonyitott: { label: '✅ Proven', szin: 'bg-violet-900/40 text-violet-400 border-violet-800' },
+  idea: { label: '🌱 Concept', szin: 'bg-green-900/40 text-green-400 border-green-800' },
+  prototype: { label: '🛠️ Prototype', szin: 'bg-blue-900/40 text-blue-400 border-blue-800' },
+  proven: { label: '✅ Proven', szin: 'bg-violet-900/40 text-violet-400 border-violet-800' },
 }
 
 type Projekt = {
@@ -76,9 +76,9 @@ export default function Marketplace() {
         <div className="flex gap-2 mb-8 flex-wrap">
           {[
             { ertek: 'mind', label: 'All' },
-            { ertek: 'papir', label: '🌱 Concept' },
-            { ertek: 'prototipus', label: '🛠️ Prototype' },
-            { ertek: 'bizonyitott', label: '✅ Proven' },
+            { ertek: 'idea', label: '🌱 Concept' },
+            { ertek: 'prototype', label: '🛠️ Prototype' },
+            { ertek: 'proven', label: '✅ Proven' },
           ].map(s => (
             <button
               key={s.ertek}

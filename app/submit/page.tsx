@@ -64,12 +64,24 @@ function SubmitInner() {
   const [allapot, setAllapot] = useState<'idle' | 'szures' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
   const [draftId, setDraftId] = useState<string | null>(null)
+  const [felfuggesztve, setFelfuggesztve] = useState<string | null>(null)
 
   const searchParams = useSearchParams()
 
   useEffect(() => {
     if (chatVegRef.current) chatVegRef.current.scrollIntoView({ behavior: 'smooth' })
   }, [chatUzenetek])
+
+  useEffect(() => {
+    async function ellenorizFelfuggesztes() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const res = await fetch(`/api/suspension?user_id=${user.id}`)
+      const data = await res.json()
+      if (data.suspended) setFelfuggesztve(data.ok || 'A tartalmad megszegte a marketplace szabályait.')
+    }
+    ellenorizFelfuggesztes()
+  }, [])
 
   useEffect(() => {
     const draft = searchParams.get('draft')
@@ -98,25 +110,27 @@ function SubmitInner() {
         setTokenEgyenleg(tokenData?.egyenleg ?? 0)
       }
       setLepes(2)
-      setChatAllapot('loading')
-      try {
-        const res = await fetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            uzenet: 'Hello! I am continuing to refine my idea. Can you help me make it market-ready?',
-            elozmenyek: [],
-            projekt: { nev: data.nev, kategoria: data.kategoria, rovid_leiras: data.rovid_leiras, reszletes_leiras: data.reszletes_leiras },
-          }),
-        })
-        const aiData = await res.json()
-        setChatUzenetek([{ role: 'assistant', content: aiData.valasz }])
-        setChatKeszen(aiData.keszen ?? false)
-        setChatScore(aiData.score ?? null)
-      } catch {
-        setChatUzenetek([{ role: 'assistant', content: 'Welcome back! Let\'s continue refining your idea.' }])
-      } finally {
+
+      if (data.chat_elozmenyek && data.chat_elozmenyek.length > 0) {
+        setChatUzenetek(data.chat_elozmenyek)
         setChatAllapot('idle')
+      } else {
+        setChatAllapot('loading')
+        try {
+          const projektAdat = { nev: data.nev, kategoria: data.kategoria, rovid_leiras: data.rovid_leiras, reszletes_leiras: data.reszletes_leiras }
+          const { score, keszen } = await chatStream(
+            'Hello! I just passed the initial screening. Can you help me refine my idea further?',
+            [],
+            projektAdat,
+            (text) => setChatUzenetek([{ role: 'assistant', content: text }])
+          )
+          setChatKeszen(keszen)
+          setChatScore(score)
+        } catch {
+          setChatUzenetek([{ role: 'assistant', content: 'Welcome back! Let\'s continue refining your idea.' }])
+        } finally {
+          setChatAllapot('idle')
+        }
       }
     }
     betoltDraft()
@@ -171,6 +185,28 @@ function SubmitInner() {
       body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, kepUrlok, fajlSzovegek }),
     })
     const data = await res.json()
+    if (data.blocked) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await fetch('/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: user.id,
+            user_email: user.email,
+            nev: form.nev,
+            rovid_leiras: form.rovid_leiras,
+            reszletes_leiras: form.reszletes_leiras,
+            kategoria: form.kategoria,
+            block_reason: data.block_reason || 'Content violates marketplace rules.',
+            fajlok: feltoltottFajlok,
+          }),
+        })
+        setFelfuggesztve(data.block_reason || 'Content violates marketplace rules.')
+      }
+      setFeedbackAllapot('idle')
+      return
+    }
     setFeedback(data)
     setFeedbackAllapot('idle')
   }
@@ -222,7 +258,7 @@ function SubmitInner() {
         rovid_leiras: form.rovid_leiras,
         reszletes_leiras: form.reszletes_leiras,
         kategoria: form.kategoria,
-        badge: 'papir',
+        badge: 'idea',
         kikialtasi_ar: 0,
         lejarat: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         statusz: 'draft',
@@ -242,14 +278,19 @@ function SubmitInner() {
     setChatUzenetek([{ role: 'assistant', content: '' }])
     try {
       const projektAdat = { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras }
+      let vegsoSzoveg = ''
       const { score, keszen } = await chatStream(
         'Hello! I just passed the initial screening. Can you help me refine my idea further?',
         [],
         projektAdat,
-        (text) => setChatUzenetek([{ role: 'assistant', content: text }])
+        (text) => { vegsoSzoveg = text; setChatUzenetek([{ role: 'assistant', content: text }]) }
       )
       setChatKeszen(keszen)
       setChatScore(score)
+      if (draftId && vegsoSzoveg) {
+        const mentendoUzenetek = [{ role: 'assistant', content: vegsoSzoveg }]
+        await supabase.from('projektek').update({ chat_elozmenyek: mentendoUzenetek }).eq('id', draftId)
+      }
     } catch (e) {
       setChatUzenetek([{ role: 'assistant', content: 'Failed to connect to AI. Please try again.' }])
     } finally {
@@ -284,14 +325,19 @@ function SubmitInner() {
     setChatUzenetek([...ujUzenetek, ujValasz])
     try {
       const projektAdat = { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras }
+      let vegsoValasz = ''
       const { score, keszen } = await chatStream(
         chatInput,
         chatUzenetek,
         projektAdat,
-        (text) => setChatUzenetek([...ujUzenetek, { role: 'assistant', content: text }])
+        (text) => { vegsoValasz = text; setChatUzenetek([...ujUzenetek, { role: 'assistant', content: text }]) }
       )
       setChatKeszen(keszen)
       setChatScore(score)
+      if (draftId && vegsoValasz) {
+        const mentendoUzenetek = [...ujUzenetek, { role: 'assistant', content: vegsoValasz }]
+        await supabase.from('projektek').update({ chat_elozmenyek: mentendoUzenetek }).eq('id', draftId)
+      }
     } catch (e) {
       await fetch('/api/tokens/spend', {
         method: 'POST',
@@ -342,34 +388,29 @@ function SubmitInner() {
 
     setAllapot('szures')
 
-    const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
-    const screenRes = await fetch('/api/ai/screen', {
+    const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
+    const validateRes = await fetch('/api/ai/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, kepUrlok }),
+      body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, fajlSzovegek }),
     })
-    const screen = await screenRes.json()
-    if (!screen.ok) {
-      setHiba(screen.reason || 'Your submission did not pass our quality check.')
+    const validateData = validateRes.ok ? await validateRes.json() : { ok: true }
+    if (!validateData.ok) {
+      setHiba(validateData.reason || 'Your submission did not pass our content check. Please ensure it contains a real business idea.')
       setAllapot('hiba')
       return
     }
 
     setAllapot('loading')
 
-    const deepRes = await fetch('/api/ai/deep-analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, badge: screen.badge || 'papir', kikialtasi_ar: parseInt(form.kikialtasi_ar), kepUrlok }),
-    })
-    const deepData = deepRes.ok ? await deepRes.json() : { analysis: '' }
+    const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
 
     const projektAdat = {
       nev: form.nev,
       rovid_leiras: form.rovid_leiras,
       reszletes_leiras: form.reszletes_leiras,
       kategoria: form.kategoria,
-      badge: screen.badge || 'papir',
+      badge,
       kikialtasi_ar: parseInt(form.kikialtasi_ar),
       lejarat: new Date(Date.now() + parseInt(form.idotartam_nap) * 24 * 60 * 60 * 1000).toISOString(),
       van_domain: form.van_domain,
@@ -378,7 +419,6 @@ function SubmitInner() {
       van_bevetel: form.van_bevetel,
       statusz: 'aktiv',
       fajlok: feltoltottFajlok,
-      ai_elemzes: deepData.analysis || null,
     }
 
     const { error } = draftId
@@ -393,12 +433,33 @@ function SubmitInner() {
     }
   }
 
+  if (felfuggesztve) {
+    return (
+      <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
+        <div className="text-5xl mb-4">🔒</div>
+        <h2 className="text-2xl font-bold mb-2">Account suspended</h2>
+        <p className="text-gray-400 mb-2 text-center">Your account has been temporarily suspended pending review.</p>
+        <div className="bg-red-900/20 border border-red-800 rounded-xl px-5 py-3 mb-6 text-sm text-red-300 max-w-md text-center">
+          <strong>Reason:</strong> {felfuggesztve}
+        </div>
+        <p className="text-gray-500 text-sm text-center max-w-sm">An admin will review your submission and you will be notified by email of the outcome.</p>
+        <button onClick={() => router.push('/dashboard')} className="mt-6 border border-gray-700 text-gray-400 hover:text-white transition px-6 py-3 rounded-full">
+          Back to Dashboard
+        </button>
+      </main>
+    )
+  }
+
   if (allapot === 'siker') {
     return (
       <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
         <div className="text-5xl mb-4">🎉</div>
         <h2 className="text-2xl font-bold mb-2">Project submitted!</h2>
-        <p className="text-gray-400 mb-6 text-center">Your project is now live on the marketplace.</p>
+        <p className="text-gray-400 mb-3 text-center">Your project is now live on the marketplace.</p>
+        <div className="flex items-center gap-2 bg-amber-900/20 border border-amber-800 rounded-xl px-4 py-3 mb-6 text-sm text-amber-300">
+          <span>🔒</span>
+          <span>This project has been submitted and <strong>cannot be edited</strong>.</span>
+        </div>
         <button onClick={() => router.push('/dashboard')} className="bg-violet-600 hover:bg-violet-700 transition px-6 py-3 rounded-full font-semibold">
           Back to Dashboard
         </button>
@@ -692,7 +753,7 @@ function SubmitInner() {
 
             <button type="submit" disabled={allapot !== 'idle' && allapot !== 'hiba'}
               className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg">
-              {allapot === 'szures' ? '🤖 Final AI check...' : allapot === 'loading' ? 'Submitting...' : `Submit Project — ${totalCost} tokens →`}
+              {allapot === 'szures' ? '🤖 Checking content...' : allapot === 'loading' ? 'Submitting...' : `Submit Project — ${totalCost} tokens →`}
             </button>
           </form>
         )}

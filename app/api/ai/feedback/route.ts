@@ -21,12 +21,22 @@ Project:
 - Detailed description: ${reszletes_leiras}
 ${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s) — factor them into your evaluation.` : '\nNo images uploaded yet — mention this as an improvement if relevant.'}${dokumentumSzoveg}
 
+FIRST — check if the submission must be BLOCKED. Set "blocked": true and fill "block_reason" if ANY of these apply:
+- Illegal activity: drugs, weapons, hacking tools, fraud, scams, counterfeit goods, human trafficking, gambling without license
+- Dangerous or harmful content: content promoting violence, self-harm, exploitation
+- Complete nonsense: pure gibberish, test data (e.g. "asdf", "test 123"), or no real idea at all
+- Hate speech or discrimination
+
+If NOT blocked, evaluate as normal.
+
 Respond in this exact JSON format (no markdown, just JSON):
 {
-  "score": <1-10 overall quality score>,
-  "verdict": "<one sentence summary>",
-  "strengths": ["<point>", "<point>"],
-  "improvements": ["<specific actionable fix>", "<specific actionable fix>"],
+  "blocked": <true if must be rejected, false otherwise>,
+  "block_reason": "<short reason if blocked, else empty string>",
+  "score": <1-10 overall quality score, 0 if blocked>,
+  "verdict": "<one sentence summary, empty if blocked>",
+  "strengths": [],
+  "improvements": [],
   "ready": <true if score >= 7 and listing is strong enough, false otherwise>
 }`
 
