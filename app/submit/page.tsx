@@ -9,7 +9,7 @@ const categories = [
   'Marketplace', 'Fintech', 'Edtech', 'Healthtech', 'Other',
 ]
 
-const SUBMIT_COST = 10
+const SUBMIT_COST = 25
 const FILE_COST = 2
 const DURATION_COST: Record<string, number> = { '7': 0, '14': 5, '30': 15 }
 const CHAT_COST = 2
