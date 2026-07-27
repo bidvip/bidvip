@@ -52,7 +52,7 @@ Be strict. Most ideas need 3-5 rounds to reach 8.5.`
     },
     body: JSON.stringify({
       model: 'claude-sonnet-5',
-      max_tokens: 1024,
+      max_tokens: 2048,
       stream: true,
       system: rendszerPrompt,
       messages: [...elozmenyek, utolsoUzenet],
