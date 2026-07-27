@@ -11,7 +11,7 @@ const PACKAGES: Record<string, { tokens: number; amount: number; name: string }>
 
 export async function POST(req: NextRequest) {
   try {
-    const { package: pkg, user_id, user_email } = await req.json()
+    const { package: pkg, user_id, user_email, redirect = '' } = await req.json()
 
     const selected = PACKAGES[pkg]
     if (!selected) return NextResponse.json({ error: 'Invalid package' }, { status: 400 })
@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       metadata: { user_id, tokens: selected.tokens.toString(), pkg },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/tokens?status=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/tokens?status=cancelled`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/tokens?status=success&session_id={CHECKOUT_SESSION_ID}${redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/tokens?status=cancelled${redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''}`,
     })
 
     return NextResponse.json({ url: session.url })

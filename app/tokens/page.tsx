@@ -43,7 +43,13 @@ export default function TokensPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    setStatus(params.get('status'))
+    const st = params.get('status')
+    setStatus(st)
+
+    const redirect = params.get('redirect')
+    if (st === 'success' && redirect) {
+      setTimeout(() => router.push(redirect), 2000)
+    }
 
     async function betolt() {
       const { data: { user: u } } = await supabase.auth.getUser()
@@ -63,10 +69,11 @@ export default function TokensPage() {
   async function vasarlas(pkg: string) {
     if (!user) return
     setLoading(pkg)
+    const redirect = new URLSearchParams(window.location.search).get('redirect') || ''
     const res = await fetch('/api/tokens/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ package: pkg, user_id: user.id, user_email: user.email }),
+      body: JSON.stringify({ package: pkg, user_id: user.id, user_email: user.email, redirect }),
     })
     const { url, error } = await res.json()
     if (url) {
@@ -91,6 +98,9 @@ export default function TokensPage() {
         {status === 'success' && (
           <div className="bg-green-900/40 border border-green-800 rounded-2xl px-6 py-4 text-center text-green-400 font-semibold mb-8">
             🎉 Payment successful! Your tokens have been added to your balance.
+            {new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('redirect') && (
+              <p className="text-green-300 text-sm font-normal mt-1">Redirecting you back...</p>
+            )}
           </div>
         )}
         {status === 'cancelled' && (

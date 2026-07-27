@@ -671,7 +671,7 @@ function SubmitInner() {
             </div>
 
             {(tokenEgyenleg ?? 0) < CHAT_COST && (
-              <p className="text-red-400 text-sm text-center">Not enough tokens. <a href="/tokens" className="text-violet-400 hover:underline">Buy tokens →</a></p>
+              <p className="text-red-400 text-sm text-center">Not enough tokens. <a href="/tokens?redirect=/submit" className="text-violet-400 hover:underline">Buy tokens →</a></p>
             )}
 
             <div className="border-t border-gray-800 pt-4">
