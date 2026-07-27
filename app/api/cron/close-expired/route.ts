@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     .update({ statusz: 'lezart' })
     .eq('statusz', 'aktiv')
     .lt('lejarat', new Date().toISOString())
-    .select('id, nev, user_email, kikialtasi_ar')
+    .select('id, nev, user_email, kikialtasi_ar, reserve_ar')
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!lejartProjektek || lejartProjektek.length === 0) {
