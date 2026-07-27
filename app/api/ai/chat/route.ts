@@ -1,17 +1,9 @@
 import { NextRequest } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
-const BADGE_LABELS: Record<string, string> = {
-  papir: 'Concept (idea only)',
-  prototipus: 'Prototype (tangible exists)',
-  bizonyitott: 'Proven (real revenue/users)',
-}
-
 export async function POST(req: NextRequest) {
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
   const { uzenet, elozmenyek, projekt, kepUrlok = [] } = await req.json()
 
   const rendszerPrompt = `You are a senior startup advisor and investor on BidVip, a marketplace where startup ideas are auctioned. You have reviewed hundreds of startups. Your job is to help the seller turn their rough idea into a compelling, market-ready listing that buyers will actually bid on.
@@ -42,35 +34,65 @@ Score criteria:
 
 Be strict. Most ideas need 3-5 rounds to reach 8.5.`
 
+  const kepTartalom = kepUrlok.slice(0, 4).map((url: string) => ({
+    type: 'image',
+    source: { type: 'url', url },
+  }))
+
+  const utolsoUzenet = kepTartalom.length > 0
+    ? { role: 'user', content: [...kepTartalom, { type: 'text', text: uzenet }] }
+    : { role: 'user', content: uzenet }
+
+  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY!,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-5',
+      max_tokens: 1024,
+      stream: true,
+      system: rendszerPrompt,
+      messages: [...elozmenyek, utolsoUzenet],
+    }),
+  })
+
+  if (!anthropicRes.ok) {
+    const err = await anthropicRes.text()
+    return new Response(`\n\n__BIDVIP_META__${JSON.stringify({ score: null, keszen: false, error: err })}`, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    })
+  }
+
   const encoder = new TextEncoder()
   let fullText = ''
 
   const stream = new ReadableStream({
     async start(controller) {
+      const reader = anthropicRes.body!.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
       try {
-        const kepTartalom = kepUrlok.slice(0, 4).map((url: string) => ({
-          type: 'image' as const,
-          source: { type: 'url' as const, url },
-        }))
-
-        const elsoUzenet = kepTartalom.length > 0
-          ? { role: 'user' as const, content: [...kepTartalom, { type: 'text' as const, text: uzenet }] }
-          : { role: 'user' as const, content: uzenet }
-
-        const messageStream = client.messages.stream({
-          model: 'claude-sonnet-5',
-          max_tokens: 1024,
-          system: rendszerPrompt,
-          messages: [
-            ...elozmenyek,
-            elsoUzenet,
-          ],
-        })
-
-        for await (const event of messageStream) {
-          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-            fullText += event.delta.text
-            controller.enqueue(encoder.encode(event.delta.text))
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop() ?? ''
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue
+            const data = line.slice(6).trim()
+            if (data === '[DONE]') continue
+            try {
+              const json = JSON.parse(data)
+              if (json.type === 'content_block_delta' && json.delta?.type === 'text_delta') {
+                fullText += json.delta.text
+                controller.enqueue(encoder.encode(json.delta.text))
+              }
+            } catch {}
           }
         }
 
@@ -79,7 +101,7 @@ Be strict. Most ideas need 3-5 rounds to reach 8.5.`
         const keszen = jsonMatch ? jsonMatch[2] === 'true' : false
         controller.enqueue(encoder.encode(`\n\n__BIDVIP_META__${JSON.stringify({ score, keszen })}`))
       } catch (e) {
-        controller.enqueue(encoder.encode(`\n\n__BIDVIP_META__${JSON.stringify({ score: null, keszen: false, error: true })}`))
+        controller.enqueue(encoder.encode(`\n\n__BIDVIP_META__${JSON.stringify({ score: null, keszen: false })}`))
       } finally {
         controller.close()
       }
