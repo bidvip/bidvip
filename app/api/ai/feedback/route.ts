@@ -6,7 +6,11 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-  const { nev, rovid_leiras, reszletes_leiras, kategoria, kepUrlok = [] } = await req.json()
+  const { nev, rovid_leiras, reszletes_leiras, kategoria, kepUrlok = [], fajlSzovegek = [] } = await req.json()
+
+  const dokumentumSzoveg = fajlSzovegek.length > 0
+    ? `\nExtracted content from uploaded documents:\n${fajlSzovegek.map((s: string, i: number) => `[Document ${i + 1}]:\n${s}`).join('\n\n')}`
+    : ''
 
   const szoveg = `You are a startup mentor reviewing a project idea submitted to BidVip, a marketplace where ideas are auctioned. Give honest, actionable feedback to help the seller improve their listing before it goes live.
 
@@ -15,7 +19,7 @@ Project:
 - Category: ${kategoria}
 - Short description: ${rovid_leiras}
 - Detailed description: ${reszletes_leiras}
-${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s) — factor them into your evaluation.` : '\nNo images uploaded yet — mention this as an improvement if relevant.'}
+${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s) — factor them into your evaluation.` : '\nNo images uploaded yet — mention this as an improvement if relevant.'}${dokumentumSzoveg}
 
 Respond in this exact JSON format (no markdown, just JSON):
 {

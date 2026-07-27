@@ -4,7 +4,7 @@ export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const { uzenet, elozmenyek, projekt, kepUrlok = [] } = await req.json()
+  const { uzenet, elozmenyek, projekt, kepUrlok = [], fajlSzovegek = [] } = await req.json()
 
   const rendszerPrompt = `You are a senior startup advisor and investor on BidVip, a marketplace where startup ideas are auctioned. You have reviewed hundreds of startups. Your job is to help the seller turn their rough idea into a compelling, market-ready listing that buyers will actually bid on.
 
@@ -12,7 +12,7 @@ The seller's project:
 - Name: ${projekt.nev}
 - Category: ${projekt.kategoria}
 - Short description: ${projekt.rovid_leiras}
-- Detailed description: ${projekt.reszletes_leiras}
+- Detailed description: ${projekt.reszletes_leiras}${fajlSzovegek.length > 0 ? `\n\nExtracted content from uploaded documents:\n${fajlSzovegek.map((s: string, i: number) => `[Document ${i + 1}]:\n${s}`).join('\n\n')}` : ''}
 
 HOW TO RESPOND:
 - Give a real, professional opinion — like a VC would in a 15-minute meeting
@@ -52,7 +52,7 @@ Be strict. Most ideas need 3-5 rounds to reach 8.5.`
     },
     body: JSON.stringify({
       model: 'claude-sonnet-5',
-      max_tokens: 2048,
+      max_tokens: 4096,
       stream: true,
       system: rendszerPrompt,
       messages: [...elozmenyek, utolsoUzenet],

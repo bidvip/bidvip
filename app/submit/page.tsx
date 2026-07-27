@@ -22,7 +22,7 @@ type Feedback = {
   ready: boolean
 }
 
-type Fajl = { nev: string; url: string; tipus: string }
+type Fajl = { nev: string; url: string; tipus: string; szoveg?: string }
 type ChatUzenet = { role: 'user' | 'assistant'; content: string }
 
 function SubmitInner() {
@@ -164,10 +164,11 @@ function SubmitInner() {
       kepUrlok = ujFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     }
 
+    const fajlSzovegek = ujFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
     const res = await fetch('/api/ai/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, kepUrlok }),
+      body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, kepUrlok, fajlSzovegek }),
     })
     const data = await res.json()
     setFeedback(data)
@@ -176,10 +177,11 @@ function SubmitInner() {
 
   async function chatStream(uzenet: string, elozmenyek: ChatUzenet[], projektAdat: object, onChunk: (text: string) => void): Promise<{ score: number | null; keszen: boolean }> {
     const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
+    const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
     const res = await fetch('/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uzenet, elozmenyek, projekt: projektAdat, kepUrlok }),
+      body: JSON.stringify({ uzenet, elozmenyek, projekt: projektAdat, kepUrlok, fajlSzovegek }),
     })
     const reader = res.body!.getReader()
     const decoder = new TextDecoder()

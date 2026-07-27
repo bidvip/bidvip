@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { extractText } from '@/lib/extract-text'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,5 +39,11 @@ export async function POST(req: NextRequest) {
     .from('project-files')
     .getPublicUrl(data.path)
 
-  return NextResponse.json({ url: publicUrl, nev: fajl.name, tipus: fajl.type })
+  // Extract text from non-image files
+  let szoveg = ''
+  if (!fajl.type.startsWith('image/')) {
+    szoveg = await extractText(buffer, fajl.type)
+  }
+
+  return NextResponse.json({ url: publicUrl, nev: fajl.name, tipus: fajl.type, szoveg })
 }
