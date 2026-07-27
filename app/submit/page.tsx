@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -25,7 +25,7 @@ type Feedback = {
 type Fajl = { nev: string; url: string; tipus: string }
 type ChatUzenet = { role: 'user' | 'assistant'; content: string }
 
-export default function Submit() {
+function SubmitInner() {
   const router = useRouter()
   const supabase = createClient()
   const chatVegRef = useRef<HTMLDivElement>(null)
@@ -696,5 +696,13 @@ export default function Submit() {
         )}
       </div>
     </main>
+  )
+}
+
+export default function Submit() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-gray-950 flex items-center justify-center"><div className="text-gray-400">Loading...</div></main>}>
+      <SubmitInner />
+    </Suspense>
   )
 }
