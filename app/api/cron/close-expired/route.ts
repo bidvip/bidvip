@@ -42,7 +42,13 @@ export async function GET(req: NextRequest) {
       .limit(1)
       .single()
 
-    if (!topLicit) continue // No bids, just stays closed
+    if (!topLicit) continue // No bids, stays closed
+
+    // Check reserve price
+    if (projekt.reserve_ar && topLicit.osszeg < projekt.reserve_ar) {
+      await supabase.from('projektek').update({ statusz: 'reserve_nem_teljesult' }).eq('id', projekt.id)
+      continue
+    }
 
     // Get winner email
     const { data: { user: winner } } = await supabase.auth.admin.getUserById(topLicit.user_id)

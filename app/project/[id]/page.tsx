@@ -13,6 +13,13 @@ const badge_info: Record<string, { label: string; szin: string }> = {
 
 type Fajl = { nev: string; url: string; tipus: string }
 
+function minIncrement(ar: number): number {
+  if (ar < 500) return 25
+  if (ar < 2000) return 50
+  if (ar < 10000) return 100
+  return 250
+}
+
 type Projekt = {
   id: string
   user_id: string
@@ -22,6 +29,7 @@ type Projekt = {
   kategoria: string
   badge: string
   kikialtasi_ar: number
+  reserve_ar: number | null
   van_domain: boolean
   van_kod: boolean
   van_feliratkozok: boolean
@@ -61,6 +69,8 @@ export default function ProjectDetail() {
   const [licitek, setLicitek] = useState<Licit[]>([])
   const [user, setUser] = useState<User | null>(null)
   const [licitOsszeg, setLicitOsszeg] = useState('')
+  const [proxyMax, setProxyMax] = useState('')
+  const [proxyMode, setProxyMode] = useState(false)
   const [allapot, setAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
   const [hiba, setHiba] = useState('')
   const [loading, setLoading] = useState(true)
@@ -87,10 +97,31 @@ export default function ProjectDetail() {
       setLoading(false)
     }
     betolt()
+
+    // Real-time bid updates
+    const channel = supabase
+      .channel(`licitek-${id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'licitek',
+        filter: `projekt_id=eq.${id}`,
+      }, (payload) => {
+        setLicitek(prev => {
+          const ujLicit = payload.new as Licit
+          const frissitett = [ujLicit, ...prev.filter(l => l.id !== ujLicit.id)]
+          return frissitett.sort((a, b) => b.osszeg - a.osszeg)
+        })
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [id])
 
   const legmagasabb = licitek[0]?.osszeg || projekt?.kikialtasi_ar || 0
-  const minimumLicit = legmagasabb + 1
+  const increment = minIncrement(legmagasabb)
+  const minimumLicit = legmagasabb + increment
+  const reserveTeljesitve = !projekt?.reserve_ar || legmagasabb >= projekt.reserve_ar
 
   const AI_ELEMZES_COST = 1
 
@@ -154,34 +185,35 @@ export default function ProjectDetail() {
   async function licitBeküldes(e: React.FormEvent) {
     e.preventDefault()
     if (!user) { router.push('/auth'); return }
-    if (parseInt(licitOsszeg) < minimumLicit) {
-      setHiba(`Minimum bid is €${minimumLicit}.`)
+    const osszeg = parseInt(proxyMode ? proxyMax : licitOsszeg)
+    if (!osszeg || osszeg < minimumLicit) {
+      setHiba(`Minimum bid is €${minimumLicit.toLocaleString()} (increment: €${increment})`)
       setAllapot('hiba')
       return
     }
     setAllapot('loading')
     setHiba('')
 
-    const { error } = await supabase.from('licitek').insert([{
-      projekt_id: id,
-      user_id: user.id,
-      osszeg: parseInt(licitOsszeg),
-    }])
+    const res = await fetch('/api/bid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projekt_id: id,
+        user_id: user.id,
+        osszeg: proxyMode ? minimumLicit : osszeg,
+        proxy_max: proxyMode ? osszeg : null,
+      }),
+    })
+    const data = await res.json()
 
-    if (error) {
-      setHiba('Something went wrong. Please try again.')
+    if (!res.ok) {
+      setHiba(data.error || 'Something went wrong.')
       setAllapot('hiba')
     } else {
       setAllapot('siker')
       setLicitOsszeg('')
-      const { data: lics } = await supabase.from('licitek').select('*').eq('projekt_id', id).order('osszeg', { ascending: false })
-      setLicitek(lics || [])
+      setProxyMax('')
       setTimeout(() => setAllapot('idle'), 3000)
-      fetch('/api/bid-notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projekt_id: id, osszeg: parseInt(licitOsszeg) }),
-      }).catch(() => {})
     }
   }
 
@@ -357,6 +389,11 @@ export default function ProjectDetail() {
             <p className="text-gray-400 text-sm mb-1">Current highest bid</p>
             <p className="text-4xl font-bold text-violet-400 mb-1">€{legmagasabb.toLocaleString()}</p>
             <p className="text-gray-500 text-xs">Starting price: €{projekt.kikialtasi_ar.toLocaleString()}</p>
+            {projekt.reserve_ar && (
+              <p className={`text-xs mt-1 font-semibold ${reserveTeljesitve ? 'text-green-400' : 'text-amber-400'}`}>
+                {reserveTeljesitve ? '✓ Reserve price met' : `⚠️ Reserve not yet met (€${projekt.reserve_ar.toLocaleString()})`}
+              </p>
+            )}
             {projekt.lejarat && (
               <p className={`text-sm font-semibold mt-2 mb-4 ${new Date(projekt.lejarat) < new Date() ? 'text-red-400' : 'text-amber-400'}`}>
                 ⏱ {timeLeft(projekt.lejarat)}
@@ -374,28 +411,41 @@ export default function ProjectDetail() {
               </div>
             ) : (
               <form onSubmit={licitBeküldes} className="flex flex-col gap-3">
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-                  <input
-                    type="number"
-                    required
-                    min={minimumLicit}
-                    value={licitOsszeg}
-                    onChange={e => setLicitOsszeg(e.target.value)}
-                    placeholder={`min. ${minimumLicit}`}
-                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
-                  />
-                </div>
+                {/* Proxy toggle */}
+                <button type="button" onClick={() => setProxyMode(p => !p)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition ${proxyMode ? 'border-violet-500 text-violet-400 bg-violet-900/20' : 'border-gray-700 text-gray-500 hover:border-gray-500'}`}>
+                  {proxyMode ? '🤖 Proxy bid ON — system bids for you' : '🤖 Enable proxy bidding'}
+                </button>
+
+                {proxyMode ? (
+                  <div className="flex flex-col gap-1">
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
+                      <input type="number" required min={minimumLicit} value={proxyMax}
+                        onChange={e => setProxyMax(e.target.value)}
+                        placeholder={`Your maximum (min. €${minimumLicit.toLocaleString()})`}
+                        className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-violet-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
+                      />
+                    </div>
+                    <p className="text-gray-500 text-xs">System places €{minimumLicit.toLocaleString()} now, auto-bids up to your max if outbid.</p>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
+                    <input type="number" required min={minimumLicit} value={licitOsszeg}
+                      onChange={e => setLicitOsszeg(e.target.value)}
+                      placeholder={`min. €${minimumLicit.toLocaleString()} (+€${increment})`}
+                      className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
+                    />
+                  </div>
+                )}
+
                 {allapot === 'hiba' && <p className="text-red-400 text-xs">{hiba}</p>}
                 {allapot === 'siker' && <p className="text-green-400 text-xs">Bid placed successfully!</p>}
-                <button
-                  type="submit"
-                  disabled={allapot === 'loading'}
-                  className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-3 rounded-full font-semibold"
-                >
-                  {allapot === 'loading' ? 'Submitting...' : 'Place Bid →'}
+                <button type="submit" disabled={allapot === 'loading'}
+                  className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-3 rounded-full font-semibold">
+                  {allapot === 'loading' ? 'Submitting...' : proxyMode ? '🤖 Set Proxy Bid →' : 'Place Bid →'}
                 </button>
-                {!user && <p className="text-gray-500 text-xs text-center">You need to sign in to place a bid.</p>}
               </form>
             )}
 

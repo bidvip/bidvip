@@ -38,6 +38,7 @@ function SubmitInner() {
     reszletes_leiras: '',
     kategoria: '',
     kikialtasi_ar: '',
+    reserve_ar: '',
     idotartam_nap: '14',
     van_domain: false,
     van_kod: false,
@@ -605,6 +606,7 @@ function SubmitInner() {
       statusz: 'aktiv',
       fajlok: feltoltottFajlok,
       ai_ertekeles: aiErtekeles?.estimated_value ?? null,
+      reserve_ar: form.reserve_ar ? parseInt(form.reserve_ar) : null,
     }
 
     const { error } = draftId
@@ -1007,6 +1009,21 @@ function SubmitInner() {
                   placeholder={aiErtekeles ? `e.g. ${aiErtekeles.estimated_value}` : 'e.g. 500'}
                   className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
                 />
+              </div>
+            </div>
+
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-semibold">Reserve Price <span className="text-gray-500 font-normal text-sm">(optional)</span></h2>
+                  <p className="text-gray-400 text-sm mt-0.5">Minimum amount you'll accept. If not reached, no sale.</p>
+                </div>
+              </div>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
+                <input type="number" min={1} value={form.reserve_ar || ''} onChange={e => frissit('reserve_ar', e.target.value)}
+                  placeholder="e.g. 5000 — leave empty for no reserve"
+                  className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
               </div>
             </div>
 
