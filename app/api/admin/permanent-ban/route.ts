@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   // Keep suspension permanent (feloldva stays null)
   // Optionally disable auth user
-  await supabase.auth.admin.updateUser(user_id, { ban_duration: '876600h' }) // 100 years
+  await supabase.auth.admin.updateUserById(user_id, { ban_duration: '876600h' }) // 100 years
 
   return NextResponse.json({ ok: true })
 }
