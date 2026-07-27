@@ -1,11 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+
+const MAX_WAITLIST = 2000
 
 export default function Home() {
   const [email, setEmail] = useState('')
   const [allapot, setAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
+  const [feliratkozokSzam, setFeliratkozokSzam] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch('/api/waitlist-count')
+      .then(r => r.json())
+      .then(d => setFeliratkozokSzam(d.count ?? 0))
+      .catch(() => setFeliratkozokSzam(0))
+  }, [])
+
+  const elesbe = feliratkozokSzam !== null && feliratkozokSzam >= MAX_WAITLIST
+  const szazalek = feliratkozokSzam !== null ? Math.min(100, Math.round((feliratkozokSzam / MAX_WAITLIST) * 100)) : 0
 
   async function feliratkozas(e: React.FormEvent) {
     e.preventDefault()
@@ -34,9 +47,15 @@ export default function Home() {
         <span className="text-2xl font-bold tracking-tight">
           Bid<span className="text-violet-500">Vip</span>
         </span>
-        <a href="/auth" className="bg-violet-600 hover:bg-violet-700 transition px-5 py-2 rounded-full text-sm font-semibold">
-          Get Started
-        </a>
+        {elesbe ? (
+          <a href="/auth" className="bg-violet-600 hover:bg-violet-700 transition px-5 py-2 rounded-full text-sm font-semibold">
+            Get Started
+          </a>
+        ) : (
+          <span className="bg-gray-700 text-gray-400 cursor-not-allowed px-5 py-2 rounded-full text-sm font-semibold select-none" title="Opens when we reach 2,000 early signups">
+            Coming Soon
+          </span>
+        )}
       </nav>
 
       {/* Hero */}
@@ -85,6 +104,27 @@ export default function Home() {
         {allapot !== 'siker' && (
           <p className="text-gray-600 text-xs mt-4">No spam. Unsubscribe in one click.</p>
         )}
+
+        {/* Waitlist progress */}
+        <div className="w-full max-w-md mt-8">
+          <div className="flex justify-between text-xs text-gray-500 mb-2">
+            <span>{feliratkozokSzam !== null ? feliratkozokSzam.toLocaleString() : '—'} early signups</span>
+            <span>{MAX_WAITLIST.toLocaleString()} to unlock</span>
+          </div>
+          <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-violet-600 rounded-full transition-all duration-700"
+              style={{ width: `${szazalek}%` }}
+            />
+          </div>
+          {elesbe ? (
+            <p className="text-violet-400 text-xs text-center mt-2 font-semibold">Platform is live — create your account now!</p>
+          ) : (
+            <p className="text-gray-600 text-xs text-center mt-2">
+              {feliratkozokSzam !== null ? `${MAX_WAITLIST - feliratkozokSzam} spots left until launch` : ''}
+            </p>
+          )}
+        </div>
       </section>
 
       {/* 3 steps */}
