@@ -62,13 +62,13 @@ export default function AdminPage() {
       }
       setHozzaferes(true)
 
-      const [{ data: proj }, { data: rep }] = await Promise.all([
+      const [{ data: proj }, rep] = await Promise.all([
         supabase.from('projektek').select('*').order('letrehozva', { ascending: false }),
         fetch('/api/admin/reports').then(r => r.json()),
       ])
 
       setProjektek(proj || [])
-      setReportok(rep || [])
+      setReportok(Array.isArray(rep) ? rep : [])
       setLoading(false)
     }
     betolt()
