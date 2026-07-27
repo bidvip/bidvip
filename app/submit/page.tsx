@@ -67,6 +67,8 @@ function SubmitInner() {
   const [felfuggesztve, setFelfuggesztve] = useState<string | null>(null)
   const [chatFajlAllapot, setChatFajlAllapot] = useState<'idle' | 'loading'>('idle')
   const chatFajlInputRef = useRef<HTMLInputElement>(null)
+  const [step3FajlAllapot, setStep3FajlAllapot] = useState<'idle' | 'loading'>('idle')
+  const step3FajlInputRef = useRef<HTMLInputElement>(null)
 
   const searchParams = useSearchParams()
 
@@ -452,6 +454,35 @@ function SubmitInner() {
 
   const totalCost = SUBMIT_COST + feltoltottFajlok.length * FILE_COST + (DURATION_COST[form.idotartam_nap] ?? 0)
 
+  async function step3FajlFeltoltes(e: React.ChangeEvent<HTMLInputElement>) {
+    const fajl = e.target.files?.[0]
+    if (!fajl) return
+    e.target.value = ''
+    if (feltoltottFajlok.length >= 10) { setHiba('Maximum 10 files allowed.'); return }
+    if (fajl.size > 10 * 1024 * 1024) { setHiba('File too large (max 10MB).'); return }
+    setStep3FajlAllapot('loading')
+    let ujFajl: Fajl
+    try {
+      const fd = new FormData()
+      fd.append('fajl', fajl)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const resData = await res.json()
+      if (!res.ok) { setHiba(`Upload failed: ${resData.error || res.status}`); return }
+      ujFajl = resData
+    } catch {
+      setHiba('Upload failed: network error.')
+      return
+    } finally {
+      setStep3FajlAllapot('idle')
+    }
+    const ujFajlok = [...feltoltottFajlok, ujFajl]
+    setFeltoltottFajlok(ujFajlok)
+    if (draftId) {
+      await supabase.from('projektek').update({ fajlok: ujFajlok }).eq('id', draftId)
+    }
+    setHiba('')
+  }
+
   async function beküldes(e: React.FormEvent) {
     e.preventDefault()
     setHiba('')
@@ -830,21 +861,41 @@ function SubmitInner() {
               </div>
             </div>
 
-            {feltoltottFajlok.length > 0 && (
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-400 font-semibold">{feltoltottFajlok.length} file(s) attached</p>
-                  <span className="text-xs text-amber-400 flex items-center gap-1">🔒 Locked — cannot be removed after submit</span>
+            {/* Final Documents */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-semibold">Final Documents</h2>
+                  <p className="text-gray-400 text-sm mt-0.5">Upload the deliverables buyers will receive — pitch deck, business plan, code, designs. Each file costs {FILE_COST} tokens.</p>
                 </div>
-                {feltoltottFajlok.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                    <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>
-                    <span className="truncate">{f.nev}</span>
-                    <span className="ml-auto text-violet-400 text-xs shrink-0">-{FILE_COST} tokens</span>
-                  </div>
-                ))}
+                <button
+                  type="button"
+                  onClick={() => step3FajlInputRef.current?.click()}
+                  disabled={step3FajlAllapot === 'loading' || feltoltottFajlok.length >= 10}
+                  className="shrink-0 px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white disabled:opacity-40 transition font-semibold text-sm whitespace-nowrap">
+                  {step3FajlAllapot === 'loading' ? 'Uploading...' : '+ Add File'}
+                </button>
+                <input ref={step3FajlInputRef} type="file" className="hidden" accept="image/*,.pdf,.docx,.xlsx,.zip,.pptx" onChange={step3FajlFeltoltes} />
               </div>
-            )}
+
+              {feltoltottFajlok.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-xs text-gray-500 pb-1 border-b border-gray-800">
+                    <span>{feltoltottFajlok.length} file(s) attached</span>
+                    <span className="text-amber-400">🔒 Locked after submit</span>
+                  </div>
+                  {feltoltottFajlok.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                      <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : f.tipus.includes('zip') ? '🗜️' : f.tipus.includes('pptx') || f.tipus.includes('presentation') ? '📊' : '📄'}</span>
+                      <span className="truncate flex-1">{f.nev}</span>
+                      <span className="text-violet-400 text-xs shrink-0">+{FILE_COST} tokens</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600 text-sm text-center py-2">No files yet — add your pitch deck, business plan, or other documents.</p>
+              )}
+            </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
               <h2 className="font-semibold">Starting Price</h2>
