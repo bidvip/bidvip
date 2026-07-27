@@ -278,9 +278,16 @@ function SubmitInner() {
     try {
       const fd = new FormData()
       fd.append('fajl', fajl)
+      if (userId) fd.append('user_id', userId)
+      const { data: { user: u } } = await supabase.auth.getUser()
+      if (u?.email) fd.append('user_email', u.email)
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const resData = await res.json()
-      if (!res.ok) { setHiba(`Upload failed: ${resData.error || res.status}`); return }
+      if (!res.ok) {
+        if (resData.suspended) { setFelfuggesztve(resData.error); return }
+        setHiba(`Upload failed: ${resData.error || res.status}`)
+        return
+      }
       ujFajl = resData
     } catch {
       setHiba('Upload failed: network error.')
@@ -465,9 +472,16 @@ function SubmitInner() {
     try {
       const fd = new FormData()
       fd.append('fajl', fajl)
+      if (userId) fd.append('user_id', userId)
+      const { data: { user: u } } = await supabase.auth.getUser()
+      if (u?.email) fd.append('user_email', u.email)
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const resData = await res.json()
-      if (!res.ok) { setHiba(`Upload failed: ${resData.error || res.status}`); return }
+      if (!res.ok) {
+        if (resData.suspended) { setFelfuggesztve(resData.error); return }
+        setHiba(`Upload failed: ${resData.error || res.status}`)
+        return
+      }
       ujFajl = resData
     } catch {
       setHiba('Upload failed: network error.')

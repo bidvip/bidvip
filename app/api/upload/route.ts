@@ -14,15 +14,52 @@ const ENGEDELYEZETT_TIPUSOK = [
 
 const MAX_MERET = 10 * 1024 * 1024 // 10MB
 
+const VESZELYES_TARTALOM_PROMPT = `You are a strict content safety moderator for a startup marketplace. Reject the file if it contains ANY of the following:
+
+WEAPONS & VIOLENCE:
+- Instructions for making bombs, explosives, or improvised weapons
+- Weapon modification or illegal firearm instructions
+- Plans for physical attacks or assassinations
+
+ILLEGAL SCHEMES:
+- Money laundering methods or techniques
+- Tax evasion or financial fraud instructions
+- Pyramid/Ponzi scheme blueprints
+- Counterfeit currency or documents
+- Identity theft methods
+
+DRUGS & CONTROLLED SUBSTANCES:
+- Drug synthesis, manufacturing, or trafficking instructions
+- Instructions for creating or distributing controlled substances
+
+TERRORISM & EXTREMISM:
+- Terrorism financing or planning
+- Extremist recruitment or propaganda
+- Instructions for mass casualty events
+
+EXPLOITATION & ABUSE:
+- Child sexual abuse material (CSAM) or grooming
+- Human trafficking instructions
+- Coercive control or abuse methods
+
+CYBERCRIME:
+- Malware, ransomware, or hacking tools
+- Phishing kits or social engineering scripts
+- Instructions for unauthorized system access
+
+HATE & DISCRIMINATION:
+- Content promoting genocide or ethnic cleansing
+- Explicit hate speech targeting protected groups`
+
 async function szovegEllenorzes(szoveg: string, fajlNev: string): Promise<{ ok: boolean; reason: string }> {
   if (!szoveg || szoveg.trim().length < 20) return { ok: true, reason: '' }
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
   const msg = await client.messages.create({
     model: 'claude-haiku-4-5',
-    max_tokens: 100,
+    max_tokens: 120,
     messages: [{
       role: 'user',
-      content: `You are a content moderator. Check if this document content contains dangerous, illegal, or explicitly harmful material (weapons instructions, drug synthesis, malware code, hate speech, etc.).
+      content: `${VESZELYES_TARTALOM_PROMPT}
 
 File: ${fajlNev}
 Content (first 3000 chars):
@@ -44,12 +81,12 @@ async function kepEllenorzes(publicUrl: string, fajlNev: string): Promise<{ ok: 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
   const msg = await client.messages.create({
     model: 'claude-haiku-4-5',
-    max_tokens: 100,
+    max_tokens: 120,
     messages: [{
       role: 'user',
       content: [
         { type: 'image', source: { type: 'url', url: publicUrl } },
-        { type: 'text', text: `Does this image contain dangerous, illegal, or explicitly offensive content (violence, weapons, drugs, explicit material, hate symbols)? File: ${fajlNev}\n\nRespond ONLY with JSON: {"ok": true} or {"ok": false, "reason": "<short reason, max 80 chars>"}` },
+        { type: 'text', text: `${VESZELYES_TARTALOM_PROMPT}\n\nFile: ${fajlNev}\n\nDoes this image contain any of the above dangerous/illegal content?\n\nRespond ONLY with JSON: {"ok": true} or {"ok": false, "reason": "<short reason, max 80 chars>"}` },
       ],
     }],
   })
@@ -62,6 +99,25 @@ async function kepEllenorzes(publicUrl: string, fajlNev: string): Promise<{ ok: 
   }
 }
 
+async function felfuggeszt(supabase: ReturnType<typeof createClient>, user_id: string, user_email: string, fajlNev: string, ok: string) {
+  await Promise.all([
+    supabase.from('felfuggesztesek').insert([{ user_id, user_email, ok }]),
+    supabase.from('reports').insert([{
+      user_id,
+      user_email,
+      nev: `Dangerous file upload: ${fajlNev}`,
+      rovid_leiras: '',
+      reszletes_leiras: '',
+      kategoria: '',
+      block_reason: ok,
+      fajlok: [],
+      ip_cim: 'upload',
+      user_agent: 'upload-scanner',
+      statusz: 'pending',
+    }]),
+  ])
+}
+
 export async function POST(req: NextRequest) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -70,6 +126,8 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData()
   const fajl = formData.get('fajl') as File
+  const user_id = (formData.get('user_id') as string) || ''
+  const user_email = (formData.get('user_email') as string) || ''
 
   if (!fajl) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
   if (!ENGEDELYEZETT_TIPUSOK.includes(fajl.type)) return NextResponse.json({ error: 'File type not allowed' }, { status: 400 })
@@ -78,13 +136,14 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await fajl.arrayBuffer())
   const nev = `${Date.now()}_${fajl.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
-  // Extract text before upload so we can check before storing
+  // Extract text and scan BEFORE uploading to storage
   let szoveg = ''
   if (!fajl.type.startsWith('image/')) {
     szoveg = await extractText(buffer, fajl.type)
     const ellenorzes = await szovegEllenorzes(szoveg, fajl.name)
     if (!ellenorzes.ok) {
-      return NextResponse.json({ error: `File rejected: ${ellenorzes.reason}` }, { status: 422 })
+      if (user_id) await felfuggeszt(supabase, user_id, user_email, fajl.name, ellenorzes.reason)
+      return NextResponse.json({ error: `File rejected: ${ellenorzes.reason}`, suspended: !!user_id }, { status: 422 })
     }
   }
 
@@ -98,12 +157,13 @@ export async function POST(req: NextRequest) {
     .from('project-files')
     .getPublicUrl(data.path)
 
-  // Check image content after upload (needs public URL for vision API)
+  // Check image AFTER upload (vision API needs public URL), then delete if dangerous
   if (fajl.type.startsWith('image/')) {
     const ellenorzes = await kepEllenorzes(publicUrl, fajl.name)
     if (!ellenorzes.ok) {
       await supabase.storage.from('project-files').remove([data.path])
-      return NextResponse.json({ error: `Image rejected: ${ellenorzes.reason}` }, { status: 422 })
+      if (user_id) await felfuggeszt(supabase, user_id, user_email, fajl.name, ellenorzes.reason)
+      return NextResponse.json({ error: `Image rejected: ${ellenorzes.reason}`, suspended: !!user_id }, { status: 422 })
     }
   }
 
