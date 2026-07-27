@@ -82,6 +82,23 @@ export function auctionWinnerEmail(projektNev: string, osszeg: number, paymentUr
   }
 }
 
+export function launchEmail() {
+  return {
+    subject: `BidVip is live — claim your 50 free tokens`,
+    html: `
+      <p>Hi,</p>
+      <p>You signed up to be notified — and the moment is here. <strong>BidVip is now live!</strong></p>
+      <p>BidVip is the marketplace where you develop your startup idea with AI, then auction it to the highest bidder — transparently and securely.</p>
+      <p>As one of our early supporters, <strong>you'll receive 50 free tokens</strong> when you create your account (first 2,000 users only).</p>
+      <p style="margin:24px 0;">
+        <a href="https://bidvip.vercel.app/auth" style="background:#7c3aed;color:white;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:bold;">Create Your Account →</a>
+      </p>
+      <p style="color:#888;font-size:12px;">You're receiving this because you signed up for early access at bidvip.vercel.app. <a href="https://bidvip.vercel.app">Unsubscribe</a></p>
+      <p>— BidVip Team</p>
+    `,
+  }
+}
+
 export function purchaseBuyerDetailedEmail(projektNev: string, reszletesLeiras: string, fajlok: Array<{nev: string; url: string; tipus: string}>) {
   const fajlListHTML = fajlok.length > 0
     ? `<h3>Files & Documents</h3><ul>${fajlok.map(f => `<li><a href="${f.url}">${f.nev}</a></li>`).join('')}</ul>`

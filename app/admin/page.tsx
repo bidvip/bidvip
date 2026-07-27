@@ -52,6 +52,9 @@ export default function AdminPage() {
   const [hozzaferes, setHozzaferes] = useState(false)
   const [aktiv, setAktiv] = useState<string | null>(null)
   const [tab, setTab] = useState<'projektek' | 'reportok'>('projektek')
+  const [feliratkozokSzam, setFeliratkozokSzam] = useState<number>(0)
+  const [launchAllapot, setLaunchAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
+  const [launchEredmeny, setLaunchEredmeny] = useState<{ sent: number; failed: number } | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -64,13 +67,15 @@ export default function AdminPage() {
       }
       setHozzaferes(true)
 
-      const [{ data: proj }, rep] = await Promise.all([
+      const [{ data: proj }, rep, { count: felCount }] = await Promise.all([
         supabase.from('projektek').select('*').order('letrehozva', { ascending: false }),
         fetch('/api/admin/reports').then(r => r.json()),
+        supabase.from('feliratkozok').select('id', { count: 'exact', head: true }),
       ])
 
       setProjektek(proj || [])
       setReportok(Array.isArray(rep) ? rep : [])
+      setFeliratkozokSzam(felCount ?? 0)
       setLoading(false)
     }
     betolt()
@@ -119,6 +124,26 @@ export default function AdminPage() {
     })
     setReportok(prev => prev.map(r => r.id === report.id ? { ...r, statusz: 'feloldva' } : r))
     setAktiv(null)
+  }
+
+  async function launchKuldes() {
+    if (!confirm(`Send launch notification to ${feliratkozokSzam} subscribers?`)) return
+    setLaunchAllapot('loading')
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch('/api/admin/launch-notify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`,
+      },
+    })
+    const data = await res.json()
+    if (res.ok && data.ok) {
+      setLaunchEredmeny({ sent: data.sent, failed: data.failed })
+      setLaunchAllapot('siker')
+    } else {
+      setLaunchAllapot('hiba')
+    }
   }
 
   async function vegelegesTiltas(report: Report) {
@@ -201,6 +226,25 @@ export default function AdminPage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Launch notification */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-semibold text-sm">Launch Notification</p>
+            <p className="text-gray-400 text-xs mt-0.5">{feliratkozokSzam} subscriber{feliratkozokSzam !== 1 ? 's' : ''} waiting — send the launch email when BidVip goes live</p>
+            {launchAllapot === 'siker' && launchEredmeny && (
+              <p className="text-green-400 text-xs mt-1">Sent to {launchEredmeny.sent} subscribers{launchEredmeny.failed > 0 ? `, ${launchEredmeny.failed} failed` : ''}</p>
+            )}
+            {launchAllapot === 'hiba' && <p className="text-red-400 text-xs mt-1">Failed to send. Try again.</p>}
+          </div>
+          <button
+            onClick={launchKuldes}
+            disabled={launchAllapot === 'loading' || feliratkozokSzam === 0}
+            className="shrink-0 px-4 py-2 rounded-full text-sm font-semibold bg-violet-600 hover:bg-violet-700 disabled:opacity-40 transition"
+          >
+            {launchAllapot === 'loading' ? 'Sending...' : launchAllapot === 'siker' ? 'Sent ✓' : 'Send Launch Email'}
+          </button>
         </div>
 
         <div className="flex gap-2 mb-8">
