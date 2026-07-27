@@ -101,8 +101,10 @@ async function kepEllenorzes(publicUrl: string, fajlNev: string): Promise<{ ok: 
 
 async function felfuggeszt(supabase: ReturnType<typeof createClient>, user_id: string, user_email: string, fajlNev: string, ok: string) {
   await Promise.all([
-    supabase.from('felfuggesztesek').insert([{ user_id, user_email, ok }] as any[]),
-    supabase.from('reports').insert([{
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('felfuggesztesek').insert([{ user_id, user_email, ok }]),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('reports').insert([{
       user_id,
       user_email,
       nev: `Dangerous file upload: ${fajlNev}`,
@@ -114,7 +116,7 @@ async function felfuggeszt(supabase: ReturnType<typeof createClient>, user_id: s
       ip_cim: 'upload',
       user_agent: 'upload-scanner',
       statusz: 'pending',
-    }] as any[]),
+    }]),
   ])
 }
 
