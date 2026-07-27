@@ -12,6 +12,8 @@ const badge_info: Record<string, string> = {
   proven: '✅ Proven',
 }
 
+const GYANUS_AR: Record<string, number> = { idea: 5000, prototype: 20000, proven: 100000 }
+
 type Projekt = {
   id: string
   nev: string
@@ -27,6 +29,8 @@ type Projekt = {
   statusz: string
   letrehozva: string
   user_id: string
+  user_email: string
+  vevo_email: string
 }
 
 type Report = {
@@ -51,7 +55,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [hozzaferes, setHozzaferes] = useState(false)
   const [aktiv, setAktiv] = useState<string | null>(null)
-  const [tab, setTab] = useState<'projektek' | 'reportok'>('projektek')
+  const [tab, setTab] = useState<'projektek' | 'reportok' | 'tranzakciok'>('projektek')
   const [feliratkozokSzam, setFeliratkozokSzam] = useState<number>(0)
   const [launchAllapot, setLaunchAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
   const [launchEredmeny, setLaunchEredmeny] = useState<{ sent: number; failed: number } | null>(null)
@@ -254,6 +258,14 @@ export default function AdminPage() {
           <button onClick={() => setTab('reportok')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'reportok' ? 'bg-red-700 border-red-700 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
             Reports {reportok.filter(r => r.statusz === 'pending').length > 0 && <span className="ml-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">{reportok.filter(r => r.statusz === 'pending').length}</span>}
           </button>
+          <button onClick={() => setTab('tranzakciok')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'tranzakciok' ? 'bg-amber-700 border-amber-700 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+            Transactions ({projektek.filter(p => p.statusz === 'sold').length})
+            {projektek.filter(p => p.statusz === 'sold' && p.kikialtasi_ar > (GYANUS_AR[p.badge] ?? 5000)).length > 0 && (
+              <span className="ml-1 bg-amber-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                ⚠️ {projektek.filter(p => p.statusz === 'sold' && p.kikialtasi_ar > (GYANUS_AR[p.badge] ?? 5000)).length}
+              </span>
+            )}
+          </button>
         </div>
 
         {tab === 'reportok' && (
@@ -320,6 +332,66 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+
+        {tab === 'tranzakciok' && (() => {
+          const eladt = projektek.filter(p => p.statusz === 'sold')
+          // Detect repeat buyer↔seller pairs
+          const parok: Record<string, number> = {}
+          eladt.forEach(p => {
+            if (p.vevo_email && p.user_email) {
+              const par = [p.user_email, p.vevo_email].sort().join('|')
+              parok[par] = (parok[par] || 0) + 1
+            }
+          })
+          return (
+            <div className="flex flex-col gap-4">
+              {eladt.length === 0 ? (
+                <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
+                  <p className="text-gray-400">No completed transactions yet.</p>
+                </div>
+              ) : eladt.map(p => {
+                const magas_ar = p.kikialtasi_ar > (GYANUS_AR[p.badge] ?? 5000)
+                const par = p.user_email && p.vevo_email ? [p.user_email, p.vevo_email].sort().join('|') : null
+                const ismetlo_par = par && parok[par] > 1
+                const gyanus = magas_ar || ismetlo_par
+                return (
+                  <div key={p.id} className={`bg-gray-900 border rounded-2xl p-5 ${gyanus ? 'border-amber-700' : 'border-gray-800'}`}>
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          {gyanus && <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800 px-2 py-0.5 rounded-full font-semibold">⚠️ Suspicious</span>}
+                          <span className="text-xs text-gray-500">{p.badge}</span>
+                        </div>
+                        <h2 className="font-bold text-lg">{p.nev}</h2>
+                        <p className="text-gray-400 text-sm mt-0.5">{p.kategoria}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className={`text-2xl font-bold ${magas_ar ? 'text-amber-400' : 'text-green-400'}`}>€{p.kikialtasi_ar.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">limit: €{(GYANUS_AR[p.badge] ?? 5000).toLocaleString()}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="bg-gray-800 rounded-xl px-4 py-3">
+                        <p className="text-gray-500 text-xs mb-1">Seller</p>
+                        <p className="text-white truncate">{p.user_email || '—'}</p>
+                      </div>
+                      <div className="bg-gray-800 rounded-xl px-4 py-3">
+                        <p className="text-gray-500 text-xs mb-1">Buyer</p>
+                        <p className="text-white truncate">{p.vevo_email || '—'}</p>
+                      </div>
+                    </div>
+                    {ismetlo_par && (
+                      <p className="text-amber-400 text-xs mt-3">⚠️ This buyer↔seller pair appears {parok[par!]}x — possible self-dealing</p>
+                    )}
+                    {magas_ar && (
+                      <p className="text-amber-400 text-xs mt-1">⚠️ Price is unusually high for a {p.badge}-stage project</p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })()}
 
         {tab === 'projektek' && projektek.length === 0 && (
           <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
