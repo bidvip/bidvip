@@ -12,9 +12,11 @@ const BADGE_LABELS: Record<string, string> = {
 export async function POST(req: NextRequest) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-  const { nev, rovid_leiras, reszletes_leiras, kategoria, badge, kikialtasi_ar, kepUrlok = [] } = await req.json()
+  const { nev, rovid_leiras, kategoria, badge, kikialtasi_ar } = await req.json()
 
   const szoveg = `You are an experienced startup analyst reviewing a project listed on BidVip, a marketplace where startup ideas and projects are auctioned to buyers.
+
+You only have access to the PUBLIC listing information — the full description and documents are locked and only available to the winning buyer. Base your analysis strictly on what is shown below.
 
 Project details:
 - Name: ${nev}
@@ -22,8 +24,6 @@ Project details:
 - Stage: ${BADGE_LABELS[badge] || badge}
 - Starting bid: €${kikialtasi_ar}
 - Short description: ${rovid_leiras}
-- Detailed description: ${reszletes_leiras}
-${kepUrlok.length > 0 ? `\nThe seller has uploaded ${kepUrlok.length} image(s) — take them into account in your analysis.` : ''}
 
 Provide a thorough, honest analysis with these sections (use markdown headers):
 
@@ -33,22 +33,14 @@ Provide a thorough, honest analysis with these sections (use markdown headers):
 ## Suggestions for Improvement
 ## Valuation Assessment
 
-Be direct, specific, and constructive. Consider the stage and starting price in your valuation assessment.`
-
-  const kepTartalom = kepUrlok.slice(0, 4).map((url: string) => ({
-    type: 'image' as const,
-    source: { type: 'url' as const, url },
-  }))
+Be direct and constructive. Do NOT invent or assume details beyond what is given. If the short description lacks detail, note that in your analysis.`
 
   const message = await client.messages.create({
     model: 'claude-haiku-4-5',
     max_tokens: 1024,
     messages: [{
       role: 'user',
-      content: [
-        ...kepTartalom,
-        { type: 'text' as const, text: szoveg },
-      ],
+      content: szoveg,
     }],
   })
 

@@ -113,18 +113,15 @@ export default function ProjectDetail() {
     }
     setTokenEgyenleg(spendData.uj_egyenleg)
 
-    const kepUrlok = (projekt.fajlok || []).filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const res = await fetch('/api/ai/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nev: projekt.nev,
         rovid_leiras: projekt.rovid_leiras,
-        reszletes_leiras: projekt.reszletes_leiras,
         kategoria: projekt.kategoria,
         badge: projekt.badge,
         kikialtasi_ar: projekt.kikialtasi_ar,
-        kepUrlok,
       }),
     })
     const data = await res.json()
