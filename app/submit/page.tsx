@@ -495,19 +495,7 @@ function SubmitInner() {
       return
     }
 
-    const spendRes = await fetch('/api/tokens/spend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id, amount: totalCost }),
-    })
-    const spendData = await spendRes.json()
-    if (!spendRes.ok) {
-      setHiba(spendData.error === 'insufficient_tokens'
-        ? `Not enough tokens. You need ${totalCost} but have ${spendData.egyenleg}.`
-        : 'Token deduction failed. Please try again.')
-      return
-    }
-
+    // Step 1: AI validation BEFORE any token deduction
     setAllapot('szures')
 
     const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
@@ -518,13 +506,41 @@ function SubmitInner() {
       body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, fajlSzovegek, kepUrlok }),
     })
     const validateData = validateRes.ok ? await validateRes.json() : { ok: true }
+
     if (!validateData.ok) {
-      setHiba(validateData.reason || 'Your submission did not pass our content check. Please ensure it contains a real business idea.')
-      setAllapot('hiba')
+      // Send back to Step 2 with rejection reason — no tokens lost
+      const rejectionMsg = validateData.reason || 'The submission did not pass the content check.'
+      const visszajelzes: ChatUzenet = {
+        role: 'assistant',
+        content: `⚠️ **Your project was sent back for revision.**\n\nReason: ${rejectionMsg}\n\nPlease address this before resubmitting. I'm here to help you improve it.`,
+      }
+      setChatUzenetek(prev => [...prev, visszajelzes])
+      setChatKeszen(false)
+      setChatScore(null)
+      if (draftId) {
+        localStorage.removeItem(`bv_score_${draftId}`)
+      }
+      setAllapot('idle')
+      setLepes(2)
       return
     }
 
+    // Step 2: Validation passed — now deduct tokens
     setAllapot('loading')
+
+    const spendRes = await fetch('/api/tokens/spend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.id, amount: totalCost }),
+    })
+    const spendData = await spendRes.json()
+    if (!spendRes.ok) {
+      setHiba(spendData.error === 'insufficient_tokens'
+        ? `Not enough tokens. You need ${totalCost} but have ${spendData.egyenleg}.`
+        : 'Token deduction failed. Please try again.')
+      setAllapot('hiba')
+      return
+    }
 
     const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
 
@@ -928,10 +944,21 @@ function SubmitInner() {
 
             {hiba && <p className="text-red-400 text-sm text-center">{hiba}</p>}
 
+            {allapot === 'szures' && (
+              <div className="bg-amber-900/20 border border-amber-700 rounded-2xl px-5 py-4 text-center">
+                <p className="text-amber-300 font-semibold text-sm">🤖 AI is reviewing your submission...</p>
+                <p className="text-gray-400 text-xs mt-1">Checking that the content is real, complete, and marketplace-ready. No tokens deducted yet.</p>
+              </div>
+            )}
+
             <button type="submit" disabled={allapot !== 'idle' && allapot !== 'hiba'}
               className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg">
-              {allapot === 'szures' ? '🤖 Checking content...' : allapot === 'loading' ? 'Submitting...' : `Submit Project — ${totalCost} tokens →`}
+              {allapot === 'szures' ? '🤖 Reviewing...' : allapot === 'loading' ? 'Submitting...' : `Submit Project — ${totalCost} tokens →`}
             </button>
+
+            {allapot === 'idle' && (
+              <p className="text-gray-600 text-xs text-center">An AI will review your project before it goes live. If rejected, you are sent back to the mentor — no tokens lost.</p>
+            )}
           </form>
         )}
       </div>
