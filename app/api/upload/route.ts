@@ -99,7 +99,8 @@ async function kepEllenorzes(publicUrl: string, fajlNev: string): Promise<{ ok: 
   }
 }
 
-async function felfuggeszt(supabase: ReturnType<typeof createClient>, user_id: string, user_email: string, fajlNev: string, ok: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function felfuggeszt(supabase: any, user_id: string, user_email: string, fajlNev: string, ok: string) {
   await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (supabase as any).from('felfuggesztesek').insert([{ user_id, user_email, ok }]),
