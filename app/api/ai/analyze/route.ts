@@ -14,9 +14,9 @@ export async function POST(req: NextRequest) {
 
   const { nev, rovid_leiras, kategoria, badge, kikialtasi_ar } = await req.json()
 
-  const szoveg = `You are an experienced startup analyst reviewing a project listed on BidVip, a marketplace where startup ideas and projects are auctioned to buyers.
+  const szoveg = `You are a senior investment analyst writing a buyer-focused acquisition report for a project listed on BidVip, a startup auction platform. Your reader is a potential buyer evaluating this as an investment opportunity.
 
-You only have access to the PUBLIC listing information — the full description and documents are locked and only available to the winning buyer. Base your analysis strictly on what is shown below.
+Your tone is that of a professional VC or M&A advisor — analytical, forward-looking, and opportunity-focused. You are NOT a critic. You identify potential, growth scenarios, and strategic value.
 
 Project details:
 - Name: ${nev}
@@ -25,15 +25,26 @@ Project details:
 - Starting bid: €${kikialtasi_ar}
 - Short description: ${rovid_leiras}
 
-Provide a thorough, honest analysis with these sections (use markdown headers):
+Note: Only public listing info is available — full documentation is unlocked for the winning buyer.
+
+Write a professional investment analysis with these sections (use markdown headers):
 
 ## Market Opportunity
-## Strengths
-## Weaknesses / Risks
-## Suggestions for Improvement
-## Valuation Assessment
+Analyze the market size, trends, and tailwinds. Where could this market be in 5–10 years? What macro forces support this?
 
-Be direct and constructive. Do NOT invent or assume details beyond what is given. If the short description lacks detail, note that in your analysis.`
+## Strategic Value for a Buyer
+What can an acquirer do with this? Who are the ideal buyer profiles (solo founder, agency, corporate, investor)? What synergies or use cases exist?
+
+## Growth Scenarios (5–10 Year Outlook)
+Paint 2–3 realistic scenarios for where this project could go with the right owner and execution. Be specific about revenue models, scale, and exit potential.
+
+## Key Questions to Investigate
+What should a serious buyer verify in the full documentation? (Keep this brief and practical — not a red-flag list, but a due diligence checklist.)
+
+## Acquisition Value Assessment
+Is the starting bid attractive, fair, or premium for this stage? What's the upside if assumptions play out?
+
+Be concise, professional, and optimistic-but-grounded. Do not list generic warnings. Focus on opportunity.`
 
   const message = await client.messages.create({
     model: 'claude-haiku-4-5',
