@@ -105,6 +105,13 @@ export default function ProjectDetail() {
       setUser(u)
       setLicitek(lics || [])
       setLoading(false)
+      if (proj) {
+        fetch('/api/ai/intro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nev: proj.nev, rovid_leiras: proj.rovid_leiras, kategoria: proj.kategoria, badge: proj.badge, kikialtasi_ar: proj.kikialtasi_ar }),
+        }).then(r => r.json()).then(d => { if (d.intro) setAiIntro(d.intro) }).catch(() => {})
+      }
     }
     betolt()
 
