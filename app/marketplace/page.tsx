@@ -20,40 +20,131 @@ type Projekt = {
   van_kod: boolean
   van_feliratkozok: boolean
   van_bevetel: boolean
-  letrehozva: string
   lejarat: string | null
+  priority_tokens: number
 }
 
-function timeLeft(lejarat: string | null): string {
-  if (!lejarat) return ''
-  const diff = new Date(lejarat).getTime() - Date.now()
-  if (diff <= 0) return 'Ended'
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  if (days > 0) return `${days}d ${hours}h left`
-  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  return `${hours}h ${mins}m left`
+function useCountdown(target: string | null) {
+  const [diff, setDiff] = useState(0)
+  useEffect(() => {
+    if (!target) return
+    const update = () => setDiff(Math.max(0, new Date(target).getTime() - Date.now()))
+    update()
+    const i = setInterval(update, 1000)
+    return () => clearInterval(i)
+  }, [target])
+  const h = Math.floor(diff / 3600000)
+  const m = Math.floor((diff % 3600000) / 60000)
+  const s = Math.floor((diff % 60000) / 1000)
+  return { h, m, s, done: diff === 0 }
+}
+
+function LiveAuction({ projekt }: { projekt: Projekt }) {
+  const { h, m, s, done } = useCountdown(projekt.lejarat)
+  return (
+    <div className="bg-gray-900 border-2 border-violet-600 rounded-2xl p-8 mb-12 relative overflow-hidden">
+      <div className="absolute top-4 right-4 bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">
+        🔴 LIVE NOW
+      </div>
+      <div className="flex items-start gap-3 mb-4">
+        <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${badge_info[projekt.badge]?.szin}`}>
+          {badge_info[projekt.badge]?.label}
+        </span>
+        <span className="text-xs text-gray-500">{projekt.kategoria}</span>
+      </div>
+      <h2 className="text-2xl font-bold mb-2">{projekt.nev}</h2>
+      <p className="text-gray-400 mb-6">{projekt.rovid_leiras}</p>
+      <div className="flex items-center justify-between flex-wrap gap-6">
+        <div>
+          <p className="text-xs text-gray-500 mb-1">Starting bid</p>
+          <p className="text-3xl font-bold text-violet-400">€{projekt.kikialtasi_ar.toLocaleString()}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-xs text-gray-500 mb-2">{done ? 'Auction ended' : 'Time remaining'}</p>
+          <div className="flex gap-2">
+            {[{ v: h, l: 'h' }, { v: m, l: 'm' }, { v: s, l: 's' }].map(({ v, l }) => (
+              <div key={l} className="bg-gray-800 rounded-xl px-4 py-3 min-w-[56px] text-center">
+                <p className="text-2xl font-bold text-white">{String(v).padStart(2, '0')}</p>
+                <p className="text-xs text-gray-500">{l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <a href={`/project/${projekt.id}`}
+          className="bg-violet-600 hover:bg-violet-700 transition px-8 py-3 rounded-full font-bold text-lg">
+          Place Bid →
+        </a>
+      </div>
+    </div>
+  )
+}
+
+function BreakCountdown({ szunetVege }: { szunetVege: Date }) {
+  const { m, s } = useCountdown(szunetVege.toISOString())
+  return (
+    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-12 text-center">
+      <p className="text-gray-400 text-sm mb-2">Next auction starts in</p>
+      <p className="text-4xl font-bold text-amber-400">{String(m).padStart(2, '0')}:{String(s).padStart(2, '0')}</p>
+      <p className="text-gray-500 text-sm mt-2">Get ready — the next project is coming up</p>
+    </div>
+  )
 }
 
 export default function Marketplace() {
-  const [projektek, setProjektek] = useState<Projekt[]>([])
+  const [aktiv, setAktiv] = useState<Projekt | null>(null)
+  const [sor, setSor] = useState<Projekt[]>([])
+  const [szunetVege, setSzunetVege] = useState<Date | null>(null)
   const [loading, setLoading] = useState(true)
-  const [szuro, setSzuro] = useState('mind')
   const supabase = createClient()
 
   useEffect(() => {
-    supabase
-      .from('projektek')
-      .select('*')
-      .eq('statusz', 'aktiv')
-      .order('letrehozva', { ascending: false })
-      .then(({ data }) => {
-        setProjektek(data || [])
-        setLoading(false)
-      })
+    async function betolt() {
+      // Load live auction
+      const { data: aktivProjekt } = await supabase
+        .from('projektek')
+        .select('*')
+        .eq('statusz', 'aktiv')
+        .limit(1)
+        .single()
+
+      setAktiv(aktivProjekt || null)
+
+      // If no live auction, check for break period
+      if (!aktivProjekt) {
+        const { data: utolsoLezart } = await supabase
+          .from('projektek')
+          .select('lejarat')
+          .eq('statusz', 'lezart')
+          .order('lejarat', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (utolsoLezart?.lejarat) {
+          const vege = new Date(new Date(utolsoLezart.lejarat).getTime() + 15 * 60 * 1000)
+          if (vege > new Date()) setSzunetVege(vege)
+        }
+      }
+
+      // Load queue
+      const { data: sorban } = await supabase
+        .from('projektek')
+        .select('*')
+        .eq('statusz', 'varakozas')
+        .order('priority_tokens', { ascending: false })
+        .order('varakozas_kezd', { ascending: true })
+        .limit(10)
+
+      setSor(sorban || [])
+      setLoading(false)
+    }
+    betolt()
   }, [])
 
-  const szurt = szuro === 'mind' ? projektek : projektek.filter(p => p.badge === szuro)
+  if (loading) return (
+    <main className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="text-gray-400">Loading...</div>
+    </main>
+  )
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
@@ -69,73 +160,45 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-2">Marketplace</h1>
-        <p className="text-gray-400 mb-8">Browse verified projects and place your bid on the ones you want to acquire.</p>
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        <h1 className="text-3xl font-bold mb-2">Live Auction</h1>
+        <p className="text-gray-400 mb-8">One project at a time — bid before the clock runs out.</p>
 
-        <div className="flex gap-2 mb-8 flex-wrap">
-          {[
-            { ertek: 'mind', label: 'All' },
-            { ertek: 'idea', label: '🌱 Concept' },
-            { ertek: 'prototype', label: '🛠️ Prototype' },
-            { ertek: 'proven', label: '✅ Proven' },
-          ].map(s => (
-            <button
-              key={s.ertek}
-              onClick={() => setSzuro(s.ertek)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold border transition ${szuro === s.ertek ? 'bg-violet-600 border-violet-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        {loading ? (
-          <div className="text-gray-400">Loading...</div>
-        ) : szurt.length === 0 ? (
-          <div className="text-center py-24">
-            <div className="text-5xl mb-4">🔍</div>
-            <p className="text-gray-400">No projects in this category yet.</p>
-          </div>
+        {aktiv ? (
+          <LiveAuction projekt={aktiv} />
+        ) : szunetVege ? (
+          <BreakCountdown szunetVege={szunetVege} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {szurt.map(p => (
-              <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4 hover:border-violet-700 transition">
-                <div className="flex items-start justify-between gap-2">
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${badge_info[p.badge]?.szin}`}>
+          <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-12 text-center mb-12">
+            <div className="text-5xl mb-4">⏳</div>
+            <h2 className="text-xl font-bold mb-2">No active auction right now</h2>
+            <p className="text-gray-400 text-sm">Check back soon — the next project will go live shortly.</p>
+          </div>
+        )}
+
+        {sor.length > 0 && (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Up Next <span className="text-gray-500 text-sm font-normal">({sor.length} in queue)</span></h2>
+            <div className="flex flex-col gap-3">
+              {sor.map((p, i) => (
+                <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-4 flex items-center gap-4">
+                  <span className="text-gray-600 font-bold text-lg w-6">#{i + 1}</span>
+                  <span className={`text-xs font-semibold px-2 py-1 rounded-full border shrink-0 ${badge_info[p.badge]?.szin}`}>
                     {badge_info[p.badge]?.label}
                   </span>
-                  <span className="text-xs text-gray-500">{p.kategoria}</span>
-                </div>
-
-                <div>
-                  <h3 className="font-bold text-lg mb-1">{p.nev}</h3>
-                  <p className="text-gray-400 text-sm line-clamp-2">{p.rovid_leiras}</p>
-                </div>
-
-                <div className="flex gap-2 flex-wrap">
-                  {p.van_domain && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">🌐 Domain</span>}
-                  {p.van_kod && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💻 Source Code</span>}
-                  {p.van_feliratkozok && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">📧 Email List</span>}
-                  {p.van_bevetel && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💰 Revenue</span>}
-                </div>
-
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-800">
-                  <div>
-                    <p className="text-xs text-gray-500">Starting bid</p>
-                    <p className="text-xl font-bold text-violet-400">€{p.kikialtasi_ar.toLocaleString()}</p>
-                    {p.lejarat && (
-                      <p className={`text-xs mt-1 ${new Date(p.lejarat) < new Date() ? 'text-red-400' : 'text-amber-400'}`}>
-                        ⏱ {timeLeft(p.lejarat)}
-                      </p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate">{p.nev}</p>
+                    <p className="text-gray-500 text-xs truncate">{p.rovid_leiras}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-violet-400 font-bold">€{p.kikialtasi_ar.toLocaleString()}</p>
+                    {p.priority_tokens > 0 && (
+                      <p className="text-xs text-amber-400">⚡ {p.priority_tokens} boost</p>
                     )}
                   </div>
-                  <a href={`/project/${p.id}`} className="bg-violet-600 hover:bg-violet-700 transition px-4 py-2 rounded-full text-sm font-semibold">
-                    View Details →
-                  </a>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </div>

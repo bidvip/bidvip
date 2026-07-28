@@ -12,9 +12,10 @@ export async function POST(req: NextRequest) {
 
   const { projekt_id } = await req.json()
 
+  // Approved projects go into the waiting queue, not directly active
   const { data: projekt, error } = await supabase
     .from('projektek')
-    .update({ statusz: 'aktiv' })
+    .update({ statusz: 'varakozas', varakozas_kezd: new Date().toISOString() })
     .eq('id', projekt_id)
     .select('nev, user_email')
     .single()

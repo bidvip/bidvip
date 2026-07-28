@@ -6,6 +6,8 @@ import { sendEmail, auctionWinnerEmail, auctionSellerEmail } from '@/lib/email'
 export const dynamic = 'force-dynamic'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'
+const AUCTION_DURATION_MS = 60 * 60 * 1000        // 1 hour
+const BREAK_DURATION_MS = 15 * 60 * 1000          // 15 min break between auctions
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
@@ -18,22 +20,18 @@ export async function GET(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+  const now = new Date()
 
-  // Find active projects that have expired
-  const { data: lejartProjektek, error } = await supabase
+  // 1. Close expired active auctions
+  const { data: lejartProjektek } = await supabase
     .from('projektek')
     .update({ statusz: 'lezart' })
     .eq('statusz', 'aktiv')
-    .lt('lejarat', new Date().toISOString())
-    .select('id, nev, user_email, kikialtasi_ar, reserve_ar')
+    .lt('lejarat', now.toISOString())
+    .select('id, nev, user_email, kikialtasi_ar, reserve_ar, lejarat')
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  if (!lejartProjektek || lejartProjektek.length === 0) {
-    return NextResponse.json({ lezarva: 0 })
-  }
-
-  for (const projekt of lejartProjektek) {
-    // Find highest bid
+  // Process winners for closed auctions
+  for (const projekt of lejartProjektek || []) {
     const { data: topLicit } = await supabase
       .from('licitek')
       .select('osszeg, user_id')
@@ -42,26 +40,19 @@ export async function GET(req: NextRequest) {
       .limit(1)
       .single()
 
-    if (!topLicit) continue // No bids, stays closed
+    if (!topLicit) continue
 
-    // Check reserve price
     if (projekt.reserve_ar && topLicit.osszeg < projekt.reserve_ar) {
       await supabase.from('projektek').update({ statusz: 'reserve_nem_teljesult' }).eq('id', projekt.id)
       continue
     }
 
-    // Get winner email
     const { data: { user: winner } } = await supabase.auth.admin.getUserById(topLicit.user_id)
     const winnerEmail = winner?.email
     if (!winnerEmail) continue
 
-    // Save winner email to project
-    await supabase
-      .from('projektek')
-      .update({ vevo_email: winnerEmail })
-      .eq('id', projekt.id)
+    await supabase.from('projektek').update({ vevo_email: winnerEmail }).eq('id', projekt.id)
 
-    // Create Stripe checkout link
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -69,10 +60,7 @@ export async function GET(req: NextRequest) {
       line_items: [{
         price_data: {
           currency: 'eur',
-          product_data: {
-            name: `BidVip — ${projekt.nev}`,
-            description: 'Startup project auction purchase',
-          },
+          product_data: { name: `BidVip — ${projekt.nev}`, description: 'Startup project auction purchase' },
           unit_amount: Math.round(topLicit.osszeg * 100),
         },
         quantity: 1,
@@ -83,19 +71,68 @@ export async function GET(req: NextRequest) {
     })
 
     const eladoKap = Math.round(topLicit.osszeg * 0.9)
-
-    // Email winner with payment link
     if (session.url) {
-      const { subject, html } = auctionWinnerEmail(projekt.nev, topLicit.osszeg, session.url)
-      await sendEmail(winnerEmail, subject, html)
+      await sendEmail(winnerEmail, ...Object.values(auctionWinnerEmail(projekt.nev, topLicit.osszeg, session.url)) as [string, string])
     }
-
-    // Email seller that auction ended and payment is pending
     if (projekt.user_email) {
       const { subject, html } = auctionSellerEmail(projekt.nev, topLicit.osszeg, eladoKap)
       await sendEmail(projekt.user_email, subject, html).catch(() => {})
     }
   }
 
-  return NextResponse.json({ lezarva: lejartProjektek.length, projektek: lejartProjektek.map(p => p.nev) })
+  // 2. Check if we should start the next auction
+  const { data: aktiv } = await supabase
+    .from('projektek')
+    .select('id')
+    .eq('statusz', 'aktiv')
+    .limit(1)
+    .single()
+
+  if (aktiv) {
+    return NextResponse.json({ lezarva: lejartProjektek?.length || 0, aktiv: true })
+  }
+
+  // Check break time — find the most recently closed auction
+  const { data: utolsoLezart } = await supabase
+    .from('projektek')
+    .select('lejarat')
+    .eq('statusz', 'lezart')
+    .order('lejarat', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (utolsoLezart?.lejarat) {
+    const lezartIdeje = new Date(utolsoLezart.lejarat).getTime()
+    const szunetVege = lezartIdeje + BREAK_DURATION_MS
+    if (now.getTime() < szunetVege) {
+      const maradek = Math.ceil((szunetVege - now.getTime()) / 1000)
+      return NextResponse.json({ szunet: true, masodperc: maradek })
+    }
+  }
+
+  // 3. Start next project from queue (highest priority_tokens, then earliest varakozas_kezd)
+  const { data: kovetkezo } = await supabase
+    .from('projektek')
+    .select('id, nev')
+    .eq('statusz', 'varakozas')
+    .order('priority_tokens', { ascending: false })
+    .order('varakozas_kezd', { ascending: true })
+    .limit(1)
+    .single()
+
+  if (!kovetkezo) {
+    return NextResponse.json({ lezarva: lejartProjektek?.length || 0, sor_ures: true })
+  }
+
+  const lejarat = new Date(now.getTime() + AUCTION_DURATION_MS).toISOString()
+  await supabase
+    .from('projektek')
+    .update({ statusz: 'aktiv', lejarat })
+    .eq('id', kovetkezo.id)
+
+  return NextResponse.json({
+    lezarva: lejartProjektek?.length || 0,
+    elindult: kovetkezo.nev,
+    lejarat,
+  })
 }
