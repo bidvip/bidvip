@@ -335,6 +335,7 @@ export default function Marketplace() {
   const supabase = createClient()
   const [aktivak, setAktivak] = useState<Record<string, Projekt[]>>({ fast: [], standard: [], premium: [] })
   const [sor, setSor] = useState<Projekt[]>([])
+  const [topLicitek, setTopLicitek] = useState<Record<string, number>>({})
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [kivalasztott, setKivalasztott] = useState<Projekt | null>(null)
@@ -348,6 +349,17 @@ export default function Marketplace() {
       if (ujAktivak[p.sav]) ujAktivak[p.sav].push(p)
     }
     setAktivak(ujAktivak)
+
+    const aktivIdk = (aktivProjektek || []).map(p => p.id)
+    if (aktivIdk.length > 0) {
+      const { data: licitData } = await supabase
+        .from('licitek').select('projekt_id, osszeg').in('projekt_id', aktivIdk)
+      const topMap: Record<string, number> = {}
+      for (const l of licitData || []) {
+        if (!topMap[l.projekt_id] || l.osszeg > topMap[l.projekt_id]) topMap[l.projekt_id] = l.osszeg
+      }
+      setTopLicitek(topMap)
+    }
 
     const { data: sorban } = await supabase
       .from('projektek').select('id, nev, rovid_leiras, badge, kategoria, kikialtasi_ar, lejarat, sav, priority_tokens')
