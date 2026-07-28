@@ -319,6 +319,11 @@ export default function TokensPage() {
           ))}
         </div>
 
+        {/* Calculator */}
+        <div className="mb-8">
+          <TokenCalculator onSelect={scrollToPkg} />
+        </div>
+
         {/* Feature bento */}
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-600 mb-5">What tokens unlock</p>
