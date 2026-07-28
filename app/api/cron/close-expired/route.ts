@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'
 const AUCTION_DURATION_MS = 60 * 60 * 1000        // 1 hour
-const BREAK_DURATION_MS = 15 * 60 * 1000          // 15 min break between auctions
+const BREAK_DURATION_MS = 5 * 60 * 1000           // 5 min break between auctions
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
