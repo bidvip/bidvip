@@ -418,9 +418,14 @@ export default function Marketplace() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Auction House</h1>
-          <p className="text-gray-500 mt-1 text-sm">9 live channels · click any TV to place your bid</p>
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-1">
+            <span className="text-3xl">📺</span>
+            <h1 className="text-4xl font-black tracking-tight">Auction House</h1>
+          </div>
+          <p className="text-gray-500 text-sm tracking-widest uppercase font-mono">
+            <span className="text-green-500 animate-pulse">●</span> 9 live channels · tune in · place your bid
+          </p>
         </div>
 
         {/* 3 lanes, each with 3 TVs */}
