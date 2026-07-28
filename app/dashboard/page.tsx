@@ -98,6 +98,7 @@ export default function Dashboard() {
           <a href="/tokens" className="text-gray-300 text-sm hover:text-white transition font-semibold">
             ⚡ {tokenEgyenleg ?? '...'} tokens
           </a>
+          <a href="/settings" className="text-gray-300 text-sm hover:text-white transition font-semibold">Settings</a>
           <span className="text-gray-400 text-sm hidden sm:inline">{user?.email}</span>
           <button
             onClick={kilepes}
