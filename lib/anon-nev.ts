@@ -1,5 +1,5 @@
 export async function getNapiAnonNev(
-  supabase: ReturnType<typeof import('@supabase/supabase-js').createClient>,
+  supabase: any,
   user_id: string,
   tipus: 'elado' | 'vevo'
 ): Promise<string> {
