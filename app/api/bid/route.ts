@@ -24,13 +24,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Load project + highest bid + reserve
-  const { data: projekt, error: projektHiba } = await supabase
+  const { data: projekt } = await supabase
     .from('projektek')
-    .select('kikialtasi_ar, reserve_ar, lejarat, statusz, user_id, nev')
+    .select('kikialtasi_ar, lejarat, statusz, user_id, nev')
     .eq('id', projekt_id)
     .single()
 
-  if (!projekt) return NextResponse.json({ error: 'Project not found', debug: projektHiba?.message, id: projekt_id }, { status: 404 })
+  if (!projekt) return NextResponse.json({ error: 'Project not found' }, { status: 404 })
   if (projekt.statusz !== 'aktiv') return NextResponse.json({ error: 'Auction is not active' }, { status: 400 })
   if (projekt.user_id === user_id) return NextResponse.json({ error: 'Cannot bid on your own project' }, { status: 400 })
   if (projekt.lejarat && new Date(projekt.lejarat) < new Date()) {
