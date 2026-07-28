@@ -197,7 +197,7 @@ function BidModal({ projekt, user, onZar }: {
     const data = await res.json()
 
     if (!res.ok) {
-      setHiba(data.error || 'Something went wrong.')
+      setHiba((data.error || 'Something went wrong.') + (data.debug ? ` [${data.debug}]` : '') + (data.id ? ` id:${data.id}` : ''))
       setAllapot('hiba')
     } else {
       setAllapot('siker')
