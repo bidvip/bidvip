@@ -588,7 +588,7 @@ function SubmitInner() {
       return
     }
 
-    const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
+    const badge = form.van_bevetel ? 'bizonyitott' : (form.van_kod || form.van_feliratkozok) ? 'prototipus' : 'papir'
 
     const projektAdat = {
       nev: form.nev,
@@ -604,9 +604,7 @@ function SubmitInner() {
       van_bevetel: form.van_bevetel,
       statusz: 'aktiv',
       fajlok: feltoltottFajlok,
-      ai_ertekeles: aiErtekeles?.estimated_value ?? null,
       sav: aiErtekeles ? (aiErtekeles.estimated_value >= 10000 ? 'premium' : aiErtekeles.estimated_value >= 1000 ? 'standard' : 'fast') : 'fast',
-      reserve_ar: form.reserve_ar ? parseInt(form.reserve_ar) : null,
     }
 
     // Get daily seller anon name
