@@ -8,11 +8,11 @@ export async function POST(req: NextRequest) {
   const { user_id, tipus } = await req.json()
   if (!user_id || !tipus) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 
-  const supabase = createClient(
+  const supabase: any = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const nev = await getNapiAnonNev(supabase as any, user_id, tipus)
+  const nev = await getNapiAnonNev(supabase, user_id, tipus)
   return NextResponse.json({ nev })
 }
