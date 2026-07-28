@@ -58,13 +58,14 @@ export async function POST(req: NextRequest) {
 
   // Place the bid
   const valodiBid = proxy_max ? Math.min(proxy_max, osszeg) : osszeg
-  await supabase.from('licitek').insert([{
+  const { error: insertHiba } = await supabase.from('licitek').insert([{
     projekt_id,
     user_id,
     osszeg: valodiBid,
     proxy_max: proxy_max || null,
     anon_nev: anonNev,
   }])
+  if (insertHiba) return NextResponse.json({ error: `Bid failed: ${insertHiba.message}` }, { status: 500 })
 
   // Notify previous highest bidder if outbid
   if (topLicit && topLicit.user_id !== user_id) {
