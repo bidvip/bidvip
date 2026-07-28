@@ -1,9 +1,103 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
+
+function TokenCalculator({ onSelect }: { onSelect: (pkg: string) => void }) {
+  const [analyses, setAnalyses] = useState(10)
+  const [boosts, setBoosts] = useState(3)
+  const total = analyses * 1 + boosts * 5
+  const recommended = total <= 100 ? 'small' : total <= 300 ? 'medium' : 'large'
+  const recLabel = recommended === 'small' ? 'Starter' : recommended === 'medium' ? 'Builder' : 'Pro'
+  const recPrice = recommended === 'small' ? '€5' : recommended === 'medium' ? '€13' : '€27'
+  const recTokens = recommended === 'small' ? 100 : recommended === 'medium' ? 300 : 700
+
+  return (
+    <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
+        <span className="text-white font-semibold text-sm">Token Calculator</span>
+        <span className="text-[11px] text-gray-500 bg-gray-800 rounded-full px-2 py-0.5">How many tokens do I need?</span>
+      </div>
+
+      <div className="p-6 grid md:grid-cols-2 gap-8">
+        <div className="flex flex-col gap-6">
+          {/* Slider: AI analyses */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm text-gray-300 font-medium">AI Quick Analyses</label>
+              <span className="text-violet-400 font-bold text-sm">{analyses}×</span>
+            </div>
+            <input type="range" min={0} max={200} step={5} value={analyses}
+              onChange={e => setAnalyses(Number(e.target.value))}
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+              style={{ background: `linear-gradient(to right, #7c3aed ${analyses / 2}%, #374151 ${analyses / 2}%)` }}
+            />
+            <div className="flex justify-between text-[11px] text-gray-600 mt-1"><span>0</span><span>200</span></div>
+          </div>
+
+          {/* Slider: Boosts */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm text-gray-300 font-medium">Listing Priority Boosts</label>
+              <span className="text-amber-400 font-bold text-sm">{boosts}×</span>
+            </div>
+            <input type="range" min={0} max={40} step={1} value={boosts}
+              onChange={e => setBoosts(Number(e.target.value))}
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+              style={{ background: `linear-gradient(to right, #d97706 ${boosts / 40 * 100}%, #374151 ${boosts / 40 * 100}%)` }}
+            />
+            <div className="flex justify-between text-[11px] text-gray-600 mt-1"><span>0</span><span>40</span></div>
+          </div>
+
+          {/* Breakdown */}
+          <div className="bg-gray-800/60 rounded-xl p-4 flex flex-col gap-2 text-xs">
+            <div className="flex justify-between text-gray-400">
+              <span>{analyses} analyses × 1 token</span>
+              <span className="text-white font-semibold">⚡ {analyses}</span>
+            </div>
+            <div className="flex justify-between text-gray-400">
+              <span>{boosts} boosts × 5 tokens avg</span>
+              <span className="text-white font-semibold">⚡ {boosts * 5}</span>
+            </div>
+            <div className="border-t border-gray-700 pt-2 flex justify-between font-bold text-sm">
+              <span className="text-gray-300">Total needed</span>
+              <span className="text-violet-400">⚡ {total}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recommendation */}
+        <div className="flex flex-col justify-center">
+          <p className="text-xs text-gray-500 uppercase tracking-widest mb-4">Recommended for you</p>
+          <div className="rounded-xl border border-violet-600/50 bg-violet-950/30 p-5">
+            <p className="text-xs text-violet-400 font-semibold uppercase tracking-widest mb-1">{recLabel}</p>
+            <p className="text-3xl font-black text-white mb-1">{recPrice}</p>
+            <div className="flex items-center gap-1.5 mb-4">
+              <span className="text-violet-400 font-bold">⚡ {recTokens.toLocaleString()}</span>
+              <span className="text-gray-500 text-sm">tokens</span>
+            </div>
+            <div className="w-full bg-gray-800 rounded-full h-1.5 mb-4 overflow-hidden">
+              <div className="h-full bg-violet-500 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, (total / recTokens) * 100)}%` }} />
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              {recTokens - total > 0
+                ? `${recTokens - total} tokens left over after your planned usage`
+                : 'Covers your usage exactly'}
+            </p>
+            <button
+              onClick={() => onSelect(recommended)}
+              className="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition">
+              Get {recLabel} →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const packages = [
   {
