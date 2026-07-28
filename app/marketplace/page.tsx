@@ -343,7 +343,7 @@ export default function Marketplace() {
     setAktivak(ujAktivak)
 
     const { data: sorban } = await supabase
-      .from('projektek').select('id, nev, rovid_leiras, badge, kategoria, kikialtasi_ar, sav, priority_tokens')
+      .from('projektek').select('id, nev, rovid_leiras, badge, kategoria, kikialtasi_ar, lejarat, sav, priority_tokens')
       .eq('statusz', 'varakozas')
       .order('priority_tokens', { ascending: false })
       .order('varakozas_kezd', { ascending: true })
