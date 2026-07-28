@@ -344,12 +344,20 @@ export default function ProjectDetail() {
             ) : (
               <>
                 {aiAllapot === 'idle' && (
-                  <button
-                    onClick={aiElemzesKer}
-                    className="w-full py-3 rounded-xl border border-violet-700 text-violet-400 hover:bg-violet-900/20 transition font-semibold"
-                  >
-                    🤖 Quick Analysis — 1 token (Haiku)
-                  </button>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={aiElemzesKer}
+                      className="w-full py-3 rounded-xl border border-violet-700 text-violet-400 hover:bg-violet-900/20 transition font-semibold"
+                    >
+                      🤖 Quick Analysis — 1 token (Haiku)
+                    </button>
+                    {tokenEgyenleg !== null && (
+                      <p className="text-center text-xs text-gray-500">
+                        Your balance: <span className="text-violet-400 font-semibold">⚡ {tokenEgyenleg} tokens</span>
+                        {tokenEgyenleg < 5 && <> · <a href="/tokens" className="text-violet-400 underline">Buy more →</a></>}
+                      </p>
+                    )}
+                  </div>
                 )}
                 {aiAllapot === 'nincs_token' && (
                   <div className="text-center py-4">
