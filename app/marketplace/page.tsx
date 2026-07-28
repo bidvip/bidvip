@@ -285,14 +285,22 @@ function BidModal({ projekt, user, onZar }: {
             </button>
           ) : (
             <form onSubmit={licitBeküldes} className="flex flex-col gap-3">
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
-                <input
-                  type="number" required min={minimumLicit} value={licitOsszeg}
-                  onChange={e => setLicitOsszeg(e.target.value)}
-                  placeholder={`min. €${minimumLicit.toLocaleString()} (+€${increment})`}
-                  className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 text-sm"
-                />
+              <div className="flex items-center gap-2">
+                <button type="button"
+                  onClick={() => setLicitOsszeg(v => String(Math.max(minimumLicit, (parseInt(v) || minimumLicit) - increment)))}
+                  className="w-11 h-11 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-xl font-bold flex items-center justify-center flex-shrink-0 transition">−</button>
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+                  <input
+                    type="number" required min={minimumLicit} value={licitOsszeg}
+                    onChange={e => setLicitOsszeg(e.target.value)}
+                    placeholder={`${minimumLicit.toLocaleString()}`}
+                    className="w-full pl-7 pr-3 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 text-sm text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+                <button type="button"
+                  onClick={() => setLicitOsszeg(v => String((parseInt(v) || minimumLicit) + increment))}
+                  className="w-11 h-11 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-xl font-bold flex items-center justify-center flex-shrink-0 transition">+</button>
               </div>
               {allapot === 'hiba' && <p className="text-red-400 text-xs">{hiba}</p>}
               {allapot === 'siker' && <p className="text-green-400 text-xs font-semibold">Bid placed!</p>}
