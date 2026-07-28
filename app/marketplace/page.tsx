@@ -112,9 +112,9 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit }: {
 
             <div className="mt-3 pt-3 border-t border-gray-800 flex items-end justify-between">
               <div>
-                <p className="text-[10px] text-gray-600 mb-0.5">Bid from</p>
+                <p className="text-[10px] text-gray-600 mb-0.5">{topLicit ? 'Current bid' : 'Starting price'}</p>
                 <p className="text-lg font-bold" style={{ color: info.color }}>
-                  €{projekt.kikialtasi_ar.toLocaleString()}
+                  €{(topLicit ?? projekt.kikialtasi_ar).toLocaleString()}
                 </p>
               </div>
               <div className="text-right">
