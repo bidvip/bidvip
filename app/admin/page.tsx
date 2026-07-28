@@ -434,20 +434,29 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => jovahagyas(p.id)}
-                    disabled={aktiv === p.id}
-                    className="bg-green-600 hover:bg-green-700 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm font-semibold"
-                  >
-                    {aktiv === p.id ? 'Saving...' : '✓ Approve & Publish'}
-                  </button>
-                  <button
-                    onClick={() => elutasitas(p.id)}
-                    disabled={aktiv === p.id}
-                    className="border border-red-800 text-red-400 hover:bg-red-900/20 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm font-semibold"
-                  >
-                    ✕ Reject
-                  </button>
+                  {p.statusz !== 'elutasitva' && (
+                    <button
+                      onClick={() => jovahagyas(p.id)}
+                      disabled={aktiv === p.id}
+                      className="bg-green-600 hover:bg-green-700 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm font-semibold"
+                    >
+                      {aktiv === p.id ? 'Saving...' : '✓ Approve & Publish'}
+                    </button>
+                  )}
+                  {p.statusz !== 'elutasitva' && (
+                    <button
+                      onClick={() => elutasitas(p.id)}
+                      disabled={aktiv === p.id}
+                      className="border border-red-800 text-red-400 hover:bg-red-900/20 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm font-semibold"
+                    >
+                      ✕ Reject
+                    </button>
+                  )}
+                  {p.statusz === 'elutasitva' && (
+                    <span className="border border-red-900 text-red-500 px-5 py-2 rounded-full text-sm font-semibold opacity-60">
+                      ✕ Rejected
+                    </span>
+                  )}
                   <a
                     href={`/project/${p.id}`}
                     className="border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition px-5 py-2 rounded-full text-sm"
