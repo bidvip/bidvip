@@ -49,12 +49,7 @@ export async function GET(req: NextRequest) {
 
       if (!topLicit) continue
 
-      if (projekt.reserve_ar && topLicit.osszeg < projekt.reserve_ar) {
-        await supabase.from('projektek').update({ statusz: 'reserve_nem_teljesult' }).eq('id', projekt.id)
-        continue
-      }
-
-      const { data: { user: winner } } = await supabase.auth.admin.getUserById(topLicit.user_id)
+const { data: { user: winner } } = await supabase.auth.admin.getUserById(topLicit.user_id)
       const winnerEmail = winner?.email
       if (!winnerEmail) continue
 
