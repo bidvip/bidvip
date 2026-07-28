@@ -227,7 +227,7 @@ export default function ProjectDetail() {
         <a href="/" className="text-2xl font-bold tracking-tight">
           Bid<span className="text-violet-500">Vip</span>
         </a>
-        <a href="/marketplace" className="text-gray-400 text-sm hover:text-white transition">← Marketplace</a>
+        <a href="/marketplace" className="text-gray-400 text-sm hover:text-white transition">← Auction House</a>
       </nav>
 
       {paymentStatus === 'siker' && (
