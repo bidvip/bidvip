@@ -430,16 +430,20 @@ export default function Marketplace() {
             const projektek = aktivak[sav]
             return (
               <div key={sav}>
-                {/* Lane header */}
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-px flex-1" style={{ background: `linear-gradient(to right, ${info.color}44, transparent)` }} />
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold tracking-widest" style={{ color: info.color }}>
-                      {info.label}
+                {/* Lane header — retro TV channel */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-px flex-1" style={{ background: `linear-gradient(to right, ${info.color}66, transparent)` }} />
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-black tracking-widest font-mono" style={{ color: info.color, textShadow: info.glow }}>
+                      {info.slogan}
                     </span>
-                    <span className="text-xs text-gray-600">{info.perc} MIN</span>
+                    <span className="text-[10px] text-gray-500 tracking-widest uppercase hidden sm:block">{info.tagline}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: info.color }} />
+                      <span className="text-[10px] font-bold tracking-widest" style={{ color: info.color }}>ON AIR</span>
+                    </span>
                   </div>
-                  <div className="h-px flex-1" style={{ background: `linear-gradient(to left, ${info.color}44, transparent)` }} />
+                  <div className="h-px flex-1" style={{ background: `linear-gradient(to left, ${info.color}66, transparent)` }} />
                 </div>
 
                 {/* 3 TVs */}
