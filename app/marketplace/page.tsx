@@ -61,11 +61,12 @@ function useCountdown(target: string | null) {
   return { label, done: diff === 0, diff }
 }
 
-function TvPanel({ projekt, sav, slot, onKattint }: {
+function TvPanel({ projekt, sav, slot, onKattint, topLicit }: {
   projekt: Projekt | null
   sav: keyof typeof SAV_INFO
   slot: number
   onKattint: (p: Projekt) => void
+  topLicit?: number
 }) {
   const info = SAV_INFO[sav]
   const countdown = useCountdown(projekt?.lejarat ?? null)
