@@ -266,6 +266,13 @@ export default function ProjectDetail() {
             )}
           </div>
 
+          {aiIntro && (
+            <div className="bg-gradient-to-br from-violet-950/40 to-gray-900 border border-violet-800/40 rounded-2xl p-5">
+              <p className="text-[11px] font-bold tracking-widest text-violet-400 uppercase mb-3">🤖 AI Overview</p>
+              <p className="text-gray-200 leading-relaxed text-sm">{aiIntro}</p>
+            </div>
+          )}
+
           {(() => {
             const isSeller = user?.id === projekt.user_id
             const isBuyer = projekt.statusz === 'sold' && user?.email === projekt.vevo_email
