@@ -10,26 +10,61 @@ const packages = [
     id: 'small',
     tokens: 100,
     price: '€5',
+    priceNum: 5,
     label: 'Starter',
-    description: 'Great for trying out AI development',
-    features: ['1 full AI development session', 'Project review & feedback', 'Auto-publish to marketplace'],
+    description: 'Perfect for casual buyers',
+    features: [
+      '100 AI analyses',
+      'Boost your listings in the queue',
+      'Tokens never expire',
+    ],
   },
   {
     id: 'medium',
     tokens: 300,
     price: '€13',
+    priceNum: 13,
     label: 'Builder',
-    description: 'Best value for active sellers',
-    features: ['3 full AI development sessions', 'Project review & feedback', 'Auto-publish to marketplace', 'Priority review'],
+    description: 'Best value for active bidders',
+    features: [
+      '300 AI analyses',
+      'Boost your listings in the queue',
+      'Tokens never expire',
+      'Save €2 vs. buying Starter x3',
+    ],
     popular: true,
   },
   {
     id: 'large',
     tokens: 700,
     price: '€27',
+    priceNum: 27,
     label: 'Pro',
-    description: 'For serious entrepreneurs',
-    features: ['7+ full AI development sessions', 'Project review & feedback', 'Auto-publish to marketplace', 'Priority review', '100 bonus tokens'],
+    description: 'For serious deal-makers',
+    features: [
+      '700 AI analyses',
+      'Boost your listings in the queue',
+      'Tokens never expire',
+      '100 bonus tokens included',
+    ],
+  },
+]
+
+const howItWorks = [
+  {
+    tokens: '1',
+    action: 'AI Quick Analysis',
+    desc: 'Get a full investment report on any project — market opportunity, growth scenarios, acquisition value.',
+  },
+  {
+    tokens: '1–10',
+    action: 'Listing Priority Boost',
+    desc: 'Move your project up the Auction House queue. The more tokens you spend, the higher you rank.',
+  },
+  {
+    tokens: '0',
+    action: 'AI Overview',
+    desc: 'Every project page auto-loads a compelling AI-written introduction at no cost to you.',
   },
 ]
 
@@ -86,64 +121,93 @@ export default function TokensPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-800">
-        <a href="/" className="text-2xl font-bold tracking-tight">
-          Bid<span className="text-violet-500">Vip</span>
-        </a>
-        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">Dashboard</a>
+      <nav className="flex items-center justify-between px-8 py-4 border-b border-gray-800">
+        <a href="/" className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></a>
+        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">← Dashboard</a>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-6 py-14">
 
         {status === 'success' && (
-          <div className="bg-green-900/40 border border-green-800 rounded-2xl px-6 py-4 text-center text-green-400 font-semibold mb-8">
-            🎉 Payment successful! Your tokens have been added to your balance.
+          <div className="bg-green-900/30 border border-green-800 rounded-2xl px-6 py-4 text-center text-green-400 font-semibold mb-8">
+            🎉 Payment successful! Your tokens have been added.
             {new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('redirect') && (
               <p className="text-green-300 text-sm font-normal mt-1">Redirecting you back...</p>
             )}
           </div>
         )}
         {status === 'cancelled' && (
-          <div className="bg-red-900/40 border border-red-800 rounded-2xl px-6 py-4 text-center text-red-400 mb-8">
-            Payment was cancelled.
+          <div className="bg-red-900/30 border border-red-800 rounded-2xl px-6 py-4 text-center text-red-400 mb-8">
+            Payment cancelled. No charge was made.
           </div>
         )}
 
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-3xl font-bold">Buy Tokens</h1>
-          {egyenleg !== null && (
-            <div className="bg-violet-900/40 border border-violet-800 rounded-full px-5 py-2">
-              <span className="text-violet-300 text-sm font-semibold">⚡ {egyenleg} tokens remaining</span>
+        {/* Header */}
+        <div className="mb-10">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">Get Tokens</h1>
+              <p className="text-gray-500 mt-2 text-sm max-w-md">
+                Tokens power AI features on BidVip — analyse any project before you bid, or boost your listing to the top of the Auction House.
+              </p>
             </div>
-          )}
+            {egyenleg !== null && (
+              <div className="flex-shrink-0 flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-full px-4 py-2">
+                <span className="text-violet-400 text-sm">⚡</span>
+                <span className="text-white font-semibold text-sm">{egyenleg}</span>
+                <span className="text-gray-500 text-xs">left</span>
+              </div>
+            )}
+          </div>
         </div>
-        <p className="text-gray-400 mb-10">Use tokens to develop your project with AI and publish it to the marketplace.</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Packages */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
           {packages.map(pkg => (
-            <div key={pkg.id} className={`relative bg-gray-900 border rounded-2xl p-6 flex flex-col gap-4 ${pkg.popular ? 'border-violet-500' : 'border-gray-800'}`}>
+            <div key={pkg.id}
+              className={`relative flex flex-col rounded-2xl p-6 border transition
+                ${pkg.popular
+                  ? 'bg-violet-950/30 border-violet-600 shadow-[0_0_40px_-8px_rgba(139,92,246,0.25)]'
+                  : 'bg-gray-900 border-gray-800'}`}>
+
               {pkg.popular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-xs font-bold px-4 py-1 rounded-full">
-                  Most Popular
-                </span>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="bg-violet-600 text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-wide">
+                    BEST VALUE
+                  </span>
+                </div>
               )}
-              <div>
-                <p className="text-gray-400 text-sm">{pkg.label}</p>
-                <p className="text-3xl font-bold mt-1">{pkg.price}</p>
-                <p className="text-violet-400 font-semibold">⚡ {pkg.tokens} tokens</p>
+
+              <div className="mb-5">
+                <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${pkg.popular ? 'text-violet-400' : 'text-gray-500'}`}>
+                  {pkg.label}
+                </p>
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-bold">{pkg.price}</span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="text-violet-400 font-bold text-lg">⚡ {pkg.tokens.toLocaleString()}</span>
+                  <span className="text-gray-500 text-sm">tokens</span>
+                </div>
                 <p className="text-gray-500 text-xs mt-1">{pkg.description}</p>
               </div>
-              <ul className="flex flex-col gap-2 flex-1">
+
+              <ul className="flex flex-col gap-2.5 flex-1 mb-6">
                 {pkg.features.map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-gray-300">
-                    <span className="text-green-400 mt-0.5">✓</span> {f}
+                    <span className={`mt-0.5 text-xs font-bold ${pkg.popular ? 'text-violet-400' : 'text-green-400'}`}>✓</span>
+                    {f}
                   </li>
                 ))}
               </ul>
+
               <button
                 onClick={() => vasarlas(pkg.id)}
                 disabled={loading === pkg.id}
-                className={`w-full py-3 rounded-full font-semibold transition disabled:opacity-60 ${pkg.popular ? 'bg-violet-600 hover:bg-violet-700' : 'border border-gray-700 hover:border-gray-500'}`}
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition disabled:opacity-60
+                  ${pkg.popular
+                    ? 'bg-violet-600 hover:bg-violet-500 text-white'
+                    : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700'}`}
               >
                 {loading === pkg.id ? 'Redirecting...' : `Get ${pkg.tokens} Tokens`}
               </button>
@@ -151,22 +215,29 @@ export default function TokensPage() {
           ))}
         </div>
 
-        <div className="mt-12 bg-gray-900 border border-gray-800 rounded-2xl p-6">
-          <h2 className="font-semibold mb-4">How tokens work</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { tokens: '80', action: 'Full AI development session', desc: 'AI develops your idea into a complete, marketable project' },
-              { tokens: '30', action: 'Project rewrite', desc: 'Improve an existing project description with AI' },
-              { tokens: '20', action: 'Quick review', desc: 'Get AI feedback on your project before publishing' },
-            ].map(item => (
-              <div key={item.action} className="bg-gray-800 rounded-xl p-4">
-                <p className="text-violet-400 font-bold text-lg">⚡ {item.tokens}</p>
-                <p className="font-semibold text-sm mt-1">{item.action}</p>
-                <p className="text-gray-400 text-xs mt-1">{item.desc}</p>
+        {/* How it works */}
+        <div className="border border-gray-800 rounded-2xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-800 bg-gray-900/60">
+            <h2 className="font-semibold text-sm text-gray-300">What tokens unlock</h2>
+          </div>
+          <div className="divide-y divide-gray-800">
+            {howItWorks.map(item => (
+              <div key={item.action} className="flex items-start gap-5 px-6 py-4 hover:bg-gray-900/40 transition">
+                <div className="flex-shrink-0 w-14 text-center">
+                  <span className="text-violet-400 font-bold text-base">⚡ {item.tokens}</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-white">{item.action}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
+
+        <p className="text-center text-gray-600 text-xs mt-8">
+          Tokens are non-refundable. Payments processed securely via Stripe.
+        </p>
       </div>
     </main>
   )
