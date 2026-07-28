@@ -58,6 +58,9 @@ export async function GET(req: NextRequest) {
       const winnerEmail = winner?.email
       if (!winnerEmail) continue
 
+      const { data: { user: seller } } = await supabase.auth.admin.getUserById(projekt.user_id)
+      const sellerEmail = seller?.email
+
       await supabase.from('projektek').update({ vevo_email: winnerEmail }).eq('id', projekt.id)
 
       const session = await stripe.checkout.sessions.create({
@@ -72,7 +75,7 @@ export async function GET(req: NextRequest) {
           },
           quantity: 1,
         }],
-        metadata: { projekt_id: projekt.id, vevo_email: winnerEmail, elado_email: projekt.user_email },
+        metadata: { projekt_id: projekt.id, vevo_email: winnerEmail, elado_email: sellerEmail || '' },
         success_url: `${BASE_URL}/project/${projekt.id}?fizetes=siker`,
         cancel_url: `${BASE_URL}/project/${projekt.id}?fizetes=megszakitva`,
       })
@@ -82,9 +85,9 @@ export async function GET(req: NextRequest) {
         const { subject, html } = auctionWinnerEmail(projekt.nev, topLicit.osszeg, session.url)
         await sendEmail(winnerEmail, subject, html).catch(() => {})
       }
-      if (projekt.user_email) {
+      if (sellerEmail) {
         const { subject, html } = auctionSellerEmail(projekt.nev, topLicit.osszeg, eladoKap)
-        await sendEmail(projekt.user_email, subject, html).catch(() => {})
+        await sendEmail(sellerEmail, subject, html).catch(() => {})
       }
     }
 
