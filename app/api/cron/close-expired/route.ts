@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       .eq('statusz', 'aktiv')
       .eq('sav', sav)
       .lt('lejarat', now.toISOString())
-      .select('id, nev, user_email, reserve_ar, lejarat')
+      .select('id, nev, user_id, reserve_ar, lejarat')
 
     // Process winners
     for (const projekt of lejart || []) {
