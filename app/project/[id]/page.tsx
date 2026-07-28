@@ -40,6 +40,7 @@ type Projekt = {
   ai_elemzes: string | null
   statusz: string | null
   vevo_email: string | null
+  anon_elado_nev: string | null
 }
 
 function timeLeft(lejarat: string | null): string {
@@ -58,6 +59,7 @@ type Licit = {
   osszeg: number
   letrehozva: string
   user_id: string
+  anon_nev: string | null
 }
 
 export default function ProjectDetail() {
@@ -244,6 +246,9 @@ export default function ProjectDetail() {
             </div>
             <h1 className="text-3xl font-bold mb-2">{projekt.nev}</h1>
             <p className="text-gray-400">{projekt.rovid_leiras}</p>
+            {projekt.anon_elado_nev && (
+              <p className="text-xs text-gray-500 mt-2">Listed by <span className="text-gray-400 font-medium">{projekt.anon_elado_nev}</span></p>
+            )}
           </div>
 
           {(() => {
@@ -435,7 +440,7 @@ export default function ProjectDetail() {
                 <div className="flex flex-col gap-2">
                   {licitek.slice(0, 5).map((l, i) => (
                     <div key={l.id} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">#{i + 1}</span>
+                      <span className="text-gray-400">{l.anon_nev || `Buyer#${i + 1}`}</span>
                       <span className={i === 0 ? 'text-violet-400 font-bold' : 'text-gray-300'}>€{l.osszeg.toLocaleString()}</span>
                     </div>
                   ))}

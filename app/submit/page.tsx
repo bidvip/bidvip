@@ -609,9 +609,17 @@ function SubmitInner() {
       reserve_ar: form.reserve_ar ? parseInt(form.reserve_ar) : null,
     }
 
+    // Get daily seller anon name
+    const anonRes = await fetch('/api/anon-name', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.id, tipus: 'elado' }),
+    })
+    const { nev: anonEladoNev } = await anonRes.json()
+
     const { error } = draftId
-      ? await supabase.from('projektek').update(projektAdat).eq('id', draftId)
-      : await supabase.from('projektek').insert([{ ...projektAdat, user_id: user.id, user_email: user.email }])
+      ? await supabase.from('projektek').update({ ...projektAdat, anon_elado_nev: anonEladoNev }).eq('id', draftId)
+      : await supabase.from('projektek').insert([{ ...projektAdat, user_id: user.id, user_email: user.email, anon_elado_nev: anonEladoNev }])
 
     if (error) {
       setHiba('Something went wrong. Please try again.')

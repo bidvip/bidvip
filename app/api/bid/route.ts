@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendEmail } from '@/lib/email'
+import { getNapiAnonNev } from '@/lib/anon-nev'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,6 +53,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Minimum bid is €${minimum} (increment: €${minEmel})`, minimum }, { status: 400 })
   }
 
+  // Get daily anon name for bidder
+  const anonNev = await getNapiAnonNev(supabase, user_id, 'vevo')
+
   // Place the bid
   const valodiBid = proxy_max ? Math.min(proxy_max, osszeg) : osszeg
   await supabase.from('licitek').insert([{
@@ -59,6 +63,7 @@ export async function POST(req: NextRequest) {
     user_id,
     osszeg: valodiBid,
     proxy_max: proxy_max || null,
+    anon_nev: anonNev,
   }])
 
   // Notify previous highest bidder if outbid
@@ -69,12 +74,14 @@ export async function POST(req: NextRequest) {
       const prevProxy = topLicit.proxy_max
       if (prevProxy && prevProxy > valodiBid) {
         const counterBid = Math.min(prevProxy, valodiBid + minIncrement(valodiBid))
+        const prevAnonNev = await getNapiAnonNev(supabase, topLicit.user_id, 'vevo')
         await supabase.from('licitek').insert([{
           projekt_id,
           user_id: topLicit.user_id,
           osszeg: counterBid,
           proxy_max: prevProxy,
           auto_bid: true,
+          anon_nev: prevAnonNev,
         }])
       } else {
         // Notify they were outbid
