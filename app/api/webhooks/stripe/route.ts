@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  const session = event.data.object as Stripe.CheckoutSession
+  const session = event.data.object as Stripe.Checkout.Session
   const { projekt_id, vevo_email, elado_email } = session.metadata || {}
   if (!projekt_id || !vevo_email) {
     return NextResponse.json({ error: 'Missing metadata' }, { status: 400 })
