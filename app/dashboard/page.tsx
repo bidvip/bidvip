@@ -215,7 +215,7 @@ export default function Dashboard() {
               </div>
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
                 <p className="text-gray-400 text-sm mb-1">Browse the marketplace</p>
-                <a href="/marketplace" className="text-violet-400 font-semibold hover:text-violet-300 transition">Open Marketplace →</a>
+                <a href="/marketplace" className="text-violet-400 font-semibold hover:text-violet-300 transition">Open Auction House →</a>
               </div>
             </div>
 
