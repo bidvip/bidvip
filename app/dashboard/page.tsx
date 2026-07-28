@@ -225,7 +225,7 @@ export default function Dashboard() {
                 <h2 className="text-xl font-bold mb-2">You haven&apos;t placed any bids yet</h2>
                 <p className="text-gray-400 text-sm mb-6">Browse the marketplace and place your first offer!</p>
                 <a href="/marketplace" className="bg-violet-600 hover:bg-violet-700 transition px-6 py-3 rounded-full font-semibold">
-                  Browse Marketplace →
+                  Browse Auction House →
                 </a>
               </div>
             ) : (
