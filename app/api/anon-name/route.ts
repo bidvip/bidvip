@@ -13,6 +13,6 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const nev = await getNapiAnonNev(supabase, user_id, tipus)
+  const nev = await getNapiAnonNev(supabase as any, user_id, tipus)
   return NextResponse.json({ nev })
 }

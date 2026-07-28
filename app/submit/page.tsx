@@ -606,6 +606,7 @@ function SubmitInner() {
       statusz: 'aktiv',
       fajlok: feltoltottFajlok,
       ai_ertekeles: aiErtekeles?.estimated_value ?? null,
+      sav: aiErtekeles ? (aiErtekeles.estimated_value >= 10000 ? 'premium' : aiErtekeles.estimated_value >= 1000 ? 'standard' : 'fast') : 'fast',
       reserve_ar: form.reserve_ar ? parseInt(form.reserve_ar) : null,
     }
 
