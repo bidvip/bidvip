@@ -193,7 +193,7 @@ export default function AdminPage() {
               {[
                 { label: '🏠 Home', href: '/' },
                 { label: '📊 Dashboard', href: '/dashboard' },
-                { label: '🛒 Marketplace', href: '/marketplace' },
+                { label: '🏛️ Auction House', href: '/marketplace' },
                 { label: '🪙 Tokens', href: '/tokens' },
                 { label: '🔐 Auth', href: '/auth' },
               ].map(link => (
