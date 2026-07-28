@@ -216,22 +216,42 @@ export default function TokensPage() {
         </div>
 
         {/* How it works */}
-        <div className="border border-gray-800 rounded-2xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-800 bg-gray-900/60">
-            <h2 className="font-semibold text-sm text-gray-300">What tokens unlock</h2>
-          </div>
-          <div className="divide-y divide-gray-800">
-            {howItWorks.map(item => (
-              <div key={item.action} className="flex items-start gap-5 px-6 py-4 hover:bg-gray-900/40 transition">
-                <div className="flex-shrink-0 w-14 text-center">
-                  <span className="text-violet-400 font-bold text-base">⚡ {item.tokens}</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-white">{item.action}</p>
-                  <p className="text-gray-500 text-xs mt-0.5">{item.desc}</p>
-                </div>
+        <div className="mb-4">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-600 mb-5">What you can do with tokens</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-950/60 to-gray-900 border border-violet-800/30 p-5 hover:border-violet-600/50 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+              <div className="text-3xl mb-4">🔍</div>
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-2xl font-black text-white">1</span>
+                <span className="text-violet-400 text-sm font-bold">token</span>
               </div>
-            ))}
+              <h3 className="font-bold text-white text-sm mb-1.5">AI Quick Analysis</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">Full investment-grade report — market opportunity, growth scenarios, acquisition value.</p>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-950/40 to-gray-900 border border-amber-800/20 p-5 hover:border-amber-600/40 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+              <div className="text-3xl mb-4">🚀</div>
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-2xl font-black text-white">1–10</span>
+                <span className="text-amber-400 text-sm font-bold">tokens</span>
+              </div>
+              <h3 className="font-bold text-white text-sm mb-1.5">Listing Priority Boost</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">Push your project to the top of the Auction House. More tokens = higher rank.</p>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/40 to-gray-900 border border-emerald-800/20 p-5 hover:border-emerald-600/40 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+              <div className="text-3xl mb-4">✨</div>
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-2xl font-black text-white">Free</span>
+              </div>
+              <h3 className="font-bold text-white text-sm mb-1.5">AI Overview</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">Every project page auto-loads an AI-written pitch summary at no cost to you.</p>
+            </div>
+
           </div>
         </div>
 
