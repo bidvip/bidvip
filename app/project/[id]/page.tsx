@@ -43,15 +43,21 @@ type Projekt = {
   anon_elado_nev: string | null
 }
 
-function timeLeft(lejarat: string | null): string {
-  if (!lejarat) return ''
-  const diff = new Date(lejarat).getTime() - Date.now()
-  if (diff <= 0) return 'Auction ended'
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  if (days > 0) return `${days}d ${hours}h ${mins}m remaining`
-  return `${hours}h ${mins}m remaining`
+function useCountdown(lejarat: string | null) {
+  const [diff, setDiff] = useState(0)
+  useEffect(() => {
+    if (!lejarat) return
+    const update = () => setDiff(Math.max(0, new Date(lejarat).getTime() - Date.now()))
+    update()
+    const i = setInterval(update, 1000)
+    return () => clearInterval(i)
+  }, [lejarat])
+  const h = Math.floor(diff / 3600000)
+  const m = Math.floor((diff % 3600000) / 60000)
+  const s = Math.floor((diff % 60000) / 1000)
+  const done = diff === 0
+  const label = done ? 'Auction ended' : `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+  return { label, done }
 }
 
 type Licit = {
@@ -77,6 +83,7 @@ export default function ProjectDetail() {
   const [hiba, setHiba] = useState('')
   const [loading, setLoading] = useState(true)
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null)
+  const countdown = useCountdown(projekt?.lejarat ?? null)
   const [aiElemzes, setAiElemzes] = useState('')
   const [aiAllapot, setAiAllapot] = useState<'idle' | 'loading' | 'kesz' | 'nincs_token'>('idle')
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
@@ -379,13 +386,13 @@ export default function ProjectDetail() {
               </p>
             )}
             {projekt.lejarat && (
-              <p className={`text-sm font-semibold mt-2 mb-4 ${new Date(projekt.lejarat) < new Date() ? 'text-red-400' : 'text-amber-400'}`}>
-                ⏱ {timeLeft(projekt.lejarat)}
-              </p>
+              <div className={`text-2xl font-bold mt-2 mb-4 font-mono ${countdown.done ? 'text-red-400' : 'text-amber-400'}`}>
+                ⏱ {countdown.label}
+              </div>
             )}
             {!projekt.lejarat && <div className="mb-6" />}
 
-            {projekt.lejarat && new Date(projekt.lejarat) < new Date() ? (
+            {countdown.done && projekt.lejarat ? (
               <div className="text-center text-red-400 text-sm py-4 border border-red-900 rounded-xl bg-red-900/10">
                 This auction has ended. No more bids accepted.
               </div>
