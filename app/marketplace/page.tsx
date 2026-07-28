@@ -443,6 +443,7 @@ export default function Marketplace() {
                       sav={sav}
                       projekt={projektek[i] ?? null}
                       onKattint={setKivalasztott}
+                      topLicit={projektek[i] ? topLicitek[projektek[i].id] : undefined}
                     />
                   ))}
                 </div>
