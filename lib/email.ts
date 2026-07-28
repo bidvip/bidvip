@@ -99,6 +99,23 @@ export function launchEmail() {
   }
 }
 
+export function auctionSellerEmail(projektNev: string, osszeg: number, eladoKap: number) {
+  return {
+    subject: `Your auction ended: ${projektNev}`,
+    html: `
+      <p>Hi,</p>
+      <p>Your auction for <strong>${projektNev}</strong> has ended with a winning bid of <strong>€${osszeg.toLocaleString()}</strong>.</p>
+      <p>The winner is completing their payment now. Once confirmed, you will receive:</p>
+      <ul>
+        <li>The buyer's contact details</li>
+        <li><strong>€${eladoKap.toLocaleString()}</strong> (after BidVip's 10% platform fee)</li>
+      </ul>
+      <p style="color:#888;font-size:12px;">The platform fee covers secure escrow, AI vetting, and marketplace access.</p>
+      <p>— BidVip Team</p>
+    `,
+  }
+}
+
 export function purchaseBuyerDetailedEmail(projektNev: string, reszletesLeiras: string, fajlok: Array<{nev: string; url: string; tipus: string}>) {
   const fajlListHTML = fajlok.length > 0
     ? `<h3>Files & Documents</h3><ul>${fajlok.map(f => `<li><a href="${f.url}">${f.nev}</a></li>`).join('')}</ul>`

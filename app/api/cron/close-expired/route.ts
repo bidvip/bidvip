@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
-import { sendEmail, auctionWinnerEmail } from '@/lib/email'
+import { sendEmail, auctionWinnerEmail, auctionSellerEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -77,15 +77,23 @@ export async function GET(req: NextRequest) {
         },
         quantity: 1,
       }],
-      metadata: { projekt_id: projekt.id, vevo_email: winnerEmail },
+      metadata: { projekt_id: projekt.id, vevo_email: winnerEmail, elado_email: projekt.user_email },
       success_url: `${BASE_URL}/project/${projekt.id}?fizetes=siker`,
       cancel_url: `${BASE_URL}/project/${projekt.id}?fizetes=megszakitva`,
     })
+
+    const eladoKap = Math.round(topLicit.osszeg * 0.9)
 
     // Email winner with payment link
     if (session.url) {
       const { subject, html } = auctionWinnerEmail(projekt.nev, topLicit.osszeg, session.url)
       await sendEmail(winnerEmail, subject, html)
+    }
+
+    // Email seller that auction ended and payment is pending
+    if (projekt.user_email) {
+      const { subject, html } = auctionSellerEmail(projekt.nev, topLicit.osszeg, eladoKap)
+      await sendEmail(projekt.user_email, subject, html).catch(() => {})
     }
   }
 

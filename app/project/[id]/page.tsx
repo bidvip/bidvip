@@ -370,7 +370,7 @@ export default function ProjectDetail() {
             <p className="text-gray-500 text-xs">Starting price: €{projekt.kikialtasi_ar.toLocaleString()}</p>
             {projekt.reserve_ar && (
               <p className={`text-xs mt-1 font-semibold ${reserveTeljesitve ? 'text-green-400' : 'text-amber-400'}`}>
-                {reserveTeljesitve ? '✓ Reserve price met' : `⚠️ Reserve not yet met (€${projekt.reserve_ar.toLocaleString()})`}
+                {reserveTeljesitve ? '✓ Reserve price met' : '⚠️ Reserve not yet met'}
               </p>
             )}
             {projekt.lejarat && (
