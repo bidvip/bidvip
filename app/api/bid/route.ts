@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
     projekt_id,
     user_id,
     osszeg: valodiBid,
-    proxy_max: proxy_max || null,
     anon_nev: anonNev,
   }])
   if (insertHiba) return NextResponse.json({ error: `Bid failed: ${insertHiba.message}` }, { status: 500 })
