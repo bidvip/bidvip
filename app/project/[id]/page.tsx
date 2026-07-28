@@ -105,6 +105,10 @@ export default function ProjectDetail() {
       setUser(u)
       setLicitek(lics || [])
       setLoading(false)
+      if (u) {
+        supabase.from('tokenek').select('egyenleg').eq('user_id', u.id).single()
+          .then(({ data }) => setTokenEgyenleg(data?.egyenleg ?? 0))
+      }
       if (proj) {
         fetch('/api/ai/intro', {
           method: 'POST',
