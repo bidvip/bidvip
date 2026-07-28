@@ -167,6 +167,8 @@ export default function TokensPage() {
   const [egyenleg, setEgyenleg] = useState<number | null>(null)
   const [loading, setLoading] = useState<string | null>(null)
   const [status, setStatus] = useState<string | null>(null)
+  const [highlighted, setHighlighted] = useState<string | null>(null)
+  const packagesRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const supabase = createClient()
 
