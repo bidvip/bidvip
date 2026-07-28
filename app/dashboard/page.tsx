@@ -94,7 +94,7 @@ export default function Dashboard() {
           Bid<span className="text-violet-500">Vip</span>
         </a>
         <div className="flex items-center gap-4">
-          <a href="/marketplace" className="text-gray-300 text-sm hover:text-white transition font-semibold">Marketplace</a>
+          <a href="/marketplace" className="text-gray-300 text-sm hover:text-white transition font-semibold">Auction House</a>
           <a href="/tokens" className="text-gray-300 text-sm hover:text-white transition font-semibold">
             ⚡ {tokenEgyenleg ?? '...'} tokens
           </a>
