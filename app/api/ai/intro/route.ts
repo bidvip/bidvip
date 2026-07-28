@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     max_tokens: 300,
     messages: [{
       role: 'user',
-      content: `You are a compelling startup pitch writer. Write a SHORT, exciting 3-sentence introduction for this project that makes a potential buyer immediately understand what it is and why it's interesting. Write it like the opening of a great pitch deck — clear, vivid, enthusiastic but professional. No headers, no bullet points, just flowing prose.
+      content: `You are a compelling startup pitch writer. Write a SHORT, exciting 3-sentence introduction for this project. No headers, no titles, no bullet points, no markdown — just 3 clean sentences of flowing prose.
 
 Project: ${nev}
 Category: ${kategoria}
@@ -26,7 +26,12 @@ Stage: ${BADGE_LABELS[badge] || badge}
 Starting bid: €${kikialtasi_ar}
 Description: ${rovid_leiras}
 
-Write exactly 3 sentences. First sentence: what the project IS. Second sentence: the opportunity/market. Third sentence: why a buyer should be excited.`,
+Rules:
+- Do NOT start with the project name or a title
+- Do NOT use any markdown formatting (no #, no **, no -)
+- Sentence 1: what the product does and who it's for
+- Sentence 2: the market opportunity and timing
+- Sentence 3: why a buyer should be excited to acquire this now`,
     }],
   })
 
