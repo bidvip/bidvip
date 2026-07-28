@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BidVip — Startup Project Marketplace",
+  title: "BidVip — Startup Project Auction House",
   description: "Buy and sell validated startup ideas through secure, transparent auctions.",
 };
 
