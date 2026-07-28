@@ -197,6 +197,12 @@ export default function TokensPage() {
     betolt()
   }, [])
 
+  function scrollToPkg(pkg: string) {
+    setHighlighted(pkg)
+    packagesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setTimeout(() => setHighlighted(null), 2000)
+  }
+
   async function vasarlas(pkg: string) {
     if (!user) return
     setLoading(pkg)
