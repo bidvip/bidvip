@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 
 export default function Onboarding() {
-  const [valasztott, setValasztott] = useState<'vevo' | 'elado' | null>(null)
+  const [valasztott, setValasztott] = useState<'vevo' | 'elado' | 'mindketto' | null>(null)
   const [loading, setLoading] = useState(false)
   const [bonuszKapott, setBonuszKapott] = useState(false)
   const router = useRouter()
@@ -53,7 +53,7 @@ export default function Onboarding() {
           <h1 className="text-3xl font-bold text-center mb-2">How do you want to use BidVip?</h1>
           <p className="text-gray-400 text-center mb-10">You can change this anytime in your settings.</p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <button
               onClick={() => setValasztott('vevo')}
               className={`flex flex-col items-center gap-4 p-8 rounded-2xl border-2 transition ${
@@ -81,6 +81,21 @@ export default function Onboarding() {
               <div className="text-center">
                 <p className="font-bold text-lg mb-1">I&apos;m a Seller</p>
                 <p className="text-gray-400 text-sm">I want to sell my project, idea, or startup through an open auction.</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setValasztott('mindketto')}
+              className={`flex flex-col items-center gap-4 p-8 rounded-2xl border-2 transition ${
+                valasztott === 'mindketto'
+                  ? 'border-violet-500 bg-violet-900/20'
+                  : 'border-gray-700 hover:border-gray-500'
+              }`}
+            >
+              <span className="text-5xl">🔄</span>
+              <div className="text-center">
+                <p className="font-bold text-lg mb-1">Both</p>
+                <p className="text-gray-400 text-sm">I want to sell my own ideas and also discover and bid on others.</p>
               </div>
             </button>
           </div>

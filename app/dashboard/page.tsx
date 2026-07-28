@@ -31,14 +31,15 @@ export default function Dashboard() {
       if (!profil) { router.push('/onboarding'); return }
       setSzerepkor(profil.szerepkor)
 
-      if (profil.szerepkor === 'elado') {
+      if (profil.szerepkor === 'elado' || profil.szerepkor === 'mindketto') {
         const { data: projektek } = await supabase
           .from('projektek')
           .select('*')
           .eq('user_id', u.id)
           .order('letrehozva', { ascending: false })
         setSajatProjektek(projektek || [])
-      } else {
+      }
+      if (profil.szerepkor === 'vevo' || profil.szerepkor === 'mindketto') {
         const { data: licitek } = await supabase
           .from('licitek')
           .select('*, projektek(nev, kikialtasi_ar, badge)')
@@ -110,15 +111,21 @@ export default function Dashboard() {
       <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold">Welcome, <span className="text-violet-400">{user?.email?.split('@')[0]}</span>!</h1>
-          <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${szerepkor === 'elado' ? 'bg-amber-900/40 text-amber-400 border-amber-800' : 'bg-blue-900/40 text-blue-400 border-blue-800'}`}>
-            {szerepkor === 'elado' ? '💡 Seller' : '🛒 Buyer'}
+          <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
+            szerepkor === 'elado' ? 'bg-amber-900/40 text-amber-400 border-amber-800' :
+            szerepkor === 'mindketto' ? 'bg-violet-900/40 text-violet-400 border-violet-800' :
+            'bg-blue-900/40 text-blue-400 border-blue-800'
+          }`}>
+            {szerepkor === 'elado' ? '💡 Seller' : szerepkor === 'mindketto' ? '🔄 Seller & Buyer' : '🛒 Buyer'}
           </span>
         </div>
         <p className="text-gray-400 mb-10">
-          {szerepkor === 'elado' ? 'Manage your listings and track incoming bids.' : 'Track your bids and purchase winning projects.'}
+          {szerepkor === 'elado' ? 'Manage your listings and track incoming bids.' :
+           szerepkor === 'mindketto' ? 'Manage your listings and track your bids in one place.' :
+           'Track your bids and purchase winning projects.'}
         </p>
 
-        {szerepkor === 'elado' ? (
+        {szerepkor === 'elado' || szerepkor === 'mindketto' ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
@@ -195,7 +202,11 @@ export default function Dashboard() {
               </div>
             )}
           </>
-        ) : (
+        ) : null}
+
+        {szerepkor === 'vevo' || szerepkor === 'mindketto' ? (
+          <div className={szerepkor === 'mindketto' ? 'mt-12 pt-12 border-t border-gray-800' : ''}>
+          {szerepkor === 'mindketto' && <h2 className="text-2xl font-bold mb-6">My Bids</h2>}
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
@@ -232,7 +243,8 @@ export default function Dashboard() {
               </div>
             )}
           </>
-        )}
+          </div>
+        ) : null}
       </div>
     </main>
   )
