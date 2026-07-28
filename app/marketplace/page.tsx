@@ -82,6 +82,11 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit }: {
       }}
       className="relative bg-gray-950 rounded-xl border flex flex-col overflow-hidden transition-all hover:scale-[1.02] group"
     >
+      {/* CRT scanline overlay */}
+      {isLive && (
+        <div className="pointer-events-none absolute inset-0 z-10 opacity-[0.03]"
+          style={{ background: 'repeating-linear-gradient(0deg, #fff 0px, #fff 1px, transparent 1px, transparent 3px)' }} />
+      )}
       {/* Top bar */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800"
         style={{ background: isLive ? info.bg : '#0d0d0d' }}>
