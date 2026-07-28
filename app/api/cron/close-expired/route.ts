@@ -6,7 +6,6 @@ import { sendEmail, auctionWinnerEmail, auctionSellerEmail } from '@/lib/email'
 export const dynamic = 'force-dynamic'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'
-const BREAK_MS = 30 * 1000  // 30 sec break between auctions
 
 const SAVOK = [
   { sav: 'fast',     perc: 3,  label: 'Fast'     },
