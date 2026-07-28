@@ -229,62 +229,59 @@ function BidModal({ projekt, user, onZar }: {
 
       {/* Panel */}
       <div className="relative w-full max-w-md bg-gray-950 border rounded-2xl overflow-hidden"
-        style={{ borderColor: `${info?.color}44` }}>
+        style={{ borderColor: `${info?.color}55`, boxShadow: `0 0 40px ${info?.color}22` }}>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800"
-          style={{ background: info?.bg }}>
+        <div className="flex items-center justify-between px-5 py-3"
+          style={{ background: `linear-gradient(to right, ${info?.color}22, transparent)` }}>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: info?.color }} />
-            <span className="text-xs font-bold tracking-widest" style={{ color: info?.color }}>
-              {info?.label}
-            </span>
-            <span className="text-xs font-bold text-white bg-red-600 px-1.5 rounded">LIVE</span>
+            <span className="text-xs font-black tracking-widest font-mono" style={{ color: info?.color }}>📺 LIVE AUCTION</span>
           </div>
-          <button onClick={onZar} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
+          <button onClick={onZar} className="text-gray-600 hover:text-white text-lg leading-none transition">✕</button>
         </div>
 
-        <div className="p-5">
-          {/* Project info */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                style={{ color: badge_info[projekt.badge]?.color, background: `${badge_info[projekt.badge]?.color}22` }}>
-                {badge_info[projekt.badge]?.label}
-              </span>
-              <span className="text-xs text-gray-500">{projekt.kategoria}</span>
-            </div>
-            <h2 className="font-bold text-lg leading-snug">{projekt.nev}</h2>
-            <p className="text-gray-400 text-sm mt-1 line-clamp-2">{projekt.rovid_leiras}</p>
+        {/* Project name bar */}
+        <div className="px-5 pt-4 pb-3 border-b border-gray-800/60">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+              style={{ color: badge_info[projekt.badge]?.color, background: `${badge_info[projekt.badge]?.color}22` }}>
+              {badge_info[projekt.badge]?.label}
+            </span>
+            <span className="text-[10px] text-gray-600">{projekt.kategoria}</span>
           </div>
+          <h2 className="font-black text-xl leading-tight">{projekt.nev}</h2>
+          <p className="text-gray-500 text-xs mt-1 line-clamp-2">{projekt.rovid_leiras}</p>
+        </div>
 
-          {/* Stats row */}
-          <div className="flex gap-4 mb-5 pb-4 border-b border-gray-800">
-            <div>
-              <p className="text-xs text-gray-500 mb-0.5">Current bid</p>
-              <p className="text-2xl font-bold" style={{ color: info?.color }}>
-                €{legmagasabb.toLocaleString()}
-              </p>
-            </div>
-            <div className="ml-auto text-right">
-              <p className="text-xs text-gray-500 mb-0.5">Time left</p>
-              <p className={`text-2xl font-mono font-bold ${countdown.done ? 'text-red-400' : 'text-white'}`}>
-                {countdown.label}
-              </p>
-            </div>
+        {/* Big bid + timer */}
+        <div className="px-5 py-4 flex items-center justify-between"
+          style={{ background: `${info?.color}0a` }}>
+          <div>
+            <p className="text-[10px] text-gray-600 uppercase tracking-widest mb-0.5">Current Bid</p>
+            <p className="text-4xl font-black tabular-nums" style={{ color: info?.color, textShadow: info?.glow }}>
+              €{legmagasabb.toLocaleString()}
+            </p>
           </div>
+          <div className="text-right">
+            <p className="text-[10px] text-gray-600 uppercase tracking-widest mb-0.5">Time Left</p>
+            <p className={`text-2xl font-mono font-black tabular-nums ${countdown.done ? 'text-red-400' : 'text-white'}`}>
+              {countdown.label}
+            </p>
+          </div>
+        </div>
 
+        <div className="px-5 pb-5">
           {/* Bid form */}
           {auctionEnded ? (
             <div className="text-center text-red-400 text-sm py-3 border border-red-900/50 rounded-xl bg-red-900/10">
               Auction ended — no more bids
             </div>
           ) : isSeller ? (
-            <div className="text-center text-gray-500 text-sm py-3">
-              This is your project
-            </div>
+            <div className="text-center text-gray-600 text-xs py-3">This is your project</div>
           ) : !user ? (
             <button onClick={() => router.push('/auth')}
-              className="w-full py-3 rounded-full font-semibold text-sm"
+              className="w-full py-3.5 rounded-2xl font-bold text-sm transition"
               style={{ background: info?.color, color: '#000' }}>
               Sign in to bid →
             </button>
@@ -293,39 +290,43 @@ function BidModal({ projekt, user, onZar }: {
               <div className="flex items-center gap-2">
                 <button type="button"
                   onClick={() => setLicitOsszeg(v => String(Math.max(minimumLicit, (parseInt(v) || minimumLicit) - increment)))}
-                  className="w-11 h-11 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-xl font-bold flex items-center justify-center flex-shrink-0 transition">−</button>
+                  className="w-12 h-12 rounded-2xl text-white text-2xl font-bold flex items-center justify-center flex-shrink-0 transition active:scale-95"
+                  style={{ background: `${info?.color}22`, border: `1px solid ${info?.color}44`, color: info?.color }}>−</button>
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">€</span>
                   <input
                     type="number" required min={minimumLicit} value={licitOsszeg}
                     onChange={e => setLicitOsszeg(e.target.value)}
                     placeholder={`${minimumLicit.toLocaleString()}`}
-                    className="w-full pl-7 pr-3 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 text-sm text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full pl-8 pr-4 py-3.5 rounded-2xl bg-gray-900 border text-white placeholder-gray-600 focus:outline-none text-lg font-bold text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition"
+                    style={{ borderColor: `${info?.color}44` }}
                   />
                 </div>
                 <button type="button"
                   onClick={() => setLicitOsszeg(v => String((parseInt(v) || minimumLicit) + increment))}
-                  className="w-11 h-11 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-xl font-bold flex items-center justify-center flex-shrink-0 transition">+</button>
+                  className="w-12 h-12 rounded-2xl text-2xl font-bold flex items-center justify-center flex-shrink-0 transition active:scale-95"
+                  style={{ background: `${info?.color}22`, border: `1px solid ${info?.color}44`, color: info?.color }}>+</button>
               </div>
-              {allapot === 'hiba' && <p className="text-red-400 text-xs">{hiba}</p>}
-              {allapot === 'siker' && <p className="text-green-400 text-xs font-semibold">Bid placed!</p>}
+              <p className="text-center text-[10px] text-gray-600">min. €{minimumLicit.toLocaleString()} · increment +€{increment}</p>
+              {allapot === 'hiba' && <p className="text-red-400 text-xs text-center">{hiba}</p>}
+              {allapot === 'siker' && <p className="text-green-400 text-xs font-bold text-center">🎉 Bid placed!</p>}
               <button type="submit" disabled={allapot === 'loading'}
-                className="py-3 rounded-full font-semibold text-sm disabled:opacity-60 transition"
-                style={{ background: info?.color, color: '#000' }}>
-                {allapot === 'loading' ? 'Submitting...' : 'Place Bid →'}
+                className="py-4 rounded-2xl font-black text-base disabled:opacity-50 transition active:scale-[0.98]"
+                style={{ background: info?.color, color: '#000', boxShadow: allapot !== 'loading' ? info?.glow : 'none' }}>
+                {allapot === 'loading' ? '⏳ Submitting...' : '🔨 Place Bid →'}
               </button>
             </form>
           )}
 
           {/* Bid history */}
           {!loading && licitek.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-800">
-              <p className="text-xs text-gray-500 mb-2 font-semibold">Bids ({licitek.length})</p>
-              <div className="flex flex-col gap-1.5">
+            <div className="mt-4 pt-4 border-t border-gray-800/60">
+              <p className="text-[10px] text-gray-600 uppercase tracking-widest mb-2">Bid History ({licitek.length})</p>
+              <div className="flex flex-col gap-1">
                 {licitek.slice(0, 5).map((l, i) => (
-                  <div key={l.id} className="flex justify-between text-xs">
-                    <span className="text-gray-500">{l.anon_nev || `Buyer#${i + 1}`}</span>
-                    <span className={i === 0 ? 'font-bold' : 'text-gray-400'} style={{ color: i === 0 ? info?.color : undefined }}>
+                  <div key={l.id} className={`flex justify-between items-center py-1.5 px-3 rounded-xl text-xs ${i === 0 ? 'bg-gray-900' : ''}`}>
+                    <span className="text-gray-500 font-mono">{i === 0 ? '🏆 ' : `${i + 1}. `}{l.anon_nev || `Buyer#${i + 1}`}</span>
+                    <span className="font-bold tabular-nums" style={{ color: i === 0 ? info?.color : '#6b7280' }}>
                       €{l.osszeg.toLocaleString()}
                     </span>
                   </div>
