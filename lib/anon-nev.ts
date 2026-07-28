@@ -17,23 +17,15 @@ export async function getNapiAnonNev(
 
   if (meglevo?.[mezó]) return meglevo[mezó]
 
-  // Get all names already taken today to avoid collision
-  const { data: maiNevek } = await (supabase as any)
+  // Count how many users already have a name today → next sequential number
+  const { count } = await (supabase as any)
     .from('anon_nevek')
-    .select(mezó)
+    .select(mezó, { count: 'exact', head: true })
     .eq('datum', ma)
     .not(mezó, 'is', null)
 
-  const foglalt = new Set((maiNevek || []).map((r: any) => r[mezó]))
-
-  // Generate unique name
-  let ujNev: string
-  let kiserletek = 0
-  do {
-    const szam = Math.floor(1000 + Math.random() * 9000)
-    ujNev = `${prefix}${szam}`
-    kiserletek++
-  } while (foglalt.has(ujNev) && kiserletek < 100)
+  const sorszam = 1001 + (count || 0)
+  const ujNev = `${prefix}${sorszam}`
 
   await (supabase as any)
     .from('anon_nevek')
