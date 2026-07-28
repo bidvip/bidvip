@@ -87,6 +87,7 @@ export default function ProjectDetail() {
   const [aiElemzes, setAiElemzes] = useState('')
   const [aiAllapot, setAiAllapot] = useState<'idle' | 'loading' | 'kesz' | 'nincs_token'>('idle')
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
+  const [aiIntro, setAiIntro] = useState('')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
