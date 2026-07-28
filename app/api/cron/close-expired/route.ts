@@ -6,8 +6,8 @@ import { sendEmail, auctionWinnerEmail, auctionSellerEmail } from '@/lib/email'
 export const dynamic = 'force-dynamic'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'
-const AUCTION_DURATION_MS = 60 * 60 * 1000        // 1 hour
-const BREAK_DURATION_MS = 5 * 60 * 1000           // 5 min break between auctions
+const AUCTION_DURATION_MS = 3 * 60 * 1000          // 3 minutes
+const BREAK_DURATION_MS = 30 * 1000               // 30 second break between auctions
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
