@@ -215,41 +215,76 @@ export default function TokensPage() {
           ))}
         </div>
 
-        {/* How it works */}
-        <div className="mb-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-600 mb-5">What you can do with tokens</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Feature bento */}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-600 mb-5">What tokens unlock</p>
+          <div className="grid grid-cols-2 gap-4" style={{gridTemplateRows: 'auto auto'}}>
 
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-950/60 to-gray-900 border border-violet-800/30 p-5 hover:border-violet-600/50 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="text-3xl mb-4">🔍</div>
-              <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="text-2xl font-black text-white">1</span>
-                <span className="text-violet-400 text-sm font-bold">token</span>
+            {/* Big card — AI Analysis */}
+            <div className="col-span-2 relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-8 flex gap-10 items-center">
+              {/* BG glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-950/40 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute -left-10 -top-10 w-52 h-52 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative flex-shrink-0 flex flex-col items-start">
+                <div className="text-[72px] font-black leading-none text-white tracking-tighter">1</div>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-violet-400">⚡</span>
+                  <span className="text-violet-400 text-sm font-semibold">token per use</span>
+                </div>
               </div>
-              <h3 className="font-bold text-white text-sm mb-1.5">AI Quick Analysis</h3>
-              <p className="text-gray-500 text-xs leading-relaxed">Full investment-grade report — market opportunity, growth scenarios, acquisition value.</p>
+
+              <div className="relative flex-1">
+                <div className="inline-flex items-center gap-2 bg-violet-900/40 border border-violet-700/40 rounded-full px-3 py-1 mb-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                  <span className="text-violet-300 text-xs font-semibold">Most used feature</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">AI Quick Analysis</h3>
+                <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
+                  Get an institutional-grade investment report on any project — market opportunity, growth scenarios over 5–10 years, strategic value, and acquisition assessment.
+                </p>
+                <div className="flex gap-3 mt-4">
+                  {['Market Opportunity', 'Growth Scenarios', 'Acquisition Value'].map(tag => (
+                    <span key={tag} className="text-[11px] text-gray-500 border border-gray-700 rounded-full px-2.5 py-1">{tag}</span>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-950/40 to-gray-900 border border-amber-800/20 p-5 hover:border-amber-600/40 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="text-3xl mb-4">🚀</div>
-              <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="text-2xl font-black text-white">1–10</span>
-                <span className="text-amber-400 text-sm font-bold">tokens</span>
+            {/* Priority Boost */}
+            <div className="relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-6">
+              <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-amber-500/8 rounded-full blur-2xl pointer-events-none" />
+              <div className="flex items-center justify-between mb-5">
+                <div className="w-10 h-10 rounded-xl bg-amber-900/40 border border-amber-800/30 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-black text-white">1–10</span>
+                  <p className="text-amber-400 text-xs font-semibold">tokens</p>
+                </div>
               </div>
-              <h3 className="font-bold text-white text-sm mb-1.5">Listing Priority Boost</h3>
-              <p className="text-gray-500 text-xs leading-relaxed">Push your project to the top of the Auction House. More tokens = higher rank.</p>
+              <h3 className="font-bold text-white mb-1.5">Listing Priority Boost</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">Spend tokens to move your project up the Auction House queue. The more you spend, the higher your ranking — outbid competitors for top placement.</p>
             </div>
 
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/40 to-gray-900 border border-emerald-800/20 p-5 hover:border-emerald-600/40 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="text-3xl mb-4">✨</div>
-              <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="text-2xl font-black text-white">Free</span>
+            {/* AI Overview — free */}
+            <div className="relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-6">
+              <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-emerald-500/8 rounded-full blur-2xl pointer-events-none" />
+              <div className="flex items-center justify-between mb-5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-900/40 border border-emerald-800/30 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-black text-emerald-400">Free</span>
+                  <p className="text-gray-600 text-xs">always included</p>
+                </div>
               </div>
-              <h3 className="font-bold text-white text-sm mb-1.5">AI Overview</h3>
-              <p className="text-gray-500 text-xs leading-relaxed">Every project page auto-loads an AI-written pitch summary at no cost to you.</p>
+              <h3 className="font-bold text-white mb-1.5">AI Overview</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">Every project page auto-loads a compelling AI-written introduction — no tokens required. You only spend tokens when you want the full deep analysis.</p>
             </div>
 
           </div>
