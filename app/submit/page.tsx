@@ -617,7 +617,7 @@ function SubmitInner() {
 
     const { error } = draftId
       ? await supabase.from('projektek').update({ ...projektAdat, anon_elado_nev: anonEladoNev }).eq('id', draftId)
-      : await supabase.from('projektek').insert([{ ...projektAdat, user_id: user.id, user_email: user.email, anon_elado_nev: anonEladoNev }])
+      : await supabase.from('projektek').insert([{ ...projektAdat, user_id: user.id, anon_elado_nev: anonEladoNev }])
 
     if (error) {
       setHiba('Something went wrong. Please try again.')
