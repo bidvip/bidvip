@@ -89,23 +89,21 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-800">
+      <nav className="flex items-center justify-between px-8 py-4 border-b border-gray-800">
         <a href="/" className="text-2xl font-bold tracking-tight">
           Bid<span className="text-violet-500">Vip</span>
         </a>
-        <div className="flex items-center gap-4">
-          <a href="/marketplace" className="text-gray-300 text-sm hover:text-white transition font-semibold">Auction House</a>
-          <a href="/tokens" className="text-gray-300 text-sm hover:text-white transition font-semibold">
-            ⚡ {tokenEgyenleg ?? '...'} tokens
+        <div className="flex items-center gap-2">
+          <a href="/marketplace"
+            className="text-gray-400 text-sm hover:text-white transition px-3 py-2 rounded-lg hover:bg-gray-800">
+            Auction House
           </a>
-          <a href="/settings" className="text-gray-300 text-sm hover:text-white transition font-semibold">Settings</a>
-          <span className="text-gray-400 text-sm hidden sm:inline">{user?.email}</span>
-          <button
-            onClick={kilepes}
-            className="border border-gray-700 hover:border-gray-500 transition px-4 py-2 rounded-full text-sm"
-          >
-            Sign Out
-          </button>
+          <a href="/tokens"
+            className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-violet-950/60 border border-violet-800/40 text-violet-300 hover:bg-violet-900/60 transition font-semibold">
+            <span>⚡</span>
+            <span>{tokenEgyenleg ?? '...'}</span>
+          </a>
+          <UserMenu email={user?.email ?? ''} onSignOut={kilepes} />
         </div>
       </nav>
 
