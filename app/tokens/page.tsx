@@ -264,13 +264,15 @@ export default function TokensPage() {
         </div>
 
         {/* Packages */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
+        <div ref={packagesRef} className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
           {packages.map(pkg => (
             <div key={pkg.id}
-              className={`relative flex flex-col rounded-2xl p-6 border transition
-                ${pkg.popular
-                  ? 'bg-violet-950/30 border-violet-600 shadow-[0_0_40px_-8px_rgba(139,92,246,0.25)]'
-                  : 'bg-gray-900 border-gray-800'}`}>
+              className={`relative flex flex-col rounded-2xl p-6 border transition-all duration-500
+                ${highlighted === pkg.id
+                  ? 'border-violet-400 shadow-[0_0_60px_-4px_rgba(139,92,246,0.5)] scale-[1.02]'
+                  : pkg.popular
+                    ? 'bg-violet-950/30 border-violet-600 shadow-[0_0_40px_-8px_rgba(139,92,246,0.25)]'
+                    : 'bg-gray-900 border-gray-800'}`}>
 
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
