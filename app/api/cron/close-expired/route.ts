@@ -89,48 +89,35 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 2. Check if lane already has an active auction
-    const { data: aktiv } = await supabase
+    // 2. Check how many slots are active (max 3 per lane)
+    const { data: aktivLista } = await supabase
       .from('projektek')
       .select('id')
       .eq('statusz', 'aktiv')
       .eq('sav', sav)
-      .limit(1)
-      .single()
 
-    if (aktiv) { eredmeny[sav] = 'active'; continue }
+    const aktivDb = aktivLista?.length ?? 0
+    const szabadSlot = 3 - aktivDb
 
-    // 3. Check break time
-    const { data: utolsoLezart } = await supabase
-      .from('projektek')
-      .select('lejarat')
-      .eq('statusz', 'lezart')
-      .eq('sav', sav)
-      .order('lejarat', { ascending: false })
-      .limit(1)
-      .single()
+    if (szabadSlot <= 0) { eredmeny[sav] = `active:${aktivDb}`; continue }
 
-    if (utolsoLezart?.lejarat) {
-      const szunetVege = new Date(utolsoLezart.lejarat).getTime() + BREAK_MS
-      if (now.getTime() < szunetVege) { eredmeny[sav] = 'break'; continue }
-    }
-
-    // 4. Start next project from queue in this lane
-    const { data: kovetkezo } = await supabase
+    // 3. Fill free slots from queue (no break when multiple slots available)
+    const { data: varakozok } = await supabase
       .from('projektek')
       .select('id, nev')
       .eq('statusz', 'varakozas')
       .eq('sav', sav)
       .order('priority_tokens', { ascending: false })
       .order('varakozas_kezd', { ascending: true })
-      .limit(1)
-      .single()
+      .limit(szabadSlot)
 
-    if (!kovetkezo) { eredmeny[sav] = 'empty'; continue }
+    if (!varakozok || varakozok.length === 0) { eredmeny[sav] = 'empty'; continue }
 
     const lejarat = new Date(now.getTime() + perc * 60 * 1000).toISOString()
-    await supabase.from('projektek').update({ statusz: 'aktiv', lejarat }).eq('id', kovetkezo.id)
-    eredmeny[sav] = `started: ${kovetkezo.nev}`
+    for (const p of varakozok) {
+      await supabase.from('projektek').update({ statusz: 'aktiv', lejarat }).eq('id', p.id)
+    }
+    eredmeny[sav] = `started:${varakozok.length} (${varakozok.map(p => p.nev).join(', ')})`
   }
 
   return NextResponse.json({ ok: true, ...eredmeny })
