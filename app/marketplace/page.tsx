@@ -393,7 +393,7 @@ export default function Marketplace() {
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Auction House</h1>
-          <p className="text-gray-500 mt-1 text-sm">9 live channels — click any TV to place your bid</p>
+          <p className="text-gray-500 mt-1 text-sm">9 live channels · click any TV to place your bid</p>
         </div>
 
         {/* 3 lanes, each with 3 TVs */}
