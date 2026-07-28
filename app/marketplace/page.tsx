@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 
 const SAV_INFO = {
-  fast:     { label: 'FAST',     perc: 3,  color: '#22c55e', glow: '0 0 24px #22c55e44', bg: '#22c55e11' },
-  standard: { label: 'STANDARD', perc: 5,  color: '#eab308', glow: '0 0 24px #eab30844', bg: '#eab30811' },
-  premium:  { label: 'PREMIUM',  perc: 20, color: '#ef4444', glow: '0 0 24px #ef444444', bg: '#ef444411' },
+  fast:     { label: 'FAST',     slogan: '⚡ CHANNEL 01', tagline: 'Fast Deals · Live Now',        perc: 3,  color: '#22c55e', glow: '0 0 24px #22c55e44', bg: '#22c55e11' },
+  standard: { label: 'STANDARD', slogan: '📡 CHANNEL 02', tagline: 'Prime Time · Bid To Win',      perc: 5,  color: '#eab308', glow: '0 0 24px #eab30844', bg: '#eab30811' },
+  premium:  { label: 'PREMIUM',  slogan: '🏆 CHANNEL 03', tagline: 'High Value · Serious Buyers',  perc: 20, color: '#ef4444', glow: '0 0 24px #ef444444', bg: '#ef444411' },
 }
 
 const badge_info: Record<string, { label: string; color: string }> = {
