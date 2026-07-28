@@ -202,6 +202,8 @@ function BidModal({ projekt, user, onZar }: {
     } else {
       setAllapot('siker')
       setLicitOsszeg('')
+      const { data: fresh } = await supabase.from('licitek').select('*').eq('projekt_id', projekt.id).order('osszeg', { ascending: false })
+      if (fresh) setLicitek(fresh)
       setTimeout(() => setAllapot('idle'), 2500)
     }
   }
