@@ -100,6 +100,19 @@ export default function Dashboard() {
           .eq('user_id', u.id)
           .order('letrehozva', { ascending: false })
         setSajatProjektek(projektek || [])
+
+        const elado_idk = (projektek || []).filter(p => p.statusz === 'aktiv').map((p: any) => p.id)
+        if (elado_idk.length > 0) {
+          const { data: pLicitek } = await supabase
+            .from('licitek').select('projekt_id, osszeg').in('projekt_id', elado_idk)
+          const pMap: Record<string, { top: number; db: number }> = {}
+          for (const b of pLicitek || []) {
+            if (!pMap[b.projekt_id]) pMap[b.projekt_id] = { top: 0, db: 0 }
+            pMap[b.projekt_id].db++
+            if (b.osszeg > pMap[b.projekt_id].top) pMap[b.projekt_id].top = b.osszeg
+          }
+          setProjektLicitek(pMap)
+        }
       }
       if (profil.szerepkor === 'vevo' || profil.szerepkor === 'mindketto') {
         const { data: licitek } = await supabase
