@@ -116,14 +116,10 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
         <div className="flex items-center gap-2">
           {projekt && (
             <button
-              onClick={e => {
-                e.stopPropagation()
-                navigator.clipboard.writeText(`${window.location.origin}/project/${projekt.id}`)
-                  .catch(() => {})
-              }}
+              onClick={handleShare}
               title="Copy link"
-              className="text-[10px] text-gray-600 hover:text-gray-400 transition"
-            >🔗</button>
+              className={`text-[10px] transition font-semibold ${copied ? 'text-green-400' : 'text-gray-600 hover:text-gray-400'}`}
+            >{copied ? '✓' : '🔗'}</button>
           )}
           <span className="text-[10px] text-gray-600">#{slot}</span>
         </div>
