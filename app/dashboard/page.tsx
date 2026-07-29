@@ -240,23 +240,18 @@ export default function Dashboard() {
 
         {szerepkor === 'elado' || szerepkor === 'mindketto' ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <p className="text-gray-400 text-sm mb-1">Total</p>
-                <p className="text-3xl font-bold">{sajatProjektek.filter(p => p.statusz !== 'draft').length}</p>
-              </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <p className="text-gray-400 text-sm mb-1">Live</p>
-                <p className="text-3xl font-bold text-green-400">{sajatProjektek.filter(p => p.statusz === 'aktiv').length}</p>
-              </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <p className="text-gray-400 text-sm mb-1">Under Review</p>
-                <p className="text-3xl font-bold text-yellow-400">{sajatProjektek.filter(p => p.statusz === 'felulvizsgalat').length}</p>
-              </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <p className="text-gray-400 text-sm mb-1">Closed</p>
-                <p className="text-3xl font-bold text-gray-500">{sajatProjektek.filter(p => p.statusz === 'lezart').length}</p>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+              {[
+                { label: 'Összes', val: sajatProjektek.filter(p => p.statusz !== 'draft').length, color: 'text-white', bg: '' },
+                { label: 'Élő', val: sajatProjektek.filter(p => p.statusz === 'aktiv').length, color: 'text-green-400', bg: 'border-green-900/40' },
+                { label: 'Felülvizsgálat', val: sajatProjektek.filter(p => p.statusz === 'felulvizsgalat').length, color: 'text-amber-400', bg: 'border-amber-900/40' },
+                { label: 'Lezárt', val: sajatProjektek.filter(p => p.statusz === 'lezart').length, color: 'text-gray-500', bg: '' },
+              ].map(s => (
+                <div key={s.label} className={`bg-gray-900 border ${s.bg || 'border-gray-800'} rounded-2xl p-5 hover:border-gray-700 transition`}>
+                  <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">{s.label}</p>
+                  <p className={`text-3xl font-black tabular-nums ${s.color}`}>{s.val}</p>
+                </div>
+              ))}
             </div>
 
             {sajatProjektek.length === 0 ? (
