@@ -372,13 +372,14 @@ export default function Home() {
               { num: '02', icon: '📺', title: 'Aukciós Ház', desc: 'Time-limited bidding in our Auction House — Fast (3 min), Standard (5 min), or Premium (20 min) channels.' },
               { num: '03', icon: '🔒', title: 'Secure Handover', desc: 'Buyer pays via Stripe. We hold funds in escrow. Seller gets paid only after delivering all files and credentials.' },
             ].map((s, i) => (
-              <div key={i}
-                className="group relative bg-gray-900/50 border border-gray-800 hover:border-violet-800/60 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(124,58,237,0.08)]">
-                <div className="absolute top-5 right-5 text-5xl font-black text-white/[0.03] select-none tabular-nums">{s.num}</div>
-                <div className="text-3xl mb-4">{s.icon}</div>
-                <h3 className="font-bold text-base mb-2 group-hover:text-violet-300 transition-colors">{s.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
-              </div>
+              <ScrollReveal key={i} delay={i * 120}>
+                <div className="group relative bg-gray-900/50 border border-gray-800 hover:border-violet-800/60 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(124,58,237,0.08)]">
+                  <div className="absolute top-5 right-5 text-5xl font-black text-white/[0.03] select-none tabular-nums">{s.num}</div>
+                  <div className="text-3xl mb-4">{s.icon}</div>
+                  <h3 className="font-bold text-base mb-2 group-hover:text-violet-300 transition-colors">{s.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
