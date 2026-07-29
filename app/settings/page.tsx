@@ -76,9 +76,13 @@ export default function Settings() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-800">
+      <nav className="flex items-center justify-between px-8 py-5 border-b border-white/5 backdrop-blur-sm">
         <a href="/" className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></a>
-        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">← Dashboard</a>
+        <div className="flex items-center gap-3 text-sm text-gray-500">
+          <a href="/dashboard" className="hover:text-white transition">Dashboard</a>
+          <span>/</span>
+          <span className="text-gray-300">Beállítások</span>
+        </div>
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-12 flex flex-col gap-6">
