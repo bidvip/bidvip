@@ -195,8 +195,34 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-400">Loading...</div>
+      <main className="min-h-screen bg-gray-950 text-white">
+        <nav className="flex items-center justify-between px-8 py-4 border-b border-gray-800/60">
+          <span className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></span>
+        </nav>
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          {/* Skeleton */}
+          <div className="h-8 w-64 bg-gray-800 rounded-xl mb-3 animate-pulse" />
+          <div className="h-4 w-80 bg-gray-800/60 rounded-lg mb-10 animate-pulse" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                <div className="h-3 w-16 bg-gray-800 rounded mb-3 animate-pulse" />
+                <div className="h-8 w-10 bg-gray-800 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col gap-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex items-center justify-between">
+                <div>
+                  <div className="h-4 w-40 bg-gray-800 rounded mb-2 animate-pulse" />
+                  <div className="h-3 w-56 bg-gray-800/60 rounded animate-pulse" />
+                </div>
+                <div className="h-6 w-16 bg-gray-800 rounded-full animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
     )
   }
