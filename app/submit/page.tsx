@@ -588,7 +588,7 @@ function SubmitInner() {
       return
     }
 
-    const badge = form.van_bevetel ? 'bizonyitott' : (form.van_kod || form.van_feliratkozok) ? 'prototipus' : 'papir'
+    const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
 
     const projektAdat = {
       nev: form.nev,
