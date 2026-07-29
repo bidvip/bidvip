@@ -53,7 +53,6 @@ function SubmitInner() {
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [feedbackAllapot, setFeedbackAllapot] = useState<'idle' | 'loading'>('idle')
 
-  // Step 2 — chat
   const [chatUzenetek, setChatUzenetek] = useState<ChatUzenet[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatAllapot, setChatAllapot] = useState<'idle' | 'loading'>('idle')
@@ -122,10 +121,7 @@ function SubmitInner() {
         setTokenEgyenleg(tokenData?.egyenleg ?? 0)
       }
       const stepParam = new URLSearchParams(window.location.search).get('step')
-      if (stepParam === '3') {
-        setLepes(3)
-        return
-      }
+      if (stepParam === '3') { setLepes(3); return }
       setLepes(2)
 
       if (data.chat_elozmenyek && data.chat_elozmenyek.length > 0) {
@@ -152,7 +148,7 @@ function SubmitInner() {
           setChatKeszen(keszen)
           setChatScore(score)
         } catch {
-          setChatUzenetek([{ role: 'assistant', content: 'Welcome back! Let\'s continue refining your idea.' }])
+          setChatUzenetek([{ role: 'assistant', content: "Welcome back! Let's continue refining your idea." }])
         } finally {
           setChatAllapot('idle')
         }
@@ -186,7 +182,6 @@ function SubmitInner() {
     }
     setHiba('')
     setFeedbackAllapot('loading')
-
     let kepUrlok: string[] = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const ujFajlok: Fajl[] = [...feltoltottFajlok]
     const ujak = kivalasztottFajlok.slice(feltoltottFajlok.length)
@@ -202,7 +197,6 @@ function SubmitInner() {
       setFeltoltesAllapot('idle')
       kepUrlok = ujFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     }
-
     const fajlSzovegek = ujFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
     const res = await fetch('/api/ai/feedback', {
       method: 'POST',
@@ -216,16 +210,7 @@ function SubmitInner() {
         await fetch('/api/report', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: user.id,
-            user_email: user.email,
-            nev: form.nev,
-            rovid_leiras: form.rovid_leiras,
-            reszletes_leiras: form.reszletes_leiras,
-            kategoria: form.kategoria,
-            block_reason: data.block_reason || 'Content violates marketplace rules.',
-            fajlok: feltoltottFajlok,
-          }),
+          body: JSON.stringify({ user_id: user.id, user_email: user.email, nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, block_reason: data.block_reason || 'Content violates marketplace rules.', fajlok: feltoltottFajlok }),
         })
         setFelfuggesztve(data.block_reason || 'Content violates marketplace rules.')
       }
@@ -275,7 +260,6 @@ function SubmitInner() {
     if (feltoltottFajlok.length >= 5) { setHiba('Maximum 5 files allowed.'); return }
     if (fajl.size > 10 * 1024 * 1024) { setHiba('File too large (max 10MB).'); return }
     if ((tokenEgyenleg ?? 0) < CHAT_COST) { setHiba('Not enough tokens to send a message.'); return }
-
     setChatFajlAllapot('loading')
     let ujFajl: Fajl
     try {
@@ -301,10 +285,7 @@ function SubmitInner() {
     const ujFajlok = [...feltoltottFajlok, ujFajl]
     setFeltoltottFajlok(ujFajlok)
     setChatFajlAllapot('idle')
-    if (draftId) {
-      await supabase.from('projektek').update({ fajlok: ujFajlok }).eq('id', draftId)
-    }
-
+    if (draftId) await supabase.from('projektek').update({ fajlok: ujFajlok }).eq('id', draftId)
     const spendRes = await fetch('/api/tokens/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -314,13 +295,11 @@ function SubmitInner() {
     const spendData = await spendRes.json()
     setTokenEgyenleg(spendData.uj_egyenleg)
     setHiba('')
-
     const uzenet = `I've uploaded a file: "${fajl.name}". Please review its contents and tell me how it supports my listing and what could be improved.`
     const ujUzenet: ChatUzenet = { role: 'user', content: uzenet }
     const ujUzenetek = [...chatUzenetek, ujUzenet]
     setChatUzenetek([...ujUzenetek, { role: 'assistant', content: '' }])
     setChatAllapot('loading')
-
     try {
       const projektAdat = { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras }
       let vegsoValasz = ''
@@ -331,8 +310,7 @@ function SubmitInner() {
       setChatKeszen(keszen)
       setChatScore(score)
       if (draftId && vegsoValasz) {
-        const mentendoUzenetek = [...ujUzenetek, { role: 'assistant', content: vegsoValasz }]
-        await supabase.from('projektek').update({ chat_elozmenyek: mentendoUzenetek }).eq('id', draftId)
+        await supabase.from('projektek').update({ chat_elozmenyek: [...ujUzenetek, { role: 'assistant', content: vegsoValasz }] }).eq('id', draftId)
       }
     } catch {
       setChatUzenetek([...ujUzenetek, { role: 'assistant', content: 'Connection error. Your token was refunded. Please try again.' }])
@@ -350,32 +328,16 @@ function SubmitInner() {
     setUserId(user.id)
     setChatAllapot('loading')
     setLepes(2)
-    // Save draft
     if (!draftId) {
       const { data: draft } = await supabase.from('projektek').insert([{
-        user_id: user.id,
-        nev: form.nev,
-        rovid_leiras: form.rovid_leiras,
-        reszletes_leiras: form.reszletes_leiras,
-        kategoria: form.kategoria,
-        badge: 'idea',
-        kikialtasi_ar: 0,
+        user_id: user.id, nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras,
+        kategoria: form.kategoria, badge: 'idea', kikialtasi_ar: 0,
         lejarat: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        statusz: 'draft',
-        fajlok: feltoltottFajlok,
+        statusz: 'draft', fajlok: feltoltottFajlok,
       }]).select().single()
-      if (draft) {
-        setDraftId(draft.id)
-        window.history.replaceState(null, '', `/submit?draft=${draft.id}`)
-      }
+      if (draft) { setDraftId(draft.id); window.history.replaceState(null, '', `/submit?draft=${draft.id}`) }
     } else {
-      await supabase.from('projektek').update({
-        nev: form.nev,
-        rovid_leiras: form.rovid_leiras,
-        reszletes_leiras: form.reszletes_leiras,
-        kategoria: form.kategoria,
-        fajlok: feltoltottFajlok,
-      }).eq('id', draftId)
+      await supabase.from('projektek').update({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, fajlok: feltoltottFajlok }).eq('id', draftId)
     }
     setChatUzenetek([{ role: 'assistant', content: '' }])
     try {
@@ -383,17 +345,15 @@ function SubmitInner() {
       let vegsoSzoveg = ''
       const { score, keszen } = await chatStream(
         'Hello! I just passed the initial screening. Can you help me refine my idea further?',
-        [],
-        projektAdat,
+        [], projektAdat,
         (text) => { vegsoSzoveg = text; setChatUzenetek([{ role: 'assistant', content: text }]) }
       )
       setChatKeszen(keszen)
       setChatScore(score)
       if (draftId && vegsoSzoveg) {
-        const mentendoUzenetek = [{ role: 'assistant', content: vegsoSzoveg }]
-        await supabase.from('projektek').update({ chat_elozmenyek: mentendoUzenetek }).eq('id', draftId)
+        await supabase.from('projektek').update({ chat_elozmenyek: [{ role: 'assistant', content: vegsoSzoveg }] }).eq('id', draftId)
       }
-    } catch (e) {
+    } catch {
       setChatUzenetek([{ role: 'assistant', content: 'Failed to connect to AI. Please try again.' }])
     } finally {
       setChatAllapot('idle')
@@ -402,50 +362,33 @@ function SubmitInner() {
 
   async function chatKuldes() {
     if (!chatInput.trim() || chatAllapot === 'loading') return
-    if ((tokenEgyenleg ?? 0) < CHAT_COST) {
-      setHiba(`Not enough tokens. You need ${CHAT_COST} but have ${tokenEgyenleg}.`)
-      return
-    }
-
+    if ((tokenEgyenleg ?? 0) < CHAT_COST) { setHiba(`Not enough tokens. You need ${CHAT_COST} but have ${tokenEgyenleg}.`); return }
     const spendRes = await fetch('/api/tokens/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId, amount: CHAT_COST }),
     })
     if (!spendRes.ok) { setHiba('Token deduction failed.'); return }
-    const spendData = await spendRes.json()
-    setTokenEgyenleg(spendData.uj_egyenleg)
+    setTokenEgyenleg((await spendRes.json()).uj_egyenleg)
     setHiba('')
-
     const ujUzenet: ChatUzenet = { role: 'user', content: chatInput }
     const ujUzenetek = [...chatUzenetek, ujUzenet]
-    setChatUzenetek(ujUzenetek)
+    setChatUzenetek([...ujUzenetek, { role: 'assistant', content: '' }])
     setChatInput('')
     setChatAllapot('loading')
-
-    const ujValasz: ChatUzenet = { role: 'assistant', content: '' }
-    setChatUzenetek([...ujUzenetek, ujValasz])
     try {
       const projektAdat = { nev: form.nev, kategoria: form.kategoria, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras }
       let vegsoValasz = ''
-      const { score, keszen } = await chatStream(
-        chatInput,
-        chatUzenetek,
-        projektAdat,
+      const { score, keszen } = await chatStream(chatInput, chatUzenetek, projektAdat,
         (text) => { vegsoValasz = text; setChatUzenetek([...ujUzenetek, { role: 'assistant', content: text }]) }
       )
       setChatKeszen(keszen)
       setChatScore(score)
       if (draftId && vegsoValasz) {
-        const mentendoUzenetek = [...ujUzenetek, { role: 'assistant', content: vegsoValasz }]
-        await supabase.from('projektek').update({ chat_elozmenyek: mentendoUzenetek }).eq('id', draftId)
+        await supabase.from('projektek').update({ chat_elozmenyek: [...ujUzenetek, { role: 'assistant', content: vegsoValasz }] }).eq('id', draftId)
       }
-    } catch (e) {
-      await fetch('/api/tokens/spend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, amount: -CHAT_COST }),
-      })
+    } catch {
+      await fetch('/api/tokens/spend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId, amount: -CHAT_COST }) })
       setTokenEgyenleg((prev) => (prev ?? 0) + CHAT_COST)
       setChatUzenetek([...ujUzenetek, { role: 'assistant', content: 'Connection error. Your token was refunded. Please try again.' }])
     } finally {
@@ -459,8 +402,6 @@ function SubmitInner() {
     const { data: tokenData } = await supabase.from('tokenek').select('egyenleg').eq('user_id', user.id).single()
     setTokenEgyenleg(tokenData?.egyenleg ?? 0)
     setLepes(3)
-
-    // AI valuation in background
     setErtekelesAllapot('loading')
     try {
       const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
@@ -468,23 +409,12 @@ function SubmitInner() {
       const res = await fetch('/api/ai/valuation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nev: form.nev,
-          rovid_leiras: form.rovid_leiras,
-          reszletes_leiras: form.reszletes_leiras,
-          kategoria: form.kategoria,
-          badge,
-          fajlSzovegek,
-          chat_score: chatScore,
-        }),
+        body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, badge, fajlSzovegek, chat_score: chatScore }),
       })
       if (res.ok) {
         const data = await res.json()
         setAiErtekeles(data)
-        // Pre-fill starting price with AI estimate if empty
-        if (!form.kikialtasi_ar) {
-          setForm(prev => ({ ...prev, kikialtasi_ar: String(data.estimated_value) }))
-        }
+        if (!form.kikialtasi_ar) setForm(prev => ({ ...prev, kikialtasi_ar: String(data.estimated_value) }))
       }
     } catch { /* ignore */ } finally {
       setErtekelesAllapot('idle')
@@ -523,27 +453,17 @@ function SubmitInner() {
     }
     const ujFajlok = [...feltoltottFajlok, ujFajl]
     setFeltoltottFajlok(ujFajlok)
-    if (draftId) {
-      await supabase.from('projektek').update({ fajlok: ujFajlok }).eq('id', draftId)
-    }
+    if (draftId) await supabase.from('projektek').update({ fajlok: ujFajlok }).eq('id', draftId)
     setHiba('')
   }
 
   async function beküldes(e: React.FormEvent) {
     e.preventDefault()
     setHiba('')
-
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth'); return }
-
-    if ((tokenEgyenleg ?? 0) < totalCost) {
-      setHiba(`Not enough tokens. You need ${totalCost} but have ${tokenEgyenleg}.`)
-      return
-    }
-
-    // Step 1: AI validation BEFORE any token deduction
+    if ((tokenEgyenleg ?? 0) < totalCost) { setHiba(`Not enough tokens. You need ${totalCost} but have ${tokenEgyenleg}.`); return }
     setAllapot('szures')
-
     const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
     const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const validateRes = await fetch('/api/ai/validate', {
@@ -552,28 +472,16 @@ function SubmitInner() {
       body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, fajlSzovegek, kepUrlok }),
     })
     const validateData = validateRes.ok ? await validateRes.json() : { ok: true }
-
     if (!validateData.ok) {
-      // Send back to Step 2 with rejection reason — no tokens lost
-      const rejectionMsg = validateData.reason || 'The submission did not pass the content check.'
-      const visszajelzes: ChatUzenet = {
-        role: 'assistant',
-        content: `⚠️ **Your project was sent back for revision.**\n\nReason: ${rejectionMsg}\n\nPlease address this before resubmitting. I'm here to help you improve it.`,
-      }
-      setChatUzenetek(prev => [...prev, visszajelzes])
+      setChatUzenetek(prev => [...prev, { role: 'assistant', content: `Your project was sent back for revision.\n\nReason: ${validateData.reason || 'The submission did not pass the content check.'}\n\nPlease address this before resubmitting.` }])
       setChatKeszen(false)
       setChatScore(null)
-      if (draftId) {
-        localStorage.removeItem(`bv_score_${draftId}`)
-      }
+      if (draftId) localStorage.removeItem(`bv_score_${draftId}`)
       setAllapot('idle')
       setLepes(2)
       return
     }
-
-    // Step 2: Validation passed — now deduct tokens
     setAllapot('loading')
-
     const spendRes = await fetch('/api/tokens/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -581,105 +489,97 @@ function SubmitInner() {
     })
     const spendData = await spendRes.json()
     if (!spendRes.ok) {
-      setHiba(spendData.error === 'insufficient_tokens'
-        ? `Not enough tokens. You need ${totalCost} but have ${spendData.egyenleg}.`
-        : 'Token deduction failed. Please try again.')
+      setHiba(spendData.error === 'insufficient_tokens' ? `Not enough tokens. You need ${totalCost} but have ${spendData.egyenleg}.` : 'Token deduction failed. Please try again.')
       setAllapot('hiba')
       return
     }
-
     const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
-
     const projektAdat = {
-      nev: form.nev,
-      rovid_leiras: form.rovid_leiras,
-      reszletes_leiras: form.reszletes_leiras,
-      kategoria: form.kategoria,
-      badge,
-      kikialtasi_ar: parseInt(form.kikialtasi_ar),
+      nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras,
+      kategoria: form.kategoria, badge, kikialtasi_ar: parseInt(form.kikialtasi_ar),
       lejarat: new Date(Date.now() + parseInt(form.idotartam_nap) * 24 * 60 * 60 * 1000).toISOString(),
-      van_domain: form.van_domain,
-      van_kod: form.van_kod,
-      van_feliratkozok: form.van_feliratkozok,
-      van_bevetel: form.van_bevetel,
-      statusz: 'aktiv',
-      fajlok: feltoltottFajlok,
+      van_domain: form.van_domain, van_kod: form.van_kod, van_feliratkozok: form.van_feliratkozok,
+      van_bevetel: form.van_bevetel, statusz: 'aktiv', fajlok: feltoltottFajlok,
       sav: aiErtekeles ? (aiErtekeles.estimated_value >= 10000 ? 'premium' : aiErtekeles.estimated_value >= 1000 ? 'standard' : 'fast') : 'fast',
     }
-
-    // Get daily seller anon name
-    const anonRes = await fetch('/api/anon-name', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id, tipus: 'elado' }),
-    })
+    const anonRes = await fetch('/api/anon-name', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id, tipus: 'elado' }) })
     const { nev: anonEladoNev } = await anonRes.json()
-
     const { error } = draftId
       ? await supabase.from('projektek').update({ ...projektAdat, anon_elado_nev: anonEladoNev }).eq('id', draftId)
       : await supabase.from('projektek').insert([{ ...projektAdat, user_id: user.id, anon_elado_nev: anonEladoNev }])
-
-    if (error) {
-      setHiba('Something went wrong. Please try again.')
-      setAllapot('hiba')
-    } else {
-      setAllapot('siker')
-    }
+    if (error) { setHiba('Something went wrong. Please try again.'); setAllapot('hiba') }
+    else setAllapot('siker')
   }
 
+  const inputStyle: React.CSSProperties = {
+    background: '#1A1217', border: '1px solid #2E2028', color: '#F5F0E8', borderRadius: '8px',
+  }
+  const cardStyle: React.CSSProperties = {
+    background: '#1A1217', border: '1px solid #2E2028', borderRadius: '8px',
+  }
+
+  // — Suspended —
   if (felfuggesztve) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6 text-center">
-        <div className="text-6xl mb-5">🚫</div>
-        <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-red-400 uppercase bg-red-950/40 border border-red-800/40 px-4 py-2 rounded-full mb-6">
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: '#100C0F', color: '#F5F0E8' }}>
+        <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase mb-6"
+          style={{ color: '#DC2626', background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', padding: '6px 14px', borderRadius: '4px' }}>
           Fiók felfüggesztve
         </span>
         <h2 className="text-2xl font-black mb-2">A fiókod felfüggesztésre került</h2>
-        <p className="text-gray-400 mb-4 max-w-sm">Az admin felülvizsgálja a beküldésedet és e-mailben értesítünk az eredményről.</p>
-        <div className="bg-red-950/30 border border-red-800/50 rounded-xl px-5 py-3 mb-8 text-sm text-red-300 max-w-md">
+        <p className="text-sm mb-4 max-w-sm" style={{ color: '#9C8B7A' }}>Az admin felülvizsgálja a beküldésedet és e-mailben értesítünk az eredményről.</p>
+        <div className="px-5 py-3 mb-8 text-sm max-w-md rounded-lg" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)', color: '#F87171' }}>
           <strong>Ok:</strong> {felfuggesztve}
         </div>
-        <button onClick={() => router.push('/dashboard')}
-          className="border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition px-6 py-3 rounded-xl font-semibold text-sm">
+        <button onClick={() => router.push('/dashboard')} className="font-semibold text-sm px-6 py-3 rounded-lg transition"
+          style={{ border: '1px solid #2E2028', color: '#9C8B7A', background: 'transparent' }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#3E3040'; e.currentTarget.style.color = '#F5F0E8' }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
           ← Dashboard
         </button>
       </main>
     )
   }
 
+  // — Success —
   if (allapot === 'siker') {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
+      <main className="min-h-screen flex flex-col overflow-hidden" style={{ background: '#100C0F', color: '#F5F0E8' }}>
         <div className="fixed inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)' }} />
+            style={{ background: 'radial-gradient(circle, rgba(22,163,74,0.08) 0%, transparent 70%)' }} />
         </div>
-        <nav className="relative z-10 flex items-center px-8 py-5 border-b border-white/5">
-          <span className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></span>
+        <nav className="relative z-10 flex items-center px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
+          <span className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Bid<span style={{ color: '#DC2626' }}>Vip</span></span>
         </nav>
         <div className="relative z-10 flex flex-1 items-center justify-center px-6 py-12">
           <div className="max-w-md w-full text-center">
-            <div className="text-7xl mb-6">🎉</div>
-            <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-green-400 uppercase bg-green-950/40 border border-green-800/40 px-4 py-2 rounded-full mb-6">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+            <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase mb-6"
+              style={{ color: '#16A34A', background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.2)', padding: '6px 14px', borderRadius: '4px' }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22C55E' }} />
               Sikeresen beküldve
             </span>
-            <h2 className="text-3xl font-black mb-3">Projekt beküldve!</h2>
-            <p className="text-gray-400 mb-6 leading-relaxed">
+            <h2 className="text-3xl font-black mb-3" style={{ letterSpacing: '-0.03em' }}>Projekt beküldve!</h2>
+            <p className="mb-6 leading-relaxed" style={{ color: '#9C8B7A' }}>
               Az admin csapatunk felülvizsgálja a projektedet, majd amikor jóváhagyják, élőbe kerül az Aukciós Házban.
             </p>
-            <div className="flex items-start gap-3 bg-amber-950/30 border border-amber-800/40 rounded-xl px-4 py-3 mb-8 text-sm text-amber-300 text-left">
-              <span className="shrink-0 mt-0.5">🔒</span>
-              <span>A projekt beküldés után <strong>nem szerkeszthető</strong>. Ha változtatni szeretnél, vedd fel a kapcsolatot az adminnal.</span>
+            <div className="flex items-start gap-3 px-4 py-3 mb-8 text-sm text-left rounded-lg"
+              style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.2)' }}>
+              <span className="shrink-0 mt-0.5" style={{ color: '#EAB308' }}>&#x1F512;</span>
+              <span style={{ color: '#9C8B7A' }}>A projekt beküldés után <strong style={{ color: '#F5F0E8' }}>nem szerkeszthető</strong>. Ha változtatni szeretnél, vedd fel a kapcsolatot az adminnal.</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button onClick={() => router.push('/dashboard')}
-                className="bg-violet-600 hover:bg-violet-500 transition px-6 py-3 rounded-xl font-semibold text-sm shadow-[0_0_20px_rgba(124,58,237,0.25)]">
+              <button onClick={() => router.push('/dashboard')} className="px-6 py-3 rounded-lg font-semibold text-sm transition"
+                style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.2)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
                 Dashboard →
               </button>
-              <button onClick={() => router.push('/marketplace')}
-                className="border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition px-6 py-3 rounded-xl font-semibold text-sm">
-                📺 Aukciós Ház
+              <button onClick={() => router.push('/marketplace')} className="px-6 py-3 rounded-lg font-semibold text-sm transition"
+                style={{ border: '1px solid #2E2028', color: '#9C8B7A', background: 'transparent' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#3E3040'; e.currentTarget.style.color = '#F5F0E8' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
+                Aukciós Ház
               </button>
             </div>
           </div>
@@ -689,48 +589,49 @@ function SubmitInner() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-800">
-        <a href="/" className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></a>
-        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">← Back</a>
+    <main className="min-h-screen" style={{ background: '#100C0F', color: '#F5F0E8' }}>
+      <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
+        <a href="/" className="text-2xl font-black no-underline" style={{ letterSpacing: '-0.03em', color: '#F5F0E8' }}>
+          Bid<span style={{ color: '#DC2626' }}>Vip</span>
+        </a>
+        <a href="/dashboard" className="text-sm no-underline transition" style={{ color: '#9C8B7A' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>
+          ← Back
+        </a>
       </nav>
 
       {/* Step indicator */}
       <div className="max-w-2xl mx-auto px-6 pt-10 pb-4">
-        {/* Progress bar */}
-        <div className="relative h-0.5 bg-gray-800 rounded-full mb-6 mx-4">
-          <div
-            className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
+        <div className="relative h-0.5 rounded-full mb-6 mx-4" style={{ background: '#2E2028' }}>
+          <div className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
             style={{
               width: lepes === 1 ? '0%' : lepes === 2 ? '50%' : '100%',
-              background: 'linear-gradient(90deg, #7c3aed, #a855f7)',
-              boxShadow: '0 0 8px rgba(168,85,247,0.5)',
-            }}
-          />
+              background: 'linear-gradient(90deg, #DC2626, #EF4444)',
+              boxShadow: '0 0 8px rgba(220,38,38,0.4)',
+            }} />
         </div>
         <div className="flex items-start justify-between">
-          {[
-            { n: 1 as const, label: 'Leírás', sub: 'Projekt adatok' },
-            { n: 2 as const, label: 'AI Finomítás', sub: 'Mentori chat' },
-            { n: 3 as const, label: 'Beküldés', sub: 'Fájlok + live' },
-          ].map((s) => {
+          {([
+            { n: 1, label: 'Leírás', sub: 'Projekt adatok' },
+            { n: 2, label: 'AI Finomítás', sub: 'Mentori chat' },
+            { n: 3, label: 'Beküldés', sub: 'Fájlok + live' },
+          ] as const).map((s) => {
             const done = lepes > s.n
             const active = lepes === s.n
             return (
               <div key={s.n} className="flex flex-col items-center gap-1.5 flex-1">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 ${
-                  done
-                    ? 'border-violet-500 bg-violet-600 text-white'
-                    : active
-                    ? 'border-violet-500 bg-violet-950/60 text-violet-300 shadow-[0_0_12px_rgba(124,58,237,0.4)]'
-                    : 'border-gray-700 bg-gray-900 text-gray-600'
-                }`}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                  style={{
+                    border: `2px solid ${done || active ? '#DC2626' : '#2E2028'}`,
+                    background: done ? '#DC2626' : active ? 'rgba(220,38,38,0.12)' : '#1A1217',
+                    color: done ? '#fff' : active ? '#DC2626' : '#5A4F4A',
+                    boxShadow: active ? '0 0 12px rgba(220,38,38,0.3)' : 'none',
+                  }}>
                   {done ? '✓' : s.n}
                 </div>
-                <span className={`text-xs font-semibold transition-colors ${active ? 'text-violet-400' : done ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {s.label}
-                </span>
-                <span className="text-[10px] text-gray-600 hidden sm:block">{s.sub}</span>
+                <span className="text-xs font-semibold" style={{ color: active ? '#DC2626' : done ? '#9C8B7A' : '#5A4F4A' }}>{s.label}</span>
+                <span className="text-[10px] hidden sm:block" style={{ color: '#5A4F4A' }}>{s.sub}</span>
               </div>
             )
           })}
@@ -739,42 +640,54 @@ function SubmitInner() {
 
       <div className="max-w-2xl mx-auto px-6 py-8">
 
-        {/* STEP 1 */}
+        {/* ── STEP 1 ── */}
         {lepes === 1 && (
           <div className="flex flex-col gap-6">
             <div>
-              <h1 className="text-3xl font-bold mb-1">Describe your project</h1>
-              <p className="text-gray-400">Get AI feedback — the AI also reviews your uploaded images.</p>
+              <h1 className="text-3xl font-black mb-1" style={{ letterSpacing: '-0.03em' }}>Describe your project</h1>
+              <p style={{ color: '#9C8B7A' }}>Get AI feedback — the AI also reviews your uploaded images.</p>
             </div>
 
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
+            <div className="p-6 flex flex-col gap-4" style={cardStyle}>
+              {[
+                { mezo: 'nev', label: 'Project name *', placeholder: 'e.g. AI-powered customer support SaaS', type: 'input' },
+                { mezo: 'rovid_leiras', label: 'Short description * (max 150 chars)', placeholder: 'What does it do in one sentence?', type: 'input', maxLength: 150 },
+              ].map(f => (
+                <div key={f.mezo}>
+                  <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>{f.label}</label>
+                  <input value={form[f.mezo as keyof typeof form] as string}
+                    onChange={e => frissit(f.mezo, e.target.value)}
+                    placeholder={f.placeholder}
+                    maxLength={f.maxLength}
+                    className="w-full px-4 py-3 focus:outline-none transition"
+                    style={inputStyle}
+                    onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+                    onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+                </div>
+              ))}
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">Project name *</label>
-                <input value={form.nev} onChange={e => frissit('nev', e.target.value)} placeholder="e.g. AI-powered customer support SaaS"
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
-              </div>
-              <div>
-                <label className="text-sm text-gray-400 mb-1 block">Short description * (max 150 chars)</label>
-                <input maxLength={150} value={form.rovid_leiras} onChange={e => frissit('rovid_leiras', e.target.value)} placeholder="What does it do in one sentence?"
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
-              </div>
-              <div>
-                <label className="text-sm text-gray-400 mb-1 block">Detailed description *</label>
+                <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>Detailed description *</label>
                 <textarea rows={6} value={form.reszletes_leiras} onChange={e => frissit('reszletes_leiras', e.target.value)}
                   placeholder="What problem does it solve? Who is the target customer? What's the competitive advantage? What's included in the sale?"
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 resize-none" />
+                  className="w-full px-4 py-3 focus:outline-none resize-none transition"
+                  style={inputStyle}
+                  onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
               </div>
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">Category *</label>
+                <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>Category *</label>
                 <select value={form.kategoria} onChange={e => frissit('kategoria', e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-violet-500">
+                  className="w-full px-4 py-3 focus:outline-none transition"
+                  style={inputStyle}
+                  onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')}>
                   <option value="">Select a category...</option>
                   {categories.map(k => <option key={k} value={k}>{k}</option>)}
                 </select>
               </div>
             </div>
 
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+            <div className="p-6 flex flex-col gap-3" style={cardStyle}>
               <h2 className="font-semibold">What&apos;s Included?</h2>
               {[
                 { mezo: 'van_domain', label: 'Domain / URL' },
@@ -784,28 +697,37 @@ function SubmitInner() {
               ].map(item => (
                 <label key={item.mezo} className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" checked={form[item.mezo as keyof typeof form] as boolean}
-                    onChange={e => frissit(item.mezo, e.target.checked)} className="w-5 h-5 accent-violet-500" />
-                  <span>{item.label}</span>
+                    onChange={e => frissit(item.mezo, e.target.checked)}
+                    className="w-5 h-5" style={{ accentColor: '#DC2626' }} />
+                  <span style={{ color: '#F5F0E8' }}>{item.label}</span>
                 </label>
               ))}
             </div>
 
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-              <h2 className="font-semibold">Files & Media <span className="text-gray-500 font-normal text-sm">(optional)</span></h2>
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 hover:border-violet-500 rounded-xl py-6 cursor-pointer transition">
-                <span className="text-3xl mb-2">📎</span>
-                <span className="text-gray-400 text-sm">Click to select files</span>
-                <span className="text-gray-600 text-xs mt-1">Images, PDF, Word, Excel — max 5 files, 10MB each</span>
+            <div className="p-6 flex flex-col gap-4" style={cardStyle}>
+              <h2 className="font-semibold">Files & Media <span className="font-normal text-sm" style={{ color: '#5A4F4A' }}>(optional)</span></h2>
+              <label className="flex flex-col items-center justify-center py-6 cursor-pointer rounded-lg transition"
+                style={{ border: '2px dashed #2E2028' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = '#DC2626')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = '#2E2028')}>
+                <span className="text-2xl mb-2">&#128206;</span>
+                <span className="text-sm" style={{ color: '#9C8B7A' }}>Click to select files</span>
+                <span className="text-xs mt-1" style={{ color: '#5A4F4A' }}>Images, PDF, Word, Excel — max 5 files, 10MB each</span>
                 <input type="file" multiple accept="image/*,.pdf,.docx,.xlsx" onChange={fajlValasztas} className="hidden" />
               </label>
               {kivalasztottFajlok.length > 0 && (
                 <div className="flex flex-col gap-2">
                   {kivalasztottFajlok.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-xl text-sm">
-                      <span className="text-gray-300 truncate">{f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}</span>
+                    <div key={i} className="flex items-center justify-between px-4 py-2 rounded-lg text-sm"
+                      style={{ background: '#221820', border: '1px solid #2E2028' }}>
+                      <span className="truncate" style={{ color: '#9C8B7A' }}>
+                        {f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}
+                      </span>
                       <div className="flex items-center gap-2 ml-2 shrink-0">
-                        {feltoltottFajlok[i] ? <span className="text-green-400 text-xs">✓</span> : <span className="text-gray-500 text-xs">pending</span>}
-                        <button type="button" onClick={() => fajlTorles(i)} className="text-gray-500 hover:text-red-400 transition">✕</button>
+                        {feltoltottFajlok[i] ? <span className="text-xs" style={{ color: '#16A34A' }}>✓</span> : <span className="text-xs" style={{ color: '#5A4F4A' }}>pending</span>}
+                        <button type="button" onClick={() => fajlTorles(i)} className="transition" style={{ color: '#5A4F4A', background: 'none', border: 'none', cursor: 'pointer' }}
+                          onMouseEnter={e => (e.currentTarget.style.color = '#DC2626')}
+                          onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>✕</button>
                       </div>
                     </div>
                   ))}
@@ -813,38 +735,41 @@ function SubmitInner() {
               )}
             </div>
 
-            {hiba && <p className="text-red-400 text-sm">{hiba}</p>}
+            {hiba && <p className="text-sm" style={{ color: '#F87171' }}>{hiba}</p>}
 
             {feedback && (
-              <div className={`rounded-2xl border p-6 flex flex-col gap-4 ${feedback.score === -1 ? 'border-red-700 bg-red-900/10' : feedback.ready ? 'border-green-700 bg-green-900/10' : 'border-amber-700 bg-amber-900/10'}`}>
+              <div className="rounded-lg p-6 flex flex-col gap-4" style={{
+                border: `1px solid ${feedback.score === -1 ? 'rgba(220,38,38,0.3)' : feedback.ready ? 'rgba(22,163,74,0.3)' : 'rgba(234,179,8,0.3)'}`,
+                background: feedback.score === -1 ? 'rgba(220,38,38,0.05)' : feedback.ready ? 'rgba(22,163,74,0.05)' : 'rgba(234,179,8,0.05)',
+              }}>
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold">🤖 AI Feedback</span>
+                  <span className="font-semibold">AI Feedback</span>
                   <div className="flex items-center gap-2">
-                    <span className={`text-2xl font-bold ${feedback.score === -1 ? 'text-red-500' : feedback.score >= 7 ? 'text-green-400' : feedback.score >= 5 ? 'text-amber-400' : 'text-red-400'}`}>
+                    <span className="text-2xl font-bold" style={{ color: feedback.score === -1 ? '#DC2626' : feedback.score >= 7 ? '#16A34A' : feedback.score >= 5 ? '#EAB308' : '#DC2626' }}>
                       {feedback.score === -1 ? '-1' : feedback.score}/10
                     </span>
                     {feedback.score === -1
-                      ? <span className="text-xs bg-red-900/40 text-red-400 border border-red-800 px-2 py-1 rounded-full">🚫 Blocked</span>
+                      ? <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(220,38,38,0.1)', color: '#DC2626', border: '1px solid rgba(220,38,38,0.2)' }}>Blocked</span>
                       : feedback.ready
-                        ? <span className="text-xs bg-green-900/40 text-green-400 border border-green-800 px-2 py-1 rounded-full">Ready</span>
-                        : <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800 px-2 py-1 rounded-full">Needs improvement</span>}
+                        ? <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(22,163,74,0.1)', color: '#16A34A', border: '1px solid rgba(22,163,74,0.2)' }}>Ready</span>
+                        : <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(234,179,8,0.1)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.2)' }}>Needs improvement</span>}
                   </div>
                 </div>
                 {feedback.score === -1 ? (
-                  <p className="text-red-300 text-sm">Your content violates marketplace policies. Your account has been suspended pending admin review.</p>
+                  <p className="text-sm" style={{ color: '#F87171' }}>Your content violates marketplace policies. Your account has been suspended pending admin review.</p>
                 ) : (
                   <>
-                    <p className="text-gray-300 text-sm italic">&quot;{feedback.verdict}&quot;</p>
+                    <p className="text-sm italic" style={{ color: '#9C8B7A' }}>&quot;{feedback.verdict}&quot;</p>
                     {feedback.strengths.length > 0 && (
                       <div>
-                        <p className="text-green-400 text-xs font-semibold mb-1 uppercase tracking-wide">Strengths</p>
-                        {feedback.strengths.map((s, i) => <p key={i} className="text-gray-300 text-sm">✓ {s}</p>)}
+                        <p className="text-xs font-bold mb-1 uppercase tracking-wide" style={{ color: '#16A34A' }}>Strengths</p>
+                        {feedback.strengths.map((s, i) => <p key={i} className="text-sm" style={{ color: '#9C8B7A' }}>✓ {s}</p>)}
                       </div>
                     )}
                     {feedback.improvements.length > 0 && (
                       <div>
-                        <p className="text-amber-400 text-xs font-semibold mb-1 uppercase tracking-wide">Improve</p>
-                        {feedback.improvements.map((s, i) => <p key={i} className="text-gray-300 text-sm">→ {s}</p>)}
+                        <p className="text-xs font-bold mb-1 uppercase tracking-wide" style={{ color: '#EAB308' }}>Improve</p>
+                        {feedback.improvements.map((s, i) => <p key={i} className="text-sm" style={{ color: '#9C8B7A' }}>→ {s}</p>)}
                       </div>
                     )}
                   </>
@@ -854,200 +779,232 @@ function SubmitInner() {
 
             <button type="button" onClick={aiFeedback}
               disabled={feedbackAllapot === 'loading' || feltoltesAllapot === 'loading' || !form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria}
-              className="w-full py-3 rounded-full border border-violet-700 text-violet-400 hover:bg-violet-900/20 disabled:opacity-60 transition font-semibold">
-              {feltoltesAllapot === 'loading' ? '📎 Uploading...' : feedbackAllapot === 'loading' ? '🤖 Analyzing...' : feedback ? '🔄 Re-analyze' : '🤖 Get AI Feedback (free)'}
+              className="w-full py-3 rounded-lg font-semibold transition"
+              style={{ border: '1px solid rgba(220,38,38,0.4)', color: '#DC2626', background: 'transparent',
+                opacity: (feedbackAllapot === 'loading' || !form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria) ? 0.5 : 1 }}>
+              {feltoltesAllapot === 'loading' ? 'Uploading...' : feedbackAllapot === 'loading' ? 'Analyzing...' : feedback ? 'Re-analyze' : 'Get AI Feedback (free)'}
             </button>
 
             {feedback && !feedback.ready && (
-              <p className="text-amber-400 text-sm text-center">Improve your listing based on the feedback, then re-analyze.</p>
+              <p className="text-sm text-center" style={{ color: '#EAB308' }}>Improve your listing based on the feedback, then re-analyze.</p>
             )}
 
             {feedback?.ready && (
               <button type="button" onClick={lepés1Tovabb}
-                className="w-full bg-violet-600 hover:bg-violet-700 transition py-3 rounded-full font-semibold">
+                className="w-full py-3 rounded-lg font-semibold transition"
+                style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.2)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
                 ✓ Continue to AI Mentor →
               </button>
             )}
           </div>
         )}
 
-        {/* STEP 2 — Sonnet 5 Chat */}
+        {/* ── STEP 2 ── */}
         {lepes === 2 && (
           <div className="flex flex-col gap-4">
             <div>
-              <button type="button" onClick={() => setLepes(1)} className="text-gray-500 hover:text-gray-300 text-sm mb-3 transition">← Back</button>
-              <h1 className="text-3xl font-bold mb-1">Refine with AI Mentor</h1>
-              <p className="text-gray-400">Chat with Sonnet 5 to make your idea market-ready. <span className="text-violet-400">{CHAT_COST} tokens/message</span> · Balance: <span className={`font-semibold ${(tokenEgyenleg ?? 0) < CHAT_COST ? 'text-red-400' : 'text-white'}`}>{tokenEgyenleg ?? '...'}</span></p>
-            {chatScore !== null && (
-              <div className="flex items-center gap-3 mt-2">
-                <div className="flex-1 bg-gray-800 rounded-full h-2">
-                  <div className={`h-2 rounded-full transition-all ${chatScore >= 8.5 ? 'bg-green-500' : chatScore >= 7 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${chatScore * 10}%` }} />
+              <button type="button" onClick={() => setLepes(1)} className="text-sm mb-3 transition"
+                style={{ color: '#5A4F4A', background: 'none', border: 'none', cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#9C8B7A')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>← Back</button>
+              <h1 className="text-3xl font-black mb-1" style={{ letterSpacing: '-0.03em' }}>Refine with AI Mentor</h1>
+              <p style={{ color: '#9C8B7A' }}>
+                Chat with Sonnet 5 to make your idea market-ready.{' '}
+                <span style={{ color: '#DC2626' }}>{CHAT_COST} tokens/message</span>
+                {' · '}Balance:{' '}
+                <span className="font-semibold" style={{ color: (tokenEgyenleg ?? 0) < CHAT_COST ? '#DC2626' : '#F5F0E8' }}>{tokenEgyenleg ?? '...'}</span>
+              </p>
+              {chatScore !== null && (
+                <div className="flex items-center gap-3 mt-2">
+                  <div className="flex-1 rounded-full h-2" style={{ background: '#2E2028' }}>
+                    <div className="h-2 rounded-full transition-all" style={{
+                      width: `${chatScore * 10}%`,
+                      background: chatScore >= 8.5 ? '#16A34A' : chatScore >= 7 ? '#EAB308' : '#DC2626',
+                    }} />
+                  </div>
+                  <span className="text-sm font-bold" style={{ color: chatScore >= 8.5 ? '#16A34A' : chatScore >= 7 ? '#EAB308' : '#DC2626' }}>{chatScore}/10</span>
+                  <span className="text-xs" style={{ color: '#5A4F4A' }}>need 8.5</span>
                 </div>
-                <span className={`text-sm font-bold ${chatScore >= 8.5 ? 'text-green-400' : chatScore >= 7 ? 'text-amber-400' : 'text-red-400'}`}>{chatScore}/10</span>
-                <span className="text-xs text-gray-500">need 8.5</span>
-              </div>
-            )}
+              )}
             </div>
 
-            {/* Chat messages */}
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col gap-4 max-h-[500px] overflow-y-auto">
+            <div className="p-4 flex flex-col gap-4 max-h-[500px] overflow-y-auto rounded-lg" style={cardStyle}>
               {chatUzenetek.map((u, i) => (
                 <div key={i} className={`flex ${u.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${u.role === 'user' ? 'bg-violet-700 text-white' : 'bg-gray-800 text-gray-200'}`}>
+                  <div className="max-w-[85%] px-4 py-3 rounded-lg text-sm leading-relaxed"
+                    style={{
+                      background: u.role === 'user' ? '#DC2626' : '#221820',
+                      color: u.role === 'user' ? '#fff' : '#9C8B7A',
+                      border: u.role === 'user' ? 'none' : '1px solid #2E2028',
+                    }}>
                     {u.content.split('\n').map((sor, j) => <p key={j} className={j > 0 ? 'mt-2' : ''}>{sor}</p>)}
                   </div>
                 </div>
               ))}
               {chatAllapot === 'loading' && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-800 px-4 py-3 rounded-2xl text-sm text-gray-400 animate-pulse">Thinking...</div>
+                  <div className="px-4 py-3 rounded-lg text-sm animate-pulse"
+                    style={{ background: '#221820', color: '#5A4F4A', border: '1px solid #2E2028' }}>Thinking...</div>
                 </div>
               )}
               <div ref={chatVegRef} />
             </div>
 
-            {hiba && <p className="text-red-400 text-sm">{hiba}</p>}
+            {hiba && <p className="text-sm" style={{ color: '#F87171' }}>{hiba}</p>}
 
-            {/* Attached files in chat */}
             {feltoltottFajlok.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {feltoltottFajlok.map((f, i) => (
-                  <div key={i} className="flex items-center gap-1.5 bg-gray-800 border border-gray-700 px-3 py-1.5 rounded-full text-xs text-gray-300">
+                  <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
+                    style={{ background: '#221820', border: '1px solid #2E2028', color: '#9C8B7A' }}>
                     <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>
                     <span className="max-w-[120px] truncate">{f.nev}</span>
-                    <span className="text-green-400 text-xs">✓</span>
+                    <span style={{ color: '#16A34A' }}>✓</span>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Input */}
             <div className="flex gap-2">
-              <input
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
+              <input value={chatInput} onChange={e => setChatInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatKuldes() } }}
                 placeholder="Ask the AI mentor anything about your idea..."
                 disabled={chatAllapot === 'loading' || chatFajlAllapot === 'loading'}
-                className="flex-1 px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 disabled:opacity-60"
-              />
-              <button
-                type="button"
-                onClick={() => chatFajlInputRef.current?.click()}
+                className="flex-1 px-4 py-3 focus:outline-none transition"
+                style={{ ...inputStyle, opacity: (chatAllapot === 'loading') ? 0.6 : 1 }}
+                onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+              <button type="button" onClick={() => chatFajlInputRef.current?.click()}
                 disabled={chatAllapot === 'loading' || chatFajlAllapot === 'loading' || feltoltottFajlok.length >= 5}
-                className="shrink-0 px-3 py-3 rounded-xl bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white disabled:opacity-40 transition font-bold text-base whitespace-nowrap">
+                className="shrink-0 px-3 py-3 rounded-lg font-bold text-base transition"
+                style={{ background: '#221820', border: '1px solid #3E3040', color: '#F5F0E8' }}>
                 {chatFajlAllapot === 'loading' ? '...' : '+ File'}
               </button>
               <input ref={chatFajlInputRef} type="file" className="hidden" accept="image/*,.pdf,.docx,.xlsx" onChange={chatFajlFeltoltes} />
-              <button onClick={chatKuldes} disabled={!chatInput.trim() || chatAllapot === 'loading' || chatFajlAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST}
-                className="bg-violet-600 hover:bg-violet-700 disabled:opacity-40 transition px-4 py-3 rounded-xl font-semibold text-sm shrink-0">
+              <button onClick={chatKuldes}
+                disabled={!chatInput.trim() || chatAllapot === 'loading' || chatFajlAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST}
+                className="px-4 py-3 rounded-lg font-semibold text-sm shrink-0 transition"
+                style={{ background: '#DC2626', color: '#fff', opacity: (!chatInput.trim() || chatAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST) ? 0.4 : 1 }}
+                onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#EF4444' }}
+                onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
                 Send
               </button>
             </div>
 
             {(tokenEgyenleg ?? 0) < CHAT_COST && (
-              <p className="text-red-400 text-sm text-center">Not enough tokens. <a href="/tokens?redirect=/submit" className="text-violet-400 hover:underline">Buy tokens →</a></p>
+              <p className="text-sm text-center" style={{ color: '#F87171' }}>
+                Not enough tokens.{' '}
+                <a href="/tokens?redirect=/submit" style={{ color: '#DC2626' }}>Buy tokens →</a>
+              </p>
             )}
 
-            <div className="border-t border-gray-800 pt-4">
+            <div className="pt-4" style={{ borderTop: '1px solid #2E2028' }}>
               {chatKeszen ? (
                 <button type="button" onClick={lepés2Tovabb}
-                  className="w-full bg-violet-600 hover:bg-violet-700 transition py-3 rounded-full font-semibold">
+                  className="w-full py-3 rounded-lg font-semibold transition"
+                  style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.2)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
                   ✓ Market-ready — Set price & submit →
                 </button>
               ) : (
-                <p className="text-center text-gray-500 text-sm py-2">The AI will unlock this button when your idea is market-ready.</p>
+                <p className="text-center text-sm py-2" style={{ color: '#5A4F4A' }}>
+                  The AI will unlock this button when your idea is market-ready.
+                </p>
               )}
             </div>
           </div>
         )}
 
-        {/* STEP 3 — Price & Submit */}
+        {/* ── STEP 3 ── */}
         {lepes === 3 && (
           <form onSubmit={beküldes} className="flex flex-col gap-6">
             <div>
-              <button type="button" onClick={() => setLepes(2)} className="text-gray-500 hover:text-gray-300 text-sm mb-3 transition">← Back</button>
-              <h1 className="text-3xl font-bold mb-1">Set price & submit</h1>
-              <p className="text-gray-400">Almost there — set your starting price and auction duration.</p>
+              <button type="button" onClick={() => setLepes(2)} className="text-sm mb-3 transition"
+                style={{ color: '#5A4F4A', background: 'none', border: 'none', cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#9C8B7A')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>← Back</button>
+              <h1 className="text-3xl font-black mb-1" style={{ letterSpacing: '-0.03em' }}>Set price & submit</h1>
+              <p style={{ color: '#9C8B7A' }}>Almost there — set your starting price and auction duration.</p>
             </div>
 
-            <div className="bg-violet-900/20 border border-violet-800 rounded-2xl p-4 flex items-center justify-between">
+            <div className="p-4 flex items-center justify-between rounded-lg"
+              style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)' }}>
               <div>
-                <p className="font-semibold text-violet-300">Submission cost</p>
-                <p className="text-gray-400 text-sm">{SUBMIT_COST} base + {feltoltottFajlok.length} × {FILE_COST} files + {DURATION_COST[form.idotartam_nap] ?? 0} duration</p>
+                <p className="font-semibold" style={{ color: '#F5F0E8' }}>Submission cost</p>
+                <p className="text-sm" style={{ color: '#9C8B7A' }}>{SUBMIT_COST} base + {feltoltottFajlok.length} × {FILE_COST} files + {DURATION_COST[form.idotartam_nap] ?? 0} duration</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-violet-400">{totalCost} tokens</p>
-                <p className={`text-xs ${(tokenEgyenleg ?? 0) < totalCost ? 'text-red-400' : 'text-gray-500'}`}>You have: {tokenEgyenleg ?? '...'}</p>
+                <p className="text-2xl font-bold" style={{ color: '#EAB308' }}>{totalCost} tokens</p>
+                <p className="text-xs" style={{ color: (tokenEgyenleg ?? 0) < totalCost ? '#DC2626' : '#5A4F4A' }}>You have: {tokenEgyenleg ?? '...'}</p>
               </div>
             </div>
 
-            {/* Final Documents */}
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col gap-3">
+            <div className="p-5 flex flex-col gap-3" style={cardStyle}>
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-semibold">Final Documents</h2>
-                  <p className="text-gray-400 text-sm mt-0.5">Upload the deliverables buyers will receive — pitch deck, business plan, code, designs. Each file costs {FILE_COST} tokens.</p>
+                  <p className="text-sm mt-0.5" style={{ color: '#9C8B7A' }}>Upload deliverables buyers will receive. Each file costs {FILE_COST} tokens.</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => step3FajlInputRef.current?.click()}
+                <button type="button" onClick={() => step3FajlInputRef.current?.click()}
                   disabled={step3FajlAllapot === 'loading' || feltoltottFajlok.length >= 10}
-                  className="shrink-0 px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white disabled:opacity-40 transition font-semibold text-sm whitespace-nowrap">
+                  className="shrink-0 px-4 py-2 rounded-lg font-semibold text-sm transition"
+                  style={{ background: '#221820', border: '1px solid #3E3040', color: '#F5F0E8' }}>
                   {step3FajlAllapot === 'loading' ? 'Uploading...' : '+ Add File'}
                 </button>
                 <input ref={step3FajlInputRef} type="file" className="hidden" accept="image/*,.pdf,.docx,.xlsx,.zip,.pptx" onChange={step3FajlFeltoltes} />
               </div>
-
               {feltoltottFajlok.length > 0 ? (
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between text-xs text-gray-500 pb-1 border-b border-gray-800">
+                  <div className="flex items-center justify-between text-xs pb-1" style={{ color: '#5A4F4A', borderBottom: '1px solid #2E2028' }}>
                     <span>{feltoltottFajlok.length} file(s) attached</span>
-                    <span className="text-amber-400">🔒 Locked after submit</span>
+                    <span style={{ color: '#EAB308' }}>Locked after submit</span>
                   </div>
                   {feltoltottFajlok.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                      <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : f.tipus.includes('zip') ? '🗜️' : f.tipus.includes('pptx') || f.tipus.includes('presentation') ? '📊' : '📄'}</span>
+                    <div key={i} className="flex items-center gap-2 text-sm" style={{ color: '#9C8B7A' }}>
+                      <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : f.tipus.includes('zip') ? '🗜️' : '📄'}</span>
                       <span className="truncate flex-1">{f.nev}</span>
-                      <span className="text-violet-400 text-xs shrink-0">+{FILE_COST} tokens</span>
+                      <span className="text-xs shrink-0" style={{ color: '#EAB308' }}>+{FILE_COST} tokens</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-600 text-sm text-center py-2">No files yet — add your pitch deck, business plan, or other documents.</p>
+                <p className="text-sm text-center py-2" style={{ color: '#5A4F4A' }}>No files yet — add your pitch deck, business plan, or other documents.</p>
               )}
             </div>
 
-            {/* AI valuation */}
             {ertekelesAllapot === 'loading' && (
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl px-5 py-4 flex items-center gap-3">
-                <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin shrink-0" />
-                <p className="text-gray-400 text-sm">AI is estimating your project's value...</p>
+              <div className="px-5 py-4 flex items-center gap-3 rounded-lg" style={cardStyle}>
+                <div className="w-4 h-4 rounded-full animate-spin shrink-0"
+                  style={{ border: '2px solid #DC2626', borderTopColor: 'transparent' }} />
+                <p className="text-sm" style={{ color: '#9C8B7A' }}>AI is estimating your project&apos;s value...</p>
               </div>
             )}
             {aiErtekeles && (
-              <div className="bg-violet-900/20 border border-violet-700 rounded-2xl px-5 py-4">
+              <div className="px-5 py-4 rounded-lg" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.2)' }}>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-violet-300 font-semibold text-sm">🤖 AI Valuation</p>
-                  <p className="text-violet-400 font-bold text-xl">€{aiErtekeles.estimated_value.toLocaleString()}</p>
+                  <p className="font-semibold text-sm" style={{ color: '#EAB308' }}>AI Valuation</p>
+                  <p className="font-bold text-xl" style={{ color: '#EAB308' }}>€{aiErtekeles.estimated_value.toLocaleString()}</p>
                 </div>
-                <p className="text-gray-400 text-xs">{aiErtekeles.reasoning}</p>
-                <p className="text-gray-500 text-xs mt-2">Starting price must be between €{aiErtekeles.estimated_value.toLocaleString()} and €{Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} (max 1.5×)</p>
+                <p className="text-xs" style={{ color: '#9C8B7A' }}>{aiErtekeles.reasoning}</p>
+                <p className="text-xs mt-2" style={{ color: '#5A4F4A' }}>
+                  Starting price: €{aiErtekeles.estimated_value.toLocaleString()} – €{Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} (max 1.5×)
+                </p>
               </div>
             )}
 
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+            <div className="p-6 flex flex-col gap-3" style={cardStyle}>
               <h2 className="font-semibold">Starting Price</h2>
-              <p className="text-gray-400 text-sm">
+              <p className="text-sm" style={{ color: '#9C8B7A' }}>
                 {aiErtekeles
-                  ? `Set between €${aiErtekeles.estimated_value.toLocaleString()} and €${Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} — buyers can bid higher during the auction.`
+                  ? `Set between €${aiErtekeles.estimated_value.toLocaleString()} and €${Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} — buyers can bid higher.`
                   : 'The minimum bid the auction starts from (EUR).'}
               </p>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-                <input
-                  required
-                  type="number"
+                <span className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#9C8B7A' }}>€</span>
+                <input required type="number"
                   min={aiErtekeles ? aiErtekeles.estimated_value : 1}
                   max={aiErtekeles ? Math.round(aiErtekeles.estimated_value * 1.5) : undefined}
                   value={form.kikialtasi_ar}
@@ -1063,45 +1020,60 @@ function SubmitInner() {
                     frissit('kikialtasi_ar', val)
                   }}
                   placeholder={aiErtekeles ? `e.g. ${aiErtekeles.estimated_value}` : 'e.g. 500'}
-                  className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500"
-                />
+                  className="w-full pl-8 pr-4 py-3 focus:outline-none transition"
+                  style={inputStyle}
+                  onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
               </div>
             </div>
 
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-3">
+            <div className="p-6 flex flex-col gap-3" style={cardStyle}>
               <h2 className="font-semibold">Auction Duration</h2>
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { nap: '7', label: '7 days', sub: 'Fast sale', token: 0 },
                   { nap: '14', label: '14 days', sub: 'Recommended', token: 5 },
                   { nap: '30', label: '30 days', sub: 'More exposure', token: 15 },
-                ].map(d => (
-                  <button key={d.nap} type="button" onClick={() => frissit('idotartam_nap', d.nap)}
-                    className={`flex flex-col items-center p-4 rounded-xl border transition ${form.idotartam_nap === d.nap ? 'border-violet-500 bg-violet-900/20' : 'border-gray-700 hover:border-gray-600'}`}>
-                    <span className="font-bold">{d.label}</span>
-                    <span className="text-xs text-gray-400 mt-1">{d.sub}</span>
-                    <span className="text-xs text-violet-400 mt-1">{d.token === 0 ? 'included' : `+${d.token} tokens`}</span>
-                  </button>
-                ))}
+                ].map(d => {
+                  const sel = form.idotartam_nap === d.nap
+                  return (
+                    <button key={d.nap} type="button" onClick={() => frissit('idotartam_nap', d.nap)}
+                      className="flex flex-col items-center p-4 rounded-lg transition"
+                      style={{ border: `1px solid ${sel ? '#DC2626' : '#2E2028'}`, background: sel ? 'rgba(220,38,38,0.08)' : '#1A1217' }}
+                      onMouseEnter={e => { if (!sel) e.currentTarget.style.borderColor = '#3E3040' }}
+                      onMouseLeave={e => { if (!sel) e.currentTarget.style.borderColor = '#2E2028' }}>
+                      <span className="font-bold" style={{ color: '#F5F0E8' }}>{d.label}</span>
+                      <span className="text-xs mt-1" style={{ color: '#9C8B7A' }}>{d.sub}</span>
+                      <span className="text-xs mt-1" style={{ color: sel ? '#DC2626' : '#EAB308' }}>
+                        {d.token === 0 ? 'included' : `+${d.token} tokens`}
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
-            {hiba && <p className="text-red-400 text-sm text-center">{hiba}</p>}
+            {hiba && <p className="text-sm text-center" style={{ color: '#F87171' }}>{hiba}</p>}
 
             {allapot === 'szures' && (
-              <div className="bg-amber-900/20 border border-amber-700 rounded-2xl px-5 py-4 text-center">
-                <p className="text-amber-300 font-semibold text-sm">🤖 AI is reviewing your submission...</p>
-                <p className="text-gray-400 text-xs mt-1">Checking that the content is real, complete, and marketplace-ready. No tokens deducted yet.</p>
+              <div className="px-5 py-4 text-center rounded-lg" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.2)' }}>
+                <p className="font-semibold text-sm" style={{ color: '#EAB308' }}>AI is reviewing your submission...</p>
+                <p className="text-xs mt-1" style={{ color: '#9C8B7A' }}>Checking content quality. No tokens deducted yet.</p>
               </div>
             )}
 
             <button type="submit" disabled={allapot !== 'idle' && allapot !== 'hiba'}
-              className="bg-violet-600 hover:bg-violet-700 disabled:opacity-60 transition py-4 rounded-full font-semibold text-lg">
-              {allapot === 'szures' ? '🤖 Reviewing...' : allapot === 'loading' ? 'Submitting...' : `Submit Project — ${totalCost} tokens →`}
+              className="py-4 rounded-lg font-semibold text-lg transition"
+              style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 24px rgba(220,38,38,0.2)', opacity: (allapot !== 'idle' && allapot !== 'hiba') ? 0.6 : 1 }}
+              onMouseEnter={e => { if (allapot === 'idle') e.currentTarget.style.background = '#EF4444' }}
+              onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+              {allapot === 'szures' ? 'Reviewing...' : allapot === 'loading' ? 'Submitting...' : `Submit Project — ${totalCost} tokens →`}
             </button>
 
             {allapot === 'idle' && (
-              <p className="text-gray-600 text-xs text-center">An AI will review your project before it goes live. If rejected, you are sent back to the mentor — no tokens lost.</p>
+              <p className="text-xs text-center" style={{ color: '#5A4F4A' }}>
+                An AI will review your project before it goes live. If rejected, you are sent back to the mentor — no tokens lost.
+              </p>
             )}
           </form>
         )}
@@ -1112,7 +1084,11 @@ function SubmitInner() {
 
 export default function Submit() {
   return (
-    <Suspense fallback={<main className="min-h-screen bg-gray-950 flex items-center justify-center"><div className="text-gray-400">Loading...</div></main>}>
+    <Suspense fallback={
+      <main className="min-h-screen flex items-center justify-center" style={{ background: '#100C0F' }}>
+        <div style={{ color: '#9C8B7A' }}>Loading...</div>
+      </main>
+    }>
       <SubmitInner />
     </Suspense>
   )
