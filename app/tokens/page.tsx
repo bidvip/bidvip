@@ -207,14 +207,26 @@ export default function TokensPage() {
         <div ref={packagesRef} className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
           {packages.map(pkg => {
             const isHighlighted = highlighted === pkg.id
-            const accent = pkg.popular ? '#DC2626' : '#2E2028'
             return (
-              <div key={pkg.id} className="relative flex flex-col rounded-lg p-6 transition-all duration-500"
+              <div key={pkg.id} className="relative flex flex-col rounded-lg p-6"
                 style={{
                   background: pkg.popular ? 'rgba(220,38,38,0.06)' : '#1A1217',
                   border: `1px solid ${isHighlighted ? '#DC2626' : pkg.popular ? 'rgba(220,38,38,0.4)' : '#2E2028'}`,
-                  boxShadow: isHighlighted ? '0 0 50px rgba(220,38,38,0.2)' : pkg.popular ? '0 0 32px rgba(220,38,38,0.08)' : 'none',
-                  transform: isHighlighted ? 'scale(1.02)' : 'none',
+                  boxShadow: isHighlighted ? '0 0 50px rgba(220,38,38,0.25)' : pkg.popular ? '0 0 32px rgba(220,38,38,0.08)' : 'none',
+                  transform: isHighlighted ? 'scale(1.03)' : 'none',
+                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                }}
+                onMouseEnter={e => {
+                  if (!isHighlighted) {
+                    e.currentTarget.style.transform = 'translateY(-4px)'
+                    e.currentTarget.style.boxShadow = pkg.popular ? '0 16px 40px rgba(220,38,38,0.2), 0 0 32px rgba(220,38,38,0.12)' : '0 16px 32px rgba(0,0,0,0.3)'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isHighlighted) {
+                    e.currentTarget.style.transform = 'none'
+                    e.currentTarget.style.boxShadow = pkg.popular ? '0 0 32px rgba(220,38,38,0.08)' : 'none'
+                  }
                 }}>
                 {pkg.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
