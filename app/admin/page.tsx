@@ -391,7 +391,7 @@ export default function AdminPage() {
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div className="bg-gray-800 rounded-xl px-4 py-3">
                         <p className="text-gray-500 text-xs mb-1">Seller</p>
-                        <p className="text-white truncate">{p.user_email || '—'}</p>
+                        <p className="text-white truncate">{sellerEmail || '—'}</p>
                       </div>
                       <div className="bg-gray-800 rounded-xl px-4 py-3">
                         <p className="text-gray-500 text-xs mb-1">Buyer</p>
