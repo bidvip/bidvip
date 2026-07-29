@@ -66,9 +66,18 @@ function UserMenu({ email, onSignOut }: { email: string; onSignOut: () => void }
 }
 
 function StatCard({ label, val, color }: { label: string; val: number; color?: string }) {
+  const [hover, setHover] = useState(false)
   return (
-    <div className="rounded-lg p-5 transition"
-      style={{ background: '#1A1217', border: `1px solid ${color ? color + '33' : '#2E2028'}` }}>
+    <div className="rounded-lg p-5"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: hover ? '#221820' : '#1A1217',
+        border: `1px solid ${hover && color ? color + '55' : color ? color + '33' : hover ? '#3E3040' : '#2E2028'}`,
+        boxShadow: hover && color ? `0 8px 24px rgba(0,0,0,0.3), 0 0 20px ${color}18` : hover ? '0 8px 24px rgba(0,0,0,0.2)' : 'none',
+        transform: hover ? 'translateY(-2px)' : 'none',
+        transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}>
       <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#5A4F4A' }}>{label}</p>
       <p className="text-3xl font-black tabular-nums" style={{ color: color ?? '#F5F0E8' }}>{val}</p>
     </div>
