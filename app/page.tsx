@@ -12,6 +12,26 @@ const PREVIEW_AUCTIONS = [
   { id: 3, nev: 'GreenTrack',  kat: 'Healthtech',      bid: 320,  badge: '🌱 Concept',   sav: 'FAST',     color: '#22c55e', time: 54  },
 ]
 
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border border-gray-800 hover:border-gray-700 rounded-xl overflow-hidden transition">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-900/40 transition"
+      >
+        <span className="font-semibold text-sm pr-4">{q}</span>
+        <span className={`text-gray-500 text-lg transition-transform duration-200 shrink-0 ${open ? 'rotate-45' : ''}`}>+</span>
+      </button>
+      {open && (
+        <div className="px-5 pb-4 text-gray-400 text-sm leading-relaxed border-t border-gray-800/60 pt-3">
+          {a}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number }) {
   const [bid, setBid] = useState(a.bid)
   const [time, setTime] = useState(a.time)
