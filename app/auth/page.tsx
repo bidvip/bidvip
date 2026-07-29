@@ -59,7 +59,7 @@ export default function AuthPage() {
       </div>
 
       {/* Nav */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
+      <nav className="relative z-10 flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #2E2028', backdropFilter: 'blur(8px)' }}>
         <a href="/" className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>
           Bid<span style={{ color: '#DC2626' }}>Vip</span>
         </a>
