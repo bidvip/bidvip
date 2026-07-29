@@ -165,6 +165,29 @@ export default function Dashboard() {
     setUjrakuldes(null)
   }
 
+  async function boostBekuldes(projekt_id: string) {
+    if (!user) return
+    const amount = parseInt(boostTokenek)
+    if (!amount || amount < 1) return
+    setBoostLoading(true)
+    setBoostUzenet('')
+    const res = await fetch('/api/queue/boost', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projekt_id, user_id: user.id, token_amount: amount }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setBoostUzenet(`✓ Now #${data.position} in queue`)
+      setSajatProjektek(prev => prev.map(p => p.id === projekt_id ? { ...p, priority_tokens: data.priority_tokens } : p))
+      setTokenEgyenleg(prev => prev !== null ? prev - amount : null)
+      setTimeout(() => { setBoostAktiv(null); setBoostUzenet('') }, 2500)
+    } else {
+      setBoostUzenet(data.error || 'Failed')
+    }
+    setBoostLoading(false)
+  }
+
   async function kilepes() {
     await supabase.auth.signOut()
     router.push('/')
