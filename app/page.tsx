@@ -187,12 +187,6 @@ export default function Home() {
             onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>
             Aukciós Ház
           </a>
-          <a href="/auth" className="text-sm font-bold px-5 py-2.5 rounded-lg transition"
-            style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.25)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
-            {launched ? 'Get Started →' : 'Sign In'}
-          </a>
         </div>
       </nav>
 
