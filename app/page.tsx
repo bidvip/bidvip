@@ -329,7 +329,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               { num: '01', icon: '🤖', title: 'AI Development', desc: 'Our AI helps you structure, validate, and document your project with expert feedback before market.' },
-              { num: '02', icon: '📺', title: 'Live Auction', desc: 'Time-limited bidding in the Auction House — Fast (3 min), Standard (5 min), or Premium (20 min) channels.' },
+              { num: '02', icon: '📺', title: 'Aukciós Ház', desc: 'Időkorlátolt licitálás az Aukciós Házban — Gyors (3 perc), Standard (5 perc), vagy Prémium (20 perc) csatornán.' },
               { num: '03', icon: '🔒', title: 'Secure Handover', desc: 'Buyer pays, we hold funds in escrow. Seller gets paid only after delivering all files and credentials.' },
             ].map((s, i) => (
               <div key={i}
