@@ -436,7 +436,7 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-10">
         {/* Hero */}
         <div className="mb-10">
           <h1 className="text-4xl font-black mb-1" style={{ letterSpacing: '-0.04em' }}>Aukciós Ház</h1>
