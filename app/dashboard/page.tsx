@@ -368,9 +368,9 @@ export default function Dashboard() {
               <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
                 <div className="text-5xl mb-4">🛒</div>
                 <h2 className="text-xl font-bold mb-2">You haven&apos;t placed any bids yet</h2>
-                <p className="text-gray-400 text-sm mb-6">Browse the marketplace and place your first offer!</p>
+                <p className="text-gray-400 text-sm mb-6">Böngéssz az Aukciós Házban és add be az első ajánlatod!</p>
                 <a href="/marketplace" className="bg-violet-600 hover:bg-violet-700 transition px-6 py-3 rounded-full font-semibold">
-                  Browse Auction House →
+                  Aukciós Ház →
                 </a>
               </div>
             ) : (
