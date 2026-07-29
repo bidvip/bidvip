@@ -326,12 +326,20 @@ export default function ProjectDetail() {
             )
           })()}
 
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+          <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-6"
+            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.04) 0%, transparent 60%)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">AI Analysis</h2>
-              {projekt.ai_elemzes && <span className="text-xs text-violet-400 border border-violet-800 px-2 py-1 rounded-full">Sonnet 5 · Deep</span>}
+              <div className="flex items-center gap-2">
+                <span className="text-base">🤖</span>
+                <h2 className="font-semibold text-sm uppercase tracking-widest text-gray-400">AI Elemzés</h2>
+              </div>
+              {projekt.ai_elemzes && (
+                <span className="text-xs text-violet-400 border border-violet-800/50 bg-violet-950/30 px-2.5 py-1 rounded-full font-semibold">
+                  Sonnet 5 · Deep
+                </span>
+              )}
               {aiAllapot === 'kesz' && !projekt.ai_elemzes && (
-                <button onClick={aiElemzesKer} className="text-xs text-gray-500 hover:text-gray-300 transition">Refresh</button>
+                <button onClick={aiElemzesKer} className="text-xs text-gray-500 hover:text-gray-300 transition">Frissítés</button>
               )}
             </div>
 
