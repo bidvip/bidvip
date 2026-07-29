@@ -353,8 +353,9 @@ export default function AdminPage() {
           // Detect repeat buyer↔seller pairs
           const parok: Record<string, number> = {}
           eladt.forEach(p => {
-            if (p.vevo_email && p.user_email) {
-              const par = [p.user_email, p.vevo_email].sort().join('|')
+            const sellerEmail = userEmailek[p.user_id]
+            if (p.vevo_email && sellerEmail) {
+              const par = [sellerEmail, p.vevo_email].sort().join('|')
               parok[par] = (parok[par] || 0) + 1
             }
           })
