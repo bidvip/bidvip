@@ -1,8 +1,23 @@
 @import "tailwindcss";
 
+/* ── BidVip Design Tokens — Auction House Luxe ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bv-bg:          #100C0F;
+  --bv-bg-card:     #1A1217;
+  --bv-bg-elevated: #221820;
+  --bv-border:      #2E2028;
+  --bv-border-hi:   #3E3040;
+  --bv-text:        #F5F0E8;
+  --bv-muted:       #9C8B7A;
+  --bv-faint:       #5A4F4A;
+  --bv-accent:      #DC2626;
+  --bv-accent-hi:   #EF4444;
+  --bv-gold:        #EAB308;
+  --bv-gold-hi:     #FBBF24;
+  --bv-green:       #16A34A;
+  --bv-live:        #22C55E;
+  --background: var(--bv-bg);
+  --foreground: var(--bv-text);
 }
 
 @theme inline {
@@ -12,25 +27,29 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bv-bg);
+  color: var(--bv-text);
+  font-family: var(--font-geist-sans), 'Arial Narrow', Arial, sans-serif;
 }
 
+/* ── Auction urgency pulse ── */
 @keyframes urgentPulse {
-  0%, 100% { border-color: #ef4444aa; box-shadow: 0 0 24px #ef444466; }
-  50%       { border-color: #ef4444ff; box-shadow: 0 0 40px #ef444499; }
+  0%, 100% { border-color: #DC262699; box-shadow: 0 0 20px #DC262655; }
+  50%       { border-color: #DC2626CC; box-shadow: 0 0 36px #DC262677; }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+
+/* ── Global resets ── */
+* { box-sizing: border-box; }
+::selection { background: #DC262633; color: #F5F0E8; }
+:focus-visible { outline: 2px solid var(--bv-gold); outline-offset: 2px; }
