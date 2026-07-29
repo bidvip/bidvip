@@ -11,22 +11,46 @@ const SZEREPKOR_LABEL: Record<string, string> = {
   mindketto: 'Buyer & Seller',
 }
 
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <section style={{ background: '#1A1217', border: '1px solid #2E2028', borderRadius: '8px', padding: '24px' }}
+      className="flex flex-col gap-4">
+      {children}
+    </section>
+  )
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: '#5A4F4A' }}>{children}</h2>
+}
+
+function Row({ label, value, action }: { label: string; value: string; action?: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid #2E2028' }}>
+      <div>
+        <p className="text-xs mb-0.5" style={{ color: '#5A4F4A' }}>{label}</p>
+        <p className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{value}</p>
+      </div>
+      {action}
+    </div>
+  )
+}
+
 export default function Settings() {
   const supabase = createClient()
   const router = useRouter()
 
-  const [user, setUser] = useState<User | null>(null)
-  const [szerepkor, setSzerepkor] = useState<string | null>(null)
+  const [user, setUser]               = useState<User | null>(null)
+  const [szerepkor, setSzerepkor]     = useState<string | null>(null)
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
-  const [anonVevo, setAnonVevo] = useState<string | null>(null)
-  const [anonElado, setAnonElado] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [anonVevo, setAnonVevo]       = useState<string | null>(null)
+  const [anonElado, setAnonElado]     = useState<string | null>(null)
+  const [loading, setLoading]         = useState(true)
 
-  const [ujJelszo, setUjJelszo] = useState('')
+  const [ujJelszo, setUjJelszo]           = useState('')
   const [ujJelszoMegint, setUjJelszoMegint] = useState('')
   const [jelszoAllapot, setJelszoAllapot] = useState<'idle' | 'loading' | 'ok' | 'hiba'>('idle')
-  const [jelszoHiba, setJelszoHiba] = useState('')
-
+  const [jelszoHiba, setJelszoHiba]       = useState('')
   const [torlesAllapot, setTorlesAllapot] = useState(false)
 
   useEffect(() => {
@@ -43,7 +67,6 @@ export default function Settings() {
 
       setSzerepkor(profil?.szerepkor ?? null)
       setTokenEgyenleg(tokenek?.egyenleg ?? 0)
-
       const vevo = anonok?.find((a: any) => a.szerepkor === 'vevo')
       const elado = anonok?.find((a: any) => a.szerepkor === 'elado')
       setAnonVevo(vevo?.nev ?? null)
@@ -56,7 +79,7 @@ export default function Settings() {
   async function jelszoValtoztat(e: React.FormEvent) {
     e.preventDefault()
     if (ujJelszo !== ujJelszoMegint) { setJelszoHiba('Passwords do not match.'); setJelszoAllapot('hiba'); return }
-    if (ujJelszo.length < 8) { setJelszoHiba('Password must be at least 8 characters.'); setJelszoAllapot('hiba'); return }
+    if (ujJelszo.length < 8) { setJelszoHiba('Minimum 8 characters.'); setJelszoAllapot('hiba'); return }
     setJelszoAllapot('loading')
     const { error } = await supabase.auth.updateUser({ password: ujJelszo })
     if (error) { setJelszoHiba(error.message); setJelszoAllapot('hiba') }
@@ -69,146 +92,162 @@ export default function Settings() {
   }
 
   if (loading) return (
-    <main className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <div className="text-gray-500 text-sm">Loading...</div>
+    <main className="min-h-screen flex items-center justify-center" style={{ background: '#100C0F' }}>
+      <p className="text-sm" style={{ color: '#5A4F4A' }}>Loading...</p>
     </main>
   )
 
+  const inputStyle = {
+    background: '#221820', border: '1px solid #2E2028', borderRadius: '8px',
+    padding: '11px 16px', color: '#F5F0E8', width: '100%', fontSize: '14px',
+  }
+
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-white/5 backdrop-blur-sm">
-        <a href="/" className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></a>
-        <div className="flex items-center gap-3 text-sm text-gray-500">
-          <a href="/dashboard" className="hover:text-white transition">Dashboard</a>
+    <main className="min-h-screen" style={{ background: '#100C0F', color: '#F5F0E8' }}>
+      <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
+        <a href="/" className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>
+          Bid<span style={{ color: '#DC2626' }}>Vip</span>
+        </a>
+        <div className="flex items-center gap-2 text-sm" style={{ color: '#5A4F4A' }}>
+          <a href="/dashboard" className="transition" style={{ color: '#9C8B7A' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>Dashboard</a>
           <span>/</span>
-          <span className="text-gray-300">Beállítások</span>
+          <span style={{ color: '#F5F0E8' }}>Beállítások</span>
         </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-6 py-12 flex flex-col gap-6">
+      <div className="max-w-2xl mx-auto px-6 py-12 flex flex-col gap-5">
         <div>
-          <h1 className="text-2xl font-bold">Fiókbeállítások</h1>
-          <p className="text-gray-500 text-sm mt-1">Profilod, biztonságod és preferenciáid kezelése.</p>
+          <h1 className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Fiókbeállítások</h1>
+          <p className="text-sm mt-1" style={{ color: '#9C8B7A' }}>Profilod, biztonságod és preferenciáid kezelése.</p>
         </div>
 
         {/* Profile */}
-        <section className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-          <h2 className="font-semibold text-sm uppercase tracking-widest text-gray-400">Profile</h2>
-
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between py-3 border-b border-gray-800">
-              <div>
-                <p className="text-xs text-gray-500 mb-0.5">Email</p>
-                <p className="text-sm font-medium">{user?.email}</p>
+        <Card>
+          <Label>Profile</Label>
+          <Row label="Email" value={user?.email ?? ''} action={
+            <span className="text-[10px] px-2 py-0.5 rounded" style={{ color: '#5A4F4A', border: '1px solid #2E2028' }}>read-only</span>
+          } />
+          <Row label="Role" value={SZEREPKOR_LABEL[szerepkor ?? ''] ?? (szerepkor ?? '—')} action={
+            <a href="/onboarding" className="text-xs transition" style={{ color: '#EAB308' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#FBBF24')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#EAB308')}>Change →</a>
+          } />
+          {(anonVevo || anonElado) && (
+            <div className="pt-1">
+              <p className="text-xs mb-2" style={{ color: '#5A4F4A' }}>Your anonymous names on BidVip</p>
+              <div className="flex flex-col gap-1.5">
+                {anonVevo && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold"
+                      style={{ background: 'rgba(234,179,8,0.1)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.2)' }}>Buyer</span>
+                    <span className="text-sm font-mono" style={{ color: '#F5F0E8' }}>{anonVevo}</span>
+                  </div>
+                )}
+                {anonElado && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold"
+                      style={{ background: 'rgba(22,163,74,0.1)', color: '#16A34A', border: '1px solid rgba(22,163,74,0.2)' }}>Seller</span>
+                    <span className="text-sm font-mono" style={{ color: '#F5F0E8' }}>{anonElado}</span>
+                  </div>
+                )}
               </div>
-              <span className="text-[10px] text-gray-600 border border-gray-700 rounded-full px-2 py-0.5">read-only</span>
+              <p className="text-[10px] mt-2" style={{ color: '#5A4F4A' }}>Anonymous names protect your identity. They reset daily.</p>
             </div>
-
-            <div className="flex items-center justify-between py-3 border-b border-gray-800">
-              <div>
-                <p className="text-xs text-gray-500 mb-0.5">Role</p>
-                <p className="text-sm font-medium">{SZEREPKOR_LABEL[szerepkor ?? ''] ?? szerepkor}</p>
-              </div>
-              <a href="/onboarding" className="text-[11px] text-violet-400 hover:text-violet-300 transition">Change →</a>
-            </div>
-
-            {(anonVevo || anonElado) && (
-              <div className="py-3">
-                <p className="text-xs text-gray-500 mb-2">Your anonymous names on BidVip</p>
-                <div className="flex flex-col gap-1.5">
-                  {anonVevo && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] bg-blue-900/40 text-blue-400 border border-blue-800 rounded-full px-2 py-0.5">Buyer</span>
-                      <span className="text-sm font-mono text-gray-300">{anonVevo}</span>
-                    </div>
-                  )}
-                  {anonElado && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] bg-green-900/40 text-green-400 border border-green-800 rounded-full px-2 py-0.5">Seller</span>
-                      <span className="text-sm font-mono text-gray-300">{anonElado}</span>
-                    </div>
-                  )}
-                </div>
-                <p className="text-[10px] text-gray-600 mt-2">Anonymous names protect your identity. They reset daily.</p>
-              </div>
-            )}
-          </div>
-        </section>
+          )}
+        </Card>
 
         {/* Tokens */}
-        <section className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-          <h2 className="font-semibold text-sm uppercase tracking-widest text-gray-400">Token Balance</h2>
+        <Card>
+          <Label>Token Balance</Label>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-3xl font-bold text-violet-400">⚡ {tokenEgyenleg ?? 0}</p>
-              <p className="text-xs text-gray-500 mt-1">tokens available for AI features</p>
+              <p className="text-3xl font-black tabular-nums" style={{ color: '#EAB308' }}>⚡ {tokenEgyenleg ?? 0}</p>
+              <p className="text-xs mt-1" style={{ color: '#9C8B7A' }}>tokens available for AI features</p>
             </div>
-            <a href="/tokens"
-              className="bg-violet-600 hover:bg-violet-700 transition text-white text-sm font-semibold px-5 py-2.5 rounded-full">
+            <a href="/tokens" className="text-sm font-black px-5 py-2.5 rounded-lg transition"
+              style={{ background: '#DC2626', color: '#fff' }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
               Buy Tokens →
             </a>
           </div>
-        </section>
+        </Card>
 
         {/* Change Password */}
-        <section className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
-          <h2 className="font-semibold text-sm uppercase tracking-widest text-gray-400">Change Password</h2>
-          <form onSubmit={jelszoValtoztat} className="flex flex-col gap-3">
-            <input
-              type="password" placeholder="New password" value={ujJelszo}
+        <Card>
+          <Label>Change Password</Label>
+          <form onSubmit={jelszoValtoztat} className="flex flex-col gap-2.5">
+            <input type="password" placeholder="New password" value={ujJelszo}
               onChange={e => { setUjJelszo(e.target.value); setJelszoAllapot('idle') }}
-              className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 text-sm"
-            />
-            <input
-              type="password" placeholder="Confirm new password" value={ujJelszoMegint}
+              style={inputStyle}
+              onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+              onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+            <input type="password" placeholder="Confirm new password" value={ujJelszoMegint}
               onChange={e => { setUjJelszoMegint(e.target.value); setJelszoAllapot('idle') }}
-              className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 text-sm"
-            />
-            {jelszoAllapot === 'hiba' && <p className="text-red-400 text-xs">{jelszoHiba}</p>}
-            {jelszoAllapot === 'ok' && <p className="text-green-400 text-xs font-semibold">✓ Password updated successfully.</p>}
+              style={inputStyle}
+              onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+              onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+            {jelszoAllapot === 'hiba' && <p className="text-xs" style={{ color: '#EF4444' }}>{jelszoHiba}</p>}
+            {jelszoAllapot === 'ok' && <p className="text-xs font-bold" style={{ color: '#16A34A' }}>Password updated.</p>}
             <button type="submit" disabled={jelszoAllapot === 'loading' || !ujJelszo}
-              className="py-3 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-40 transition text-sm font-semibold">
+              className="text-sm font-bold py-3 rounded-lg transition"
+              style={{ background: '#2E2028', color: '#F5F0E8', opacity: (jelszoAllapot === 'loading' || !ujJelszo) ? 0.4 : 1 }}
+              onMouseEnter={e => { if (ujJelszo) e.currentTarget.style.background = '#3E3040' }}
+              onMouseLeave={e => (e.currentTarget.style.background = '#2E2028')}>
               {jelszoAllapot === 'loading' ? 'Updating...' : 'Update Password'}
             </button>
           </form>
-        </section>
+        </Card>
 
         {/* Sign out */}
-        <section className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex items-center justify-between">
-          <div>
-            <p className="font-semibold text-sm">Sign Out</p>
-            <p className="text-gray-500 text-xs mt-0.5">You will be redirected to the homepage.</p>
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-sm" style={{ color: '#F5F0E8' }}>Sign Out</p>
+              <p className="text-xs mt-0.5" style={{ color: '#9C8B7A' }}>You will be redirected to the homepage.</p>
+            </div>
+            <button onClick={kijelentkezes} className="text-sm font-semibold px-5 py-2.5 rounded-lg transition"
+              style={{ border: '1px solid #2E2028', color: '#9C8B7A' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#3E3040'; e.currentTarget.style.color = '#F5F0E8' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
+              Sign Out
+            </button>
           </div>
-          <button onClick={kijelentkezes}
-            className="text-sm font-semibold px-5 py-2.5 rounded-full border border-gray-700 hover:border-gray-500 hover:text-white text-gray-400 transition">
-            Sign Out
-          </button>
-        </section>
+        </Card>
 
         {/* Danger zone */}
-        <section className="bg-red-950/20 border border-red-900/40 rounded-2xl p-6 flex flex-col gap-4">
-          <h2 className="font-semibold text-sm uppercase tracking-widest text-red-500">Danger Zone</h2>
+        <section style={{ background: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: '8px', padding: '24px' }}>
+          <Label><span style={{ color: '#DC2626' }}>Danger Zone</span></Label>
           {!torlesAllapot ? (
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-4">
               <div>
-                <p className="text-sm font-medium">Delete Account</p>
-                <p className="text-gray-500 text-xs mt-0.5">Permanently delete your account and all data. This cannot be undone.</p>
+                <p className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>Delete Account</p>
+                <p className="text-xs mt-0.5" style={{ color: '#9C8B7A' }}>Permanently delete all your data. This cannot be undone.</p>
               </div>
               <button onClick={() => setTorlesAllapot(true)}
-                className="text-sm font-semibold px-5 py-2.5 rounded-full border border-red-800 text-red-400 hover:bg-red-900/30 transition">
+                className="text-sm font-semibold px-5 py-2.5 rounded-lg transition"
+                style={{ border: '1px solid rgba(220,38,38,0.4)', color: '#DC2626' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(220,38,38,0.1)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                 Delete
               </button>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-              <p className="text-red-400 text-sm font-semibold">Are you sure? This is permanent.</p>
+            <div className="flex flex-col gap-3 mt-4">
+              <p className="text-sm font-bold" style={{ color: '#DC2626' }}>Are you sure? This is permanent.</p>
               <div className="flex gap-3">
                 <button onClick={() => setTorlesAllapot(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-gray-700 text-gray-400 hover:text-white text-sm transition">
-                  Cancel
-                </button>
+                  className="flex-1 py-2.5 rounded-lg text-sm transition"
+                  style={{ border: '1px solid #2E2028', color: '#9C8B7A' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>Cancel</button>
                 <a href="mailto:support@bidvip.com?subject=Account deletion request"
-                  className="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-semibold text-center transition">
+                  className="flex-1 py-2.5 rounded-lg text-sm font-bold text-center transition"
+                  style={{ background: '#DC2626', color: '#fff' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
                   Contact Support →
                 </a>
               </div>
