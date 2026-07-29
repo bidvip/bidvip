@@ -343,21 +343,23 @@ export default function Home() {
       </section>
 
       {/* Stats strip */}
-      <div className={`relative z-10 border-y border-white/5 py-6 transition-all duration-700 delay-500 ${visible ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="max-w-4xl mx-auto px-6 flex flex-wrap items-center justify-center gap-8 md:gap-16">
-          {[
-            { val: '3 min', label: 'Fastest auction' },
-            { val: '10%', label: 'Platform fee' },
-            { val: '100%', label: 'Escrow protected' },
-            { val: 'AI', label: 'Powered validation' },
-          ].map(s => (
-            <div key={s.label} className="text-center">
-              <p className="text-xl font-black text-violet-400">{s.val}</p>
-              <p className="text-xs text-gray-600 mt-0.5">{s.label}</p>
-            </div>
-          ))}
+      <ScrollReveal>
+        <div className="relative z-10 border-y border-white/5 py-6">
+          <div className="max-w-4xl mx-auto px-6 flex flex-wrap items-center justify-center gap-8 md:gap-16">
+            {[
+              { val: '3 min', label: 'Fastest auction' },
+              { val: '10%', label: 'Platform fee' },
+              { val: '100%', label: 'Escrow protected' },
+              { val: 'AI', label: 'Powered validation' },
+            ].map(s => (
+              <div key={s.label} className="text-center">
+                <p className="text-xl font-black text-violet-400">{s.val}</p>
+                <p className="text-xs text-gray-600 mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </ScrollReveal>
 
       {/* How it works */}
       <section className="relative z-10 px-6 py-20">
