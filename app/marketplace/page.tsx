@@ -73,6 +73,15 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
   const countdown = useCountdown(projekt?.lejarat ?? null)
   const isLive = !!projekt && !countdown.done
   const isUrgent = isLive && countdown.diff < 60000
+  const [copied, setCopied] = useState(false)
+
+  function handleShare(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!projekt) return
+    navigator.clipboard.writeText(`${window.location.origin}/project/${projekt.id}`).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
 
   return (
     <div
