@@ -446,11 +446,38 @@ export default function Marketplace() {
           </p>
         </div>
 
+        {/* Search bar */}
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
+            <input
+              type="text"
+              placeholder="Search projects, categories..."
+              value={keresoszoveg}
+              onChange={e => setKeresoszoveg(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-600 transition"
+            />
+            {keresoszoveg && (
+              <button
+                onClick={() => setKeresoszoveg('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-xs"
+              >✕</button>
+            )}
+          </div>
+        </div>
+
         {/* 3 lanes, each with 3 TVs */}
         <div className="flex flex-col gap-8 mb-12">
           {savok.map(sav => {
             const info = SAV_INFO[sav]
-            const projektek = aktivak[sav]
+            const q = keresoszoveg.trim().toLowerCase()
+            const projektek = q
+              ? aktivak[sav].filter(p =>
+                  p.nev.toLowerCase().includes(q) ||
+                  p.rovid_leiras.toLowerCase().includes(q) ||
+                  p.kategoria.toLowerCase().includes(q)
+                )
+              : aktivak[sav]
             return (
               <div key={sav}>
                 {/* Lane header — retro TV channel */}
@@ -479,6 +506,7 @@ export default function Marketplace() {
                       projekt={projektek[i] ?? null}
                       onKattint={setKivalasztott}
                       topLicit={projektek[i] ? topLicitek[projektek[i].id] : undefined}
+                      bidderCount={projektek[i] ? licitekSzama[projektek[i].id] : undefined}
                     />
                   ))}
                 </div>
