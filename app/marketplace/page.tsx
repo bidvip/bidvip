@@ -522,7 +522,10 @@ export default function Marketplace() {
               Up Next <span className="text-gray-600 font-normal text-sm">({sor.length} queued)</span>
             </h2>
             <div className="flex flex-col gap-2">
-              {sor.map((p) => {
+              {sor.filter(p => {
+                const q = keresoszoveg.trim().toLowerCase()
+                return !q || p.nev.toLowerCase().includes(q) || p.rovid_leiras.toLowerCase().includes(q) || p.kategoria.toLowerCase().includes(q)
+              }).map((p) => {
                 const si = SAV_INFO[p.sav as keyof typeof SAV_INFO]
                 return (
                   <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 flex items-center gap-4">
