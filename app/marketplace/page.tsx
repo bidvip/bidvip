@@ -98,7 +98,20 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
           </span>
           {isLive && <span className="text-[10px] font-bold text-white bg-red-600 px-1 rounded">LIVE</span>}
         </div>
-        <span className="text-[10px] text-gray-600">#{slot}</span>
+        <div className="flex items-center gap-2">
+          {projekt && (
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                navigator.clipboard.writeText(`${window.location.origin}/project/${projekt.id}`)
+                  .catch(() => {})
+              }}
+              title="Copy link"
+              className="text-[10px] text-gray-600 hover:text-gray-400 transition"
+            >🔗</button>
+          )}
+          <span className="text-[10px] text-gray-600">#{slot}</span>
+        </div>
       </div>
 
       {/* Content */}
