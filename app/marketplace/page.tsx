@@ -291,7 +291,7 @@ function BidModal({ projekt, user, onZar }: {
           </div>
           <div className="text-right">
             <p className="text-[10px] text-gray-600 uppercase tracking-widest mb-0.5">Time Left</p>
-            <p className={`text-2xl font-mono font-black tabular-nums ${countdown.done ? 'text-red-400' : 'text-white'}`}>
+            <p className={`text-2xl font-mono font-black tabular-nums ${countdown.done ? 'text-red-400' : modalUrgent ? 'text-red-400 animate-pulse' : 'text-white'}`}>
               {countdown.label}
             </p>
           </div>
