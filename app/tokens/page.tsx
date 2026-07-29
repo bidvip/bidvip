@@ -169,7 +169,7 @@ export default function TokensPage() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-14">
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-14">
         {status === 'success' && (
           <div className="px-6 py-4 text-center font-semibold mb-8 rounded-lg"
             style={{ background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.2)', color: '#22C55E' }}>
