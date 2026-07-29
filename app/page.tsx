@@ -5,70 +5,64 @@ import { supabase } from '@/lib/supabase'
 
 const MAX_WAITLIST = 2000
 
-/* Preview auction data — channels match the real marketplace */
 const PREVIEW_AUCTIONS = [
   { id: 1, nev: 'TaskFlow AI',  kat: 'SaaS / Software', bid: 4800, badge: 'Proven',    sav: 'PREMIUM',  color: '#DC2626', time: 847 },
   { id: 2, nev: 'LocalEats',    kat: 'Marketplace',     bid: 1250, badge: 'Prototype', sav: 'STANDARD', color: '#F97316', time: 192 },
   { id: 3, nev: 'GreenTrack',   kat: 'Healthtech',      bid: 320,  badge: 'Concept',   sav: 'FAST',     color: '#EAB308', time: 54  },
 ]
 
-/* ── Scroll-reveal wrapper ── */
-function ScrollReveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+/* ── Scroll-reveal ── */
+function ScrollReveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } }, { threshold: 0.1 })
-    obs.observe(el)
-    return () => obs.disconnect()
+    const el = ref.current; if (!el) return
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } }, { threshold: 0.08 })
+    obs.observe(el); return () => obs.disconnect()
   }, [])
   return (
-    <div ref={ref} style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+    <div ref={ref} className={className} style={{ transitionDelay: `${delay}ms`, transition: 'opacity 0.7s ease, transform 0.7s ease', opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(28px)' }}>
       {children}
     </div>
   )
 }
 
-/* ── FAQ accordion ── */
+/* ── FAQ accordion with smooth height transition ── */
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState(0)
+  useEffect(() => { if (bodyRef.current) setHeight(open ? bodyRef.current.scrollHeight : 0) }, [open])
   return (
-    <div style={{ borderColor: '#2E2028', background: open ? '#1A1217' : 'transparent' }}
-      className="border rounded-lg overflow-hidden transition-colors duration-200">
+    <div style={{ border: '1px solid #2E2028', background: open ? '#1A1217' : 'transparent', borderRadius: '8px', overflow: 'hidden', transition: 'background 0.2s' }}>
       <button onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left transition"
-        style={{ color: '#F5F0E8' }}>
+        className="w-full flex items-center justify-between px-5 py-4 text-left"
+        style={{ color: '#F5F0E8' }}
+        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,240,232,0.02)')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
         <span className="font-semibold text-sm pr-4">{q}</span>
-        <span className="text-lg transition-transform duration-200 shrink-0"
-          style={{ color: '#9C8B7A', transform: open ? 'rotate(45deg)' : 'none' }}>+</span>
+        <span style={{ color: '#DC2626', fontSize: '1.1rem', fontWeight: 900, transition: 'transform 0.3s ease', transform: open ? 'rotate(45deg)' : 'none', display: 'inline-block', flexShrink: 0 }}>+</span>
       </button>
-      {open && (
-        <div className="px-5 pb-4 pt-1 text-sm leading-relaxed" style={{ color: '#9C8B7A', borderTop: '1px solid #2E2028' }}>
-          {a}
-        </div>
-      )}
+      <div ref={bodyRef} style={{ maxHeight: `${height}px`, overflow: 'hidden', transition: 'max-height 0.35s ease' }}>
+        <div className="px-5 pb-4 pt-1 text-sm leading-relaxed" style={{ color: '#9C8B7A', borderTop: '1px solid #2E2028' }}>{a}</div>
+      </div>
     </div>
   )
 }
 
-/* ── Live auction preview card ── */
+/* ── Live auction card with micro-interactions ── */
 function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number }) {
   const [bid, setBid] = useState(a.bid)
   const [time, setTime] = useState(a.time)
   const [flash, setFlash] = useState(false)
+  const [hover, setHover] = useState(false)
+  const [bidJump, setBidJump] = useState(false)
   const DELAYS = [4200, 6800, 9500]
 
   useEffect(() => {
     const t = setInterval(() => setTime(s => s > 0 ? s - 1 : a.time), 1000)
     const b = setInterval(() => {
-      setBid(prev => {
-        const next = prev + Math.floor(Math.random() * 80 + 25)
-        setFlash(true)
-        setTimeout(() => setFlash(false), 500)
-        return next
-      })
+      setBid(prev => { const next = prev + Math.floor(Math.random() * 80 + 25); setFlash(true); setBidJump(true); setTimeout(() => setFlash(false), 600); setTimeout(() => setBidJump(false), 400); return next })
     }, DELAYS[idx])
     return () => { clearInterval(t); clearInterval(b) }
   }, [a.time, idx])
@@ -79,34 +73,41 @@ function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number })
   const label = `${mm}:${String(ss).padStart(2, '0')}`
 
   return (
-    <div style={{
-      background: '#1A1217',
-      borderColor: flash ? a.color : `${a.color}44`,
-      boxShadow: flash ? `0 0 24px ${a.color}33` : 'none',
-      transition: 'border-color 0.3s, box-shadow 0.3s',
-    }} className="border rounded-lg overflow-hidden">
-      {/* Channel bar */}
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: hover ? '#221820' : '#1A1217',
+        border: `1px solid ${flash ? a.color : hover ? `${a.color}66` : `${a.color}33`}`,
+        boxShadow: flash ? `0 0 32px ${a.color}44, 0 8px 32px rgba(0,0,0,0.4)` : hover ? `0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px ${a.color}22` : '0 2px 8px rgba(0,0,0,0.2)',
+        borderRadius: '8px', overflow: 'hidden',
+        transform: hover ? 'translateY(-3px)' : 'translateY(0)',
+        transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}>
       <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid #2E2028', background: `${a.color}0d` }}>
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: a.color }} />
           <span className="text-[10px] font-black tracking-widest font-mono" style={{ color: a.color }}>{a.sav}</span>
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: '#DC2626', color: '#fff' }}>LIVE</span>
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 8px rgba(220,38,38,0.5)' }}>LIVE</span>
         </div>
         <span className="text-[9px] font-mono" style={{ color: '#5A4F4A' }}>#{idx + 1}</span>
       </div>
-      {/* Content */}
       <div className="p-3">
         <div className="flex items-center gap-1.5 mb-2">
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-            style={{ color: a.color, background: `${a.color}1a` }}>{a.badge}</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: a.color, background: `${a.color}1a` }}>{a.badge}</span>
           <span className="text-[10px]" style={{ color: '#5A4F4A' }}>{a.kat}</span>
         </div>
         <p className="font-bold text-sm mb-2.5" style={{ color: '#F5F0E8' }}>{a.nev}</p>
         <div className="flex items-end justify-between pt-2.5" style={{ borderTop: '1px solid #2E2028' }}>
           <div>
             <p className="text-[9px] uppercase tracking-widest mb-0.5" style={{ color: '#5A4F4A' }}>Current bid</p>
-            <p className="text-base font-black tabular-nums font-mono transition-colors duration-300"
-              style={{ color: flash ? '#EAB308' : a.color }}>
+            <p className="text-base font-black tabular-nums font-mono"
+              style={{
+                color: flash ? '#EAB308' : a.color,
+                transform: bidJump ? 'scale(1.15)' : 'scale(1)',
+                transition: 'color 0.3s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                display: 'inline-block',
+              }}>
               €{bid.toLocaleString()}
             </p>
           </div>
@@ -176,11 +177,6 @@ export default function Home() {
           Bid<span style={{ color: '#DC2626' }}>Vip</span>
         </span>
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold"
-            style={{ color: '#EAB308', background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)', padding: '5px 12px', borderRadius: '999px' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#EAB308' }} />
-            Live now
-          </div>
           <a href="/marketplace" className="text-sm transition px-4 py-2 rounded-lg"
             style={{ color: '#9C8B7A' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
