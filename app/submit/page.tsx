@@ -646,17 +646,41 @@ function SubmitInner() {
 
   if (allapot === 'siker') {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
-        <div className="text-5xl mb-4">🎉</div>
-        <h2 className="text-2xl font-bold mb-2">Project submitted!</h2>
-        <p className="text-gray-400 mb-3 text-center">Your project is now live on the marketplace.</p>
-        <div className="flex items-center gap-2 bg-amber-900/20 border border-amber-800 rounded-xl px-4 py-3 mb-6 text-sm text-amber-300">
-          <span>🔒</span>
-          <span>This project has been submitted and <strong>cannot be edited</strong>.</span>
+      <main className="min-h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)' }} />
         </div>
-        <button onClick={() => router.push('/dashboard')} className="bg-violet-600 hover:bg-violet-700 transition px-6 py-3 rounded-full font-semibold">
-          Back to Dashboard
-        </button>
+        <nav className="relative z-10 flex items-center px-8 py-5 border-b border-white/5">
+          <span className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></span>
+        </nav>
+        <div className="relative z-10 flex flex-1 items-center justify-center px-6 py-12">
+          <div className="max-w-md w-full text-center">
+            <div className="text-7xl mb-6">🎉</div>
+            <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-green-400 uppercase bg-green-950/40 border border-green-800/40 px-4 py-2 rounded-full mb-6">
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+              Sikeresen beküldve
+            </span>
+            <h2 className="text-3xl font-black mb-3">Projekt beküldve!</h2>
+            <p className="text-gray-400 mb-6 leading-relaxed">
+              Az admin csapatunk felülvizsgálja a projektedet, majd amikor jóváhagyják, élőbe kerül az Aukciós Házban.
+            </p>
+            <div className="flex items-start gap-3 bg-amber-950/30 border border-amber-800/40 rounded-xl px-4 py-3 mb-8 text-sm text-amber-300 text-left">
+              <span className="shrink-0 mt-0.5">🔒</span>
+              <span>A projekt beküldés után <strong>nem szerkeszthető</strong>. Ha változtatni szeretnél, vedd fel a kapcsolatot az adminnal.</span>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button onClick={() => router.push('/dashboard')}
+                className="bg-violet-600 hover:bg-violet-500 transition px-6 py-3 rounded-xl font-semibold text-sm shadow-[0_0_20px_rgba(124,58,237,0.25)]">
+                Dashboard →
+              </button>
+              <button onClick={() => router.push('/marketplace')}
+                className="border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition px-6 py-3 rounded-xl font-semibold text-sm">
+                📺 Aukciós Ház
+              </button>
+            </div>
+          </div>
+        </div>
       </main>
     )
   }
