@@ -104,6 +104,9 @@ export default function Home() {
         {allapot !== 'siker' && (
           <p className="text-gray-600 text-xs mt-4">No spam. Unsubscribe in one click.</p>
         )}
+        <a href="/marketplace" className="mt-3 text-xs text-gray-600 hover:text-violet-400 transition underline underline-offset-2">
+          Or browse live auctions without signing up →
+        </a>
 
         {/* Waitlist progress */}
         <div className="w-full max-w-md mt-8">
