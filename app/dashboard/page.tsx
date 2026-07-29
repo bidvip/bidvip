@@ -359,8 +359,8 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold">{sajatLicitek.length}</p>
               </div>
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                <p className="text-gray-400 text-sm mb-1">Browse the marketplace</p>
-                <a href="/marketplace" className="text-violet-400 font-semibold hover:text-violet-300 transition">Open Auction House →</a>
+                <p className="text-gray-400 text-sm mb-1">Böngéssz az Aukciós Házban</p>
+                <a href="/marketplace" className="text-violet-400 font-semibold hover:text-violet-300 transition">Aukciós Ház megnyitása →</a>
               </div>
             </div>
 
