@@ -47,12 +47,27 @@ function useCountdown(lejarat: string | null) {
   return { label, done, diff }
 }
 
-function card(children: React.ReactNode, style?: React.CSSProperties) {
+function HoverCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  const [hover, setHover] = useState(false)
   return (
-    <div style={{ background: '#1A1217', border: '1px solid #2E2028', borderRadius: '8px', padding: '24px', ...style }}>
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: hover ? '#1E1419' : '#1A1217',
+        border: `1px solid ${hover ? '#3E3040' : '#2E2028'}`,
+        borderRadius: '8px', padding: '24px',
+        boxShadow: hover ? '0 8px 32px rgba(0,0,0,0.25)' : 'none',
+        transition: 'all 0.2s ease',
+        ...style,
+      }}>
       {children}
     </div>
   )
+}
+
+function card(children: React.ReactNode, style?: React.CSSProperties) {
+  return <HoverCard style={style}>{children}</HoverCard>
 }
 
 export default function ProjectDetail() {
