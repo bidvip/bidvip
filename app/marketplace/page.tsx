@@ -545,28 +545,34 @@ export default function Marketplace() {
         {/* Queue */}
         {sor.length > 0 && (
           <div>
-            <h2 className="text-base font-bold mb-3 text-gray-300">
-              Up Next <span className="text-gray-600 font-normal text-sm">({sor.length} queued)</span>
-            </h2>
+            <div className="flex items-center gap-4 mb-5">
+              <div className="h-px flex-1 bg-gray-800" />
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black tracking-widest text-gray-500 uppercase">📋 Sorban Következő</span>
+                <span className="text-xs bg-gray-800 text-gray-500 px-2 py-0.5 rounded-full">{sor.length}</span>
+              </div>
+              <div className="h-px flex-1 bg-gray-800" />
+            </div>
             <div className="flex flex-col gap-2">
               {sor.filter(p => {
                 const q = keresoszoveg.trim().toLowerCase()
                 return !q || p.nev.toLowerCase().includes(q) || p.rovid_leiras.toLowerCase().includes(q) || p.kategoria.toLowerCase().includes(q)
-              }).map((p) => {
+              }).map((p, idx) => {
                 const si = SAV_INFO[p.sav as keyof typeof SAV_INFO]
                 return (
-                  <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 flex items-center gap-4">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded shrink-0"
+                  <div key={p.id} className="group bg-gray-900/60 border border-gray-800 hover:border-gray-700 rounded-xl px-4 py-3 flex items-center gap-4 transition">
+                    <span className="text-xs text-gray-700 font-mono w-5 shrink-0 tabular-nums">{idx + 1}</span>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
                       style={{ color: si?.color, background: `${si?.color}22` }}>
                       {si?.label}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{p.nev}</p>
-                      <p className="text-gray-500 text-xs truncate">{p.rovid_leiras}</p>
+                      <p className="font-semibold text-sm truncate group-hover:text-white transition">{p.nev}</p>
+                      <p className="text-gray-600 text-xs truncate">{p.rovid_leiras}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-bold text-sm" style={{ color: si?.color }}>€{p.kikialtasi_ar.toLocaleString()}</p>
-                      {p.priority_tokens > 0 && <p className="text-xs text-amber-400">⚡ {p.priority_tokens}</p>}
+                      <p className="font-bold text-sm tabular-nums" style={{ color: si?.color }}>€{p.kikialtasi_ar.toLocaleString()}</p>
+                      {p.priority_tokens > 0 && <p className="text-[10px] text-amber-400">⚡ {p.priority_tokens} boost</p>}
                     </div>
                   </div>
                 )
