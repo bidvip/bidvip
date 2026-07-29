@@ -79,7 +79,7 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
         borderRadius: '8px', overflow: 'hidden',
         transition: 'border-color 0.3s, box-shadow 0.3s',
       }}
-      className="relative flex flex-col group hover:scale-[1.015] transition-transform">
+      className="relative flex flex-col group transition-transform" style2={undefined}>
 
       {/* Scanline */}
       {isLive && (
