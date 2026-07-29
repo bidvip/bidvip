@@ -12,8 +12,19 @@ const SZEREPKOR_LABEL: Record<string, string> = {
 }
 
 function Card({ children }: { children: React.ReactNode }) {
+  const [hover, setHover] = useState(false)
   return (
-    <section style={{ background: '#1A1217', border: '1px solid #2E2028', borderRadius: '8px', padding: '24px' }}
+    <section
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: hover ? '#1E1419' : '#1A1217',
+        border: `1px solid ${hover ? '#3E3040' : '#2E2028'}`,
+        borderRadius: '8px', padding: '24px',
+        boxShadow: hover ? '0 8px 32px rgba(0,0,0,0.25)' : 'none',
+        transform: hover ? 'translateY(-1px)' : 'none',
+        transition: 'all 0.2s ease',
+      }}
       className="flex flex-col gap-4">
       {children}
     </section>
