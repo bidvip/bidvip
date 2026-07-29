@@ -350,9 +350,11 @@ export default function Marketplace() {
   const [aktivak, setAktivak] = useState<Record<string, Projekt[]>>({ fast: [], standard: [], premium: [] })
   const [sor, setSor] = useState<Projekt[]>([])
   const [topLicitek, setTopLicitek] = useState<Record<string, number>>({})
+  const [licitekSzama, setLicitekSzama] = useState<Record<string, number>>({})
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [kivalasztott, setKivalasztott] = useState<Projekt | null>(null)
+  const [keresoszoveg, setKeresoszoveg] = useState('')
 
   const betolt = useCallback(async () => {
     const { data: aktivProjektek } = await supabase
