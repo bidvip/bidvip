@@ -80,12 +80,8 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
         transition: 'border-color 0.3s, box-shadow 0.3s',
       }}
       className="relative flex flex-col group hover:scale-[1.015] transition-transform">
-
-      {/* Scanline */}
-      {isLive && (
-        <div className="pointer-events-none absolute inset-0 z-10 opacity-[0.025]"
-          style={{ background: 'repeating-linear-gradient(0deg, #F5F0E8 0px, #F5F0E8 1px, transparent 1px, transparent 3px)' }} />
-      )}
+      {isLive && <div className="pointer-events-none absolute inset-0 z-10 opacity-[0.025]"
+        style={{ background: 'repeating-linear-gradient(0deg, #F5F0E8 0px, #F5F0E8 1px, transparent 1px, transparent 3px)' }} />}
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-3 py-2"
