@@ -12,9 +12,9 @@ const SAV_INFO = {
 }
 
 const badge_info: Record<string, { label: string; color: string }> = {
-  papir:       { label: '🌱 Concept',   color: '#86efac' },
-  prototipus:  { label: '🛠️ Prototype', color: '#93c5fd' },
-  bizonyitott: { label: '✅ Proven',    color: '#c4b5fd' },
+  idea:      { label: '🌱 Concept',   color: '#86efac' },
+  prototype: { label: '🛠️ Prototype', color: '#93c5fd' },
+  proven:    { label: '✅ Proven',    color: '#c4b5fd' },
 }
 
 type Projekt = {
