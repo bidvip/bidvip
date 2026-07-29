@@ -348,9 +348,9 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
-              { num: '01', icon: '🤖', title: 'AI Development', desc: 'Our AI helps you structure, validate, and document your project with expert feedback before market.' },
-              { num: '02', icon: '📺', title: 'Aukciós Ház', desc: 'Időkorlátolt licitálás az Aukciós Házban — Gyors (3 perc), Standard (5 perc), vagy Prémium (20 perc) csatornán.' },
-              { num: '03', icon: '🔒', title: 'Secure Handover', desc: 'Buyer pays, we hold funds in escrow. Seller gets paid only after delivering all files and credentials.' },
+              { num: '01', icon: '🤖', title: 'AI Development', desc: 'Our AI helps you structure, validate, and document your project with expert feedback before it hits the market.' },
+              { num: '02', icon: '📺', title: 'Aukciós Ház', desc: 'Time-limited bidding in our Auction House — Fast (3 min), Standard (5 min), or Premium (20 min) channels.' },
+              { num: '03', icon: '🔒', title: 'Secure Handover', desc: 'Buyer pays via Stripe. We hold funds in escrow. Seller gets paid only after delivering all files and credentials.' },
             ].map((s, i) => (
               <div key={i}
                 className="group relative bg-gray-900/50 border border-gray-800 hover:border-violet-800/60 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(124,58,237,0.08)]">
