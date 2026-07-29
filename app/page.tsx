@@ -400,7 +400,9 @@ export default function Home() {
               { q: 'How is my identity protected?', a: 'All buyers and sellers appear under randomly generated anonymous names. Real identities are only exchanged after a successful sale, as part of the handover.' },
               { q: "What's the platform fee?", a: 'BidVip takes 10% of the final sale price, paid by the seller. There are no listing fees or buyer fees — just pay if you sell.' },
             ].map((faq, i) => (
-              <FaqItem key={i} q={faq.q} a={faq.a} />
+              <ScrollReveal key={i} delay={i * 60}>
+                <FaqItem q={faq.q} a={faq.a} />
+              </ScrollReveal>
             ))}
           </div>
         </div>
