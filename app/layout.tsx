@@ -14,7 +14,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "BidVip — Startup Project Auction House",
-  description: "Buy and sell validated startup ideas through secure, transparent auctions.",
+  description: "Buy and sell validated startup projects through secure, AI-assisted, transparent auctions. Develop your idea with AI, then auction it to the highest bidder.",
+  openGraph: {
+    title: "BidVip — Startup Project Auction House",
+    description: "Buy and sell validated startup projects through secure, AI-assisted, transparent auctions.",
+    url: "https://bidvip.vercel.app",
+    siteName: "BidVip",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BidVip — Startup Project Auction House",
+    description: "Buy and sell validated startup projects through secure, AI-assisted, transparent auctions.",
+  },
+  metadataBase: new URL("https://bidvip.vercel.app"),
 };
 
 export default function RootLayout({
