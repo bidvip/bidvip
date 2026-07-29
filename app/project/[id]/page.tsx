@@ -361,7 +361,7 @@ export default function ProjectDetail() {
                 )}
                 {aiAllapot === 'nincs_token' && (
                   <div className="text-center py-4">
-                    <p className="text-red-400 text-sm mb-2">Not enough tokens. You have {tokenEgyenleg ?? 0}, need 5.</p>
+                    <p className="text-red-400 text-sm mb-2">Not enough tokens. You have {tokenEgyenleg ?? 0}, need {AI_ELEMZES_COST}.</p>
                     <a href="/tokens" className="text-violet-400 text-sm hover:underline">Buy tokens →</a>
                   </div>
                 )}
