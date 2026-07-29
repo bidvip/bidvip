@@ -122,7 +122,7 @@ export default function Settings() {
         </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-6 py-12 flex flex-col gap-5">
+      <div className="relative z-10 max-w-2xl mx-auto px-6 py-12 flex flex-col gap-5">
         <div>
           <h1 className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Fiókbeállítások</h1>
           <p className="text-sm mt-1" style={{ color: '#9C8B7A' }}>Profilod, biztonságod és preferenciáid kezelése.</p>
