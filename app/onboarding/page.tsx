@@ -40,7 +40,7 @@ export default function Onboarding() {
           backgroundImage: 'radial-gradient(circle, #F5F0E8 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
       </div>
 
-      <nav className="relative z-10 flex items-center px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
+      <nav className="relative z-10 flex items-center px-8 py-5" style={{ borderBottom: '1px solid #2E2028', backdropFilter: 'blur(8px)' }}>
         <span className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>
           Bid<span style={{ color: '#DC2626' }}>Vip</span>
         </span>
