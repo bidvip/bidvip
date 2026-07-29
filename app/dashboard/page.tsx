@@ -309,6 +309,31 @@ export default function Dashboard() {
                           {ujrakuldes === p.id ? '...' : 'Resubmit'}
                         </button>
                       )}
+                      {p.statusz === 'varakozas' && (
+                        boostAktiv === p.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="number" min={1} max={tokenEgyenleg ?? 999}
+                              value={boostTokenek}
+                              onChange={e => setBoostTokenek(e.target.value)}
+                              className="w-14 bg-gray-800 border border-amber-700 text-white text-xs px-2 py-1 rounded-lg text-center"
+                            />
+                            <span className="text-xs text-amber-400">⚡</span>
+                            <button onClick={() => boostBekuldes(p.id)} disabled={boostLoading}
+                              className="text-xs bg-amber-600 hover:bg-amber-500 disabled:opacity-50 transition px-2 py-1 rounded-lg font-semibold text-white">
+                              {boostLoading ? '...' : 'Boost'}
+                            </button>
+                            <button onClick={() => { setBoostAktiv(null); setBoostUzenet('') }}
+                              className="text-xs text-gray-500 hover:text-gray-300">✕</button>
+                            {boostUzenet && <span className="text-xs text-green-400">{boostUzenet}</span>}
+                          </div>
+                        ) : (
+                          <button onClick={() => { setBoostAktiv(p.id); setBoostTokenek('5') }}
+                            className="text-xs border border-amber-700/60 text-amber-400 hover:bg-amber-900/20 transition px-2.5 py-1 rounded-full flex items-center gap-1">
+                            ⚡ Boost{p.priority_tokens > 0 ? ` (${p.priority_tokens})` : ''}
+                          </button>
+                        )
+                      )}
                       {p.statusz === 'draft' ? (
                         <a href={`/submit?draft=${p.id}`} className="text-xs bg-violet-600 hover:bg-violet-700 transition px-3 py-1 rounded-full font-semibold">
                           Continue →
