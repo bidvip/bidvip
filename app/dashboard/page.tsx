@@ -74,6 +74,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [ujrakuldes, setUjrakuldes] = useState<string | null>(null)
   const [topBids, setTopBids] = useState<Record<string, number>>({})
+  const [projektLicitek, setProjektLicitek] = useState<Record<string, { top: number; db: number }>>({})
   const router = useRouter()
   const supabase = createClient()
 
