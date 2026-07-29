@@ -79,9 +79,22 @@ export default function AdminPage() {
         supabase.from('feliratkozok').select('id', { count: 'exact', head: true }),
       ])
 
-      setProjektek(proj || [])
+      const ujProjektek = proj || []
+      setProjektek(ujProjektek)
       setReportok(Array.isArray(rep) ? rep : [])
       setFeliratkozokSzam(felCount ?? 0)
+
+      // Fetch seller emails for all projects
+      const uniqueUserIds = [...new Set(ujProjektek.map((p: Projekt) => p.user_id).filter(Boolean))]
+      if (uniqueUserIds.length > 0) {
+        const { data: { session } } = await supabase.auth.getSession()
+        fetch('/api/admin/user-emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+          body: JSON.stringify({ user_ids: uniqueUserIds }),
+        }).then(r => r.json()).then(map => setUserEmailek(map)).catch(() => {})
+      }
+
       setLoading(false)
     }
     betolt()
