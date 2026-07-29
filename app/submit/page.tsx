@@ -669,22 +669,45 @@ function SubmitInner() {
       </nav>
 
       {/* Step indicator */}
-      <div className="max-w-2xl mx-auto px-6 pt-10 pb-2 flex items-center gap-2">
-        {[
-          { n: 1, label: 'Describe' },
-          { n: 2, label: 'Refine with AI' },
-          { n: 3, label: 'Submit' },
-        ].map((s, i) => (
-          <div key={s.n} className="flex items-center gap-2 flex-1">
-            <div className={`flex items-center gap-2 text-sm font-semibold ${lepes === s.n ? 'text-violet-400' : lepes > s.n ? 'text-gray-500' : 'text-gray-600'}`}>
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs border shrink-0 ${lepes === s.n ? 'border-violet-500 bg-violet-900/40' : lepes > s.n ? 'border-gray-600 bg-gray-800' : 'border-gray-700 bg-gray-900'}`}>
-                {lepes > s.n ? '✓' : s.n}
-              </span>
-              <span className="hidden sm:inline">{s.label}</span>
-            </div>
-            {i < 2 && <div className="h-px flex-1 bg-gray-800 mx-1" />}
-          </div>
-        ))}
+      <div className="max-w-2xl mx-auto px-6 pt-10 pb-4">
+        {/* Progress bar */}
+        <div className="relative h-0.5 bg-gray-800 rounded-full mb-6 mx-4">
+          <div
+            className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
+            style={{
+              width: lepes === 1 ? '0%' : lepes === 2 ? '50%' : '100%',
+              background: 'linear-gradient(90deg, #7c3aed, #a855f7)',
+              boxShadow: '0 0 8px rgba(168,85,247,0.5)',
+            }}
+          />
+        </div>
+        <div className="flex items-start justify-between">
+          {[
+            { n: 1 as const, label: 'Leírás', sub: 'Projekt adatok' },
+            { n: 2 as const, label: 'AI Finomítás', sub: 'Mentori chat' },
+            { n: 3 as const, label: 'Beküldés', sub: 'Fájlok + live' },
+          ].map((s) => {
+            const done = lepes > s.n
+            const active = lepes === s.n
+            return (
+              <div key={s.n} className="flex flex-col items-center gap-1.5 flex-1">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 ${
+                  done
+                    ? 'border-violet-500 bg-violet-600 text-white'
+                    : active
+                    ? 'border-violet-500 bg-violet-950/60 text-violet-300 shadow-[0_0_12px_rgba(124,58,237,0.4)]'
+                    : 'border-gray-700 bg-gray-900 text-gray-600'
+                }`}>
+                  {done ? '✓' : s.n}
+                </div>
+                <span className={`text-xs font-semibold transition-colors ${active ? 'text-violet-400' : done ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {s.label}
+                </span>
+                <span className="text-[10px] text-gray-600 hidden sm:block">{s.sub}</span>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-8">
