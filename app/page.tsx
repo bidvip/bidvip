@@ -165,7 +165,7 @@ export default function Home() {
           </div>
           <a href="/marketplace"
             className="text-sm text-gray-400 hover:text-white transition px-4 py-2 rounded-full hover:bg-white/5">
-            Auction House
+            Aukciós Ház
           </a>
           {elesbe ? (
             <a href="/auth"
