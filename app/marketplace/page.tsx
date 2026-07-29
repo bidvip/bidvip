@@ -460,8 +460,8 @@ export default function Marketplace() {
         </div>
 
         {/* Search bar */}
-        <div className="mb-8">
-          <div className="relative max-w-md">
+        <div className="mb-8 flex items-center gap-4 flex-wrap">
+          <div className="relative max-w-md flex-1">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
             <input
               type="text"
@@ -477,6 +477,13 @@ export default function Marketplace() {
               >✕</button>
             )}
           </div>
+          {keresoszoveg.trim() && (() => {
+            const q = keresoszoveg.trim().toLowerCase()
+            const n = savok.reduce((acc, s) => acc + aktivak[s].filter(p =>
+              p.nev.toLowerCase().includes(q) || p.rovid_leiras.toLowerCase().includes(q) || p.kategoria.toLowerCase().includes(q)
+            ).length, 0)
+            return <span className="text-sm text-gray-500">{n === 0 ? 'No results' : `${n} result${n !== 1 ? 's' : ''}`}</span>
+          })()}
         </div>
 
         {/* 3 lanes, each with 3 TVs */}
