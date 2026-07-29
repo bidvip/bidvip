@@ -289,7 +289,7 @@ export default function Home() {
           <div className="relative flex flex-col gap-3 max-w-sm mx-auto lg:ml-auto lg:mr-0">
             <div className="flex items-center gap-2 mb-1 pl-1">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-xs font-bold tracking-widest text-gray-500 uppercase">Live Auction House Preview</span>
+              <span className="text-xs font-bold tracking-widest text-gray-500 uppercase">Élő Aukciós Ház Preview</span>
             </div>
             {PREVIEW_AUCTIONS.map((a, i) => (
               <AuctionCard key={a.id} a={a} idx={i} />
