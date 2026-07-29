@@ -303,15 +303,33 @@ export default function Dashboard() {
             ) : (
               <div className="flex flex-col gap-4">
                 <h2 className="text-xl font-bold mb-2">My Bids</h2>
-                {sajatLicitek.map((l: any) => (
-                  <div key={l.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold">{l.projektek?.nev}</p>
-                      <p className="text-gray-400 text-sm">My bid: <span className="text-violet-400 font-bold">€{l.osszeg}</span></p>
+                {sajatLicitek.map((l: any) => {
+                  const top = topBids[l.projekt_id]
+                  const winning = top != null && l.osszeg >= top
+                  const lezart = l.projektek?.statusz === 'lezart'
+                  return (
+                    <div key={l.id} className={`bg-gray-900 border rounded-2xl p-5 flex items-center justify-between gap-4 ${winning && !lezart ? 'border-green-800' : 'border-gray-800'}`}>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold">{l.projektek?.nev}</p>
+                          {lezart ? (
+                            winning
+                              ? <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-400 border border-amber-800">🏆 Won</span>
+                              : <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-500">Ended</span>
+                          ) : winning ? (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-800">🥇 Winning</span>
+                          ) : (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-900/40 text-red-400 border border-red-800">Outbid</span>
+                          )}
+                        </div>
+                        <p className="text-gray-400 text-sm">My bid: <span className="text-violet-400 font-bold">€{l.osszeg.toLocaleString()}</span>
+                          {!winning && top && <span className="text-gray-600 ml-1">· Top: €{top.toLocaleString()}</span>}
+                        </p>
+                      </div>
+                      <a href={`/project/${l.projekt_id}`} className="text-gray-400 hover:text-white text-sm transition shrink-0">View →</a>
                     </div>
-                    <a href={`/project/${l.projekt_id}`} className="text-gray-400 hover:text-white text-sm transition shrink-0">View →</a>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </>
