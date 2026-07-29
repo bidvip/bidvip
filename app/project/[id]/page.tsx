@@ -395,20 +395,23 @@ export default function ProjectDetail() {
           </div>
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <h2 className="font-semibold mb-4">What&apos;s included?</h2>
-            <div className="grid grid-cols-2 gap-3">
+            <h2 className="font-semibold text-sm uppercase tracking-widest text-gray-400 mb-4">Mit tartalmaz?</h2>
+            <div className="grid grid-cols-2 gap-2.5">
               {[
                 { mezo: 'van_domain', label: 'Domain / URL', ikon: '🌐' },
-                { mezo: 'van_kod', label: 'Source Code', ikon: '💻' },
-                { mezo: 'van_feliratkozok', label: 'Email List', ikon: '📧' },
-                { mezo: 'van_bevetel', label: 'Real Revenue', ikon: '💰' },
-              ].map(item => (
-                <div key={item.mezo} className={`flex items-center gap-2 p-3 rounded-xl border ${projekt[item.mezo as keyof Projekt] ? 'border-green-800 bg-green-900/20 text-green-400' : 'border-gray-700 text-gray-600'}`}>
-                  <span>{item.ikon}</span>
-                  <span className="text-sm">{item.label}</span>
-                  <span className="ml-auto">{projekt[item.mezo as keyof Projekt] ? '✓' : '✗'}</span>
-                </div>
-              ))}
+                { mezo: 'van_kod', label: 'Forráskód', ikon: '💻' },
+                { mezo: 'van_feliratkozok', label: 'Email lista', ikon: '📧' },
+                { mezo: 'van_bevetel', label: 'Valós bevétel', ikon: '💰' },
+              ].map(item => {
+                const van = projekt[item.mezo as keyof Projekt]
+                return (
+                  <div key={item.mezo} className={`flex items-center gap-2.5 p-3 rounded-xl border transition ${van ? 'border-green-800/60 bg-green-950/20 text-green-400' : 'border-gray-800 text-gray-600'}`}>
+                    <span className="text-base">{item.ikon}</span>
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className={`ml-auto text-sm font-bold ${van ? 'text-green-400' : 'text-gray-700'}`}>{van ? '✓' : '✗'}</span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
