@@ -272,29 +272,36 @@ export default function Dashboard() {
                   </a>
                 </div>
                 {sajatProjektek.map(p => (
-                  <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold">{p.nev}</p>
-                      <p className="text-gray-400 text-sm">{p.rovid_leiras}</p>
+                  <div key={p.id} className={`bg-gray-900 border rounded-2xl p-5 flex items-center justify-between gap-4 transition hover:border-gray-700 ${
+                    p.statusz === 'aktiv' ? 'border-green-900/40' :
+                    p.statusz === 'elutasitva' ? 'border-red-900/30' :
+                    'border-gray-800'
+                  }`}>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        {p.statusz === 'aktiv' && <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shrink-0" />}
+                        <p className="font-semibold truncate">{p.nev}</p>
+                      </div>
+                      <p className="text-gray-500 text-sm truncate">{p.rovid_leiras}</p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0 flex-wrap justify-end">
                       {p.statusz === 'aktiv' && projektLicitek[p.id] && projektLicitek[p.id].db > 0 && (
                         <div className="text-right">
-                          <p className="text-[10px] text-gray-500">Top bid</p>
+                          <p className="text-[10px] text-gray-500 uppercase tracking-widest">Top licit</p>
                           <p className="text-sm font-bold text-green-400">€{projektLicitek[p.id].top.toLocaleString()}</p>
-                          <p className="text-[10px] text-gray-600">{projektLicitek[p.id].db} bid{projektLicitek[p.id].db !== 1 ? 's' : ''}</p>
+                          <p className="text-[10px] text-gray-600">{projektLicitek[p.id].db} licit</p>
                         </div>
                       )}
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' :
-                        p.statusz === 'elutasitva' ? 'bg-red-900/40 text-red-400' :
-                        p.statusz === 'lezart' ? 'bg-gray-800 text-gray-500' :
-                        p.statusz === 'draft' ? 'bg-blue-900/40 text-blue-400' :
-                        'bg-yellow-900/40 text-yellow-400'
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
+                        p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400 border border-green-800/40' :
+                        p.statusz === 'elutasitva' ? 'bg-red-900/40 text-red-400 border border-red-800/40' :
+                        p.statusz === 'lezart' ? 'bg-gray-800 text-gray-500 border border-gray-700' :
+                        p.statusz === 'draft' ? 'bg-blue-900/40 text-blue-400 border border-blue-800/40' :
+                        'bg-amber-900/40 text-amber-400 border border-amber-800/40'
                       }`}>
-                        {p.statusz === 'aktiv' ? 'Live' : p.statusz === 'elutasitva' ? 'Rejected' : p.statusz === 'lezart' ? 'Closed' : p.statusz === 'draft' ? 'Draft' : 'Under Review'}
+                        {p.statusz === 'aktiv' ? '🟢 Élő' : p.statusz === 'elutasitva' ? 'Elutasítva' : p.statusz === 'lezart' ? 'Lezárt' : p.statusz === 'draft' ? 'Vázlat' : 'Felülvizsgálat'}
                       </span>
-                      {p.statusz !== 'draft' && <span className="text-violet-400 font-bold">€{p.kikialtasi_ar.toLocaleString()}</span>}
+                      {p.statusz !== 'draft' && <span className="text-violet-400 font-bold tabular-nums">€{p.kikialtasi_ar.toLocaleString()}</span>}
                       {p.statusz === 'elutasitva' && (
                         <button
                           onClick={() => ujraBekuldes(p.id)}
