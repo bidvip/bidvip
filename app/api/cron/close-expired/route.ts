@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic'
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'
 
 const SAVOK = [
-  { sav: 'fast',     perc: 1440, label: 'Fast'     },
-  { sav: 'standard', perc: 1440, label: 'Standard' },
-  { sav: 'premium',  perc: 1440, label: 'Premium'  },
+  { sav: 'fast',     perc: 3,  label: 'Fast'     },
+  { sav: 'standard', perc: 5,  label: 'Standard' },
+  { sav: 'premium',  perc: 20, label: 'Premium'  },
 ]
 
 export async function GET(req: NextRequest) {
