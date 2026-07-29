@@ -210,7 +210,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-2">
           <a href="/marketplace"
             className="text-gray-400 text-sm hover:text-white transition px-3 py-2 rounded-lg hover:bg-gray-800">
-            Auction House
+            Aukciós Ház
           </a>
           <a href="/tokens"
             className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-violet-950/60 border border-violet-800/40 text-violet-300 hover:bg-violet-900/60 transition font-semibold">
