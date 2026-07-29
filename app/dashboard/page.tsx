@@ -103,10 +103,22 @@ export default function Dashboard() {
       if (profil.szerepkor === 'vevo' || profil.szerepkor === 'mindketto') {
         const { data: licitek } = await supabase
           .from('licitek')
-          .select('*, projektek(nev, kikialtasi_ar, badge)')
+          .select('*, projektek(nev, kikialtasi_ar, badge, statusz)')
           .eq('user_id', u.id)
           .order('letrehozva', { ascending: false })
         setSajatLicitek(licitek || [])
+
+        const projektIdk = (licitek || []).map((l: any) => l.projekt_id)
+        if (projektIdk.length > 0) {
+          const { data: osszes } = await supabase
+            .from('licitek').select('projekt_id, osszeg').in('projekt_id', projektIdk)
+            .order('osszeg', { ascending: false })
+          const topMap: Record<string, number> = {}
+          for (const b of osszes || []) {
+            if (!topMap[b.projekt_id]) topMap[b.projekt_id] = b.osszeg
+          }
+          setTopBids(topMap)
+        }
       }
 
       const { data: tokenData } = await supabase
