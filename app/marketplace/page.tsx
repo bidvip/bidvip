@@ -144,7 +144,7 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
               </div>
               <div className="text-right">
                 <p className="text-[10px] text-gray-600 mb-0.5">Time left</p>
-                <p className={`text-lg font-mono font-bold ${countdown.done ? 'text-red-400' : 'text-white'}`}>
+                <p className={`text-lg font-mono font-bold ${countdown.done ? 'text-red-400' : isUrgent ? 'text-red-400 animate-pulse' : 'text-white'}`}>
                   {countdown.label}
                 </p>
               </div>
