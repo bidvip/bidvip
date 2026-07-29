@@ -235,11 +235,15 @@ export default function ProjectDetail() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-800">
+      <nav className="flex items-center justify-between px-8 py-5 border-b border-white/5 backdrop-blur-sm">
         <a href="/" className="text-2xl font-bold tracking-tight">
           Bid<span className="text-violet-500">Vip</span>
         </a>
-        <a href="/marketplace" className="text-gray-400 text-sm hover:text-white transition">← Aukciós Ház</a>
+        <div className="flex items-center gap-3 text-sm text-gray-500">
+          <a href="/marketplace" className="hover:text-white transition">Aukciós Ház</a>
+          <span>/</span>
+          <span className="text-gray-300 font-medium truncate max-w-[200px]">{projekt.nev}</span>
+        </div>
       </nav>
 
       {paymentStatus === 'siker' && (
