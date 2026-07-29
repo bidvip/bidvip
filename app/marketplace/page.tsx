@@ -211,6 +211,7 @@ function BidModal({ projekt, user, onZar }: {
   const legmagasabb = licitek[0]?.osszeg || projekt.kikialtasi_ar
   const increment = minIncrement(legmagasabb)
   const minimumLicit = legmagasabb + increment
+  const modalUrgent = countdown.diff > 0 && countdown.diff < 60000
 
   async function licitBeküldes(e: React.FormEvent) {
     e.preventDefault()
