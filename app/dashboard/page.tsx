@@ -255,7 +255,14 @@ export default function Dashboard() {
                       <p className="font-semibold">{p.nev}</p>
                       <p className="text-gray-400 text-sm">{p.rovid_leiras}</p>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0 flex-wrap justify-end">
+                      {p.statusz === 'aktiv' && projektLicitek[p.id] && projektLicitek[p.id].db > 0 && (
+                        <div className="text-right">
+                          <p className="text-[10px] text-gray-500">Top bid</p>
+                          <p className="text-sm font-bold text-green-400">€{projektLicitek[p.id].top.toLocaleString()}</p>
+                          <p className="text-[10px] text-gray-600">{projektLicitek[p.id].db} bid{projektLicitek[p.id].db !== 1 ? 's' : ''}</p>
+                        </div>
+                      )}
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' :
                         p.statusz === 'elutasitva' ? 'bg-red-900/40 text-red-400' :
@@ -265,7 +272,7 @@ export default function Dashboard() {
                       }`}>
                         {p.statusz === 'aktiv' ? 'Live' : p.statusz === 'elutasitva' ? 'Rejected' : p.statusz === 'lezart' ? 'Closed' : p.statusz === 'draft' ? 'Draft' : 'Under Review'}
                       </span>
-                      {p.statusz !== 'draft' && <span className="text-violet-400 font-bold">€{p.kikialtasi_ar}</span>}
+                      {p.statusz !== 'draft' && <span className="text-violet-400 font-bold">€{p.kikialtasi_ar.toLocaleString()}</span>}
                       {p.statusz === 'elutasitva' && (
                         <button
                           onClick={() => ujraBekuldes(p.id)}
