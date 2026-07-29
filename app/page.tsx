@@ -164,10 +164,12 @@ export default function Home() {
         backgroundImage: 'radial-gradient(circle, #F5F0E8 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
       {/* Warm ambient glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 left-1/3 w-[700px] h-[700px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 65%)' }} />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(234,179,8,0.04) 0%, transparent 65%)' }} />
+        <div className="absolute -top-40 left-1/3 w-[800px] h-[800px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.08) 0%, rgba(220,38,38,0.02) 40%, transparent 70%)' }} />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(234,179,8,0.05) 0%, transparent 65%)' }} />
+        <div className="absolute top-1/2 -left-40 w-[400px] h-[400px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.03) 0%, transparent 70%)' }} />
       </div>
 
       {/* ── NAV ── */}
