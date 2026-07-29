@@ -254,22 +254,15 @@ export default function TokensPage() {
         )}
 
         {/* Header */}
-        <div className="mb-10">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">Get Tokens</h1>
-              <p className="text-gray-500 mt-2 text-sm max-w-md">
-                Tokens power AI features on BidVip — analyse any project before you bid, or boost your listing to the top of the Aukciós Ház.
-              </p>
-            </div>
-            {egyenleg !== null && (
-              <div className="flex-shrink-0 flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-full px-4 py-2">
-                <span className="text-violet-400 text-sm">⚡</span>
-                <span className="text-white font-semibold text-sm">{egyenleg}</span>
-                <span className="text-gray-500 text-xs">left</span>
-              </div>
-            )}
-          </div>
+        <div className="mb-12 text-center">
+          <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest text-violet-400 uppercase bg-violet-950/50 border border-violet-800/40 px-4 py-2 rounded-full mb-6">
+            <span className="text-lg">⚡</span>
+            BidVip Tokenek
+          </span>
+          <h1 className="text-4xl font-black mb-3">Töltsd fel a fiókod</h1>
+          <p className="text-gray-400 max-w-md mx-auto leading-relaxed">
+            A tokenek AI funkciókat és versenylistázást tesznek lehetővé — elemezz projekteket licitálás előtt, vagy emeld ki a sajátodat az Aukciós Ház tetejére.
+          </p>
         </div>
 
         {/* Packages */}
