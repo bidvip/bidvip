@@ -72,16 +72,22 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
   const info = SAV_INFO[sav]
   const countdown = useCountdown(projekt?.lejarat ?? null)
   const isLive = !!projekt && !countdown.done
+  const isUrgent = isLive && countdown.diff < 60000
 
   return (
     <div
       onClick={() => projekt && onKattint(projekt)}
       style={{
-        boxShadow: isLive ? info.glow : 'none',
+        boxShadow: isUrgent
+          ? '0 0 24px #ef444466'
+          : isLive ? info.glow : 'none',
         cursor: projekt ? 'pointer' : 'default',
-        borderColor: isLive ? `${info.color}66` : '#1f2937',
+        borderColor: isUrgent
+          ? '#ef4444aa'
+          : isLive ? `${info.color}66` : '#1f2937',
+        animation: isUrgent ? 'urgentPulse 1s ease-in-out infinite' : 'none',
       }}
-      className="relative bg-gray-950 rounded-xl border flex flex-col overflow-hidden transition-all hover:scale-[1.02] group"
+      className="relative bg-gray-950 rounded-xl border flex flex-col overflow-hidden transition-colors hover:scale-[1.02] group"
     >
       {/* CRT scanline overlay */}
       {isLive && (
