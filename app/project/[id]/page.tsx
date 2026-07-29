@@ -6,9 +6,9 @@ import { useParams, useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 
 const badge_info: Record<string, { label: string; szin: string }> = {
-  idea: { label: '🌱 Concept', szin: 'bg-green-900/40 text-green-400 border-green-800' },
-  prototype: { label: '🛠️ Prototype', szin: 'bg-blue-900/40 text-blue-400 border-blue-800' },
-  proven: { label: '✅ Proven', szin: 'bg-violet-900/40 text-violet-400 border-violet-800' },
+  papir:       { label: '🌱 Concept',   szin: 'bg-green-900/40 text-green-400 border-green-800' },
+  prototipus:  { label: '🛠️ Prototype', szin: 'bg-blue-900/40 text-blue-400 border-blue-800' },
+  bizonyitott: { label: '✅ Proven',    szin: 'bg-violet-900/40 text-violet-400 border-violet-800' },
 }
 
 type Fajl = { nev: string; url: string; tipus: string }
