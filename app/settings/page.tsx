@@ -87,8 +87,8 @@ export default function Settings() {
 
       <div className="max-w-2xl mx-auto px-6 py-12 flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold">Account Settings</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage your profile, security and preferences.</p>
+          <h1 className="text-2xl font-bold">Fiókbeállítások</h1>
+          <p className="text-gray-500 text-sm mt-1">Profilod, biztonságod és preferenciáid kezelése.</p>
         </div>
 
         {/* Profile */}
