@@ -21,9 +21,9 @@ If valid: {"ok": true, "badge": "<level>"}
 If invalid (spam, gibberish, test data, too vague, or not a real business idea): {"ok": false, "reason": "brief explanation"}
 
 Badge levels (pick one):
-- "papir" — idea only, no code, no users, no revenue
-- "prototipus" — something tangible exists: code, mockup, domain, or early users, but no real revenue
-- "bizonyitott" — real revenue or proven measurable traction`
+- "idea" — idea only, no code, no users, no revenue
+- "prototype" — something tangible exists: code, mockup, domain, or early users, but no real revenue
+- "proven" — real revenue or proven measurable traction`
 
   const kepTartalom = kepUrlok.slice(0, 3).map((url: string) => ({
     type: 'image' as const,
