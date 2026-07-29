@@ -396,14 +396,24 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ── */}
-      <div className="relative z-10 px-6 py-10" style={{ borderTop: '1px solid #2E2028' }}>
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-black text-lg" style={{ color: '#F5F0E8', letterSpacing: '-0.02em' }}>
-            Bid<span style={{ color: '#DC2626' }}>Vip</span>
+      <div className="relative z-10 px-6 py-12" style={{ background: 'linear-gradient(180deg, transparent, rgba(220,38,38,0.03))', borderTop: '1px solid transparent', backgroundClip: 'padding-box', position: 'relative' }}>
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(220,38,38,0.4), rgba(234,179,8,0.3), transparent)' }} />
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <span className="font-black text-xl" style={{ color: '#F5F0E8', letterSpacing: '-0.03em' }}>
+            Bid<span style={{ color: '#DC2626', textShadow: '0 0 20px rgba(220,38,38,0.4)' }}>Vip</span>
           </span>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs" style={{ color: '#5A4F4A' }}>
-            {['Stripe Payments', 'AI-Powered', 'Escrow Protected', 'Anonymous Bidding', 'Real-time Updates'].map(t => (
-              <span key={t}>{t}</span>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {[
+              { label: 'Stripe Payments', icon: '💳' },
+              { label: 'AI-Powered', icon: '🤖' },
+              { label: 'Escrow Protected', icon: '🔒' },
+              { label: 'Anonymous Bidding', icon: '🎭' },
+            ].map(t => (
+              <span key={t.label} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                style={{ color: '#5A4F4A', border: '1px solid #2E2028', background: 'rgba(245,240,232,0.02)' }}>
+                <span style={{ fontSize: '0.7rem' }}>{t.icon}</span>
+                {t.label}
+              </span>
             ))}
           </div>
           <p className="text-xs" style={{ color: '#5A4F4A' }}>© 2026 BidVip</p>
