@@ -358,7 +358,7 @@ function SubmitInner() {
         rovid_leiras: form.rovid_leiras,
         reszletes_leiras: form.reszletes_leiras,
         kategoria: form.kategoria,
-        badge: 'papir',
+        badge: 'idea',
         kikialtasi_ar: 0,
         lejarat: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         statusz: 'draft',
