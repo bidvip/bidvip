@@ -434,8 +434,24 @@ export default function Marketplace() {
   }, [])
 
   if (loading) return (
-    <main className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <div className="text-gray-400 text-sm">Loading...</div>
+    <main className="min-h-screen bg-gray-950 text-white">
+      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-800/60">
+        <span className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></span>
+      </nav>
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="h-10 w-48 bg-gray-800 rounded-xl mb-2 animate-pulse" />
+        <div className="h-4 w-64 bg-gray-800/50 rounded-lg mb-10 animate-pulse" />
+        {['fast','standard','premium'].map(s => (
+          <div key={s} className="mb-10">
+            <div className="h-3 w-40 bg-gray-800/60 rounded mb-4 animate-pulse" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[0,1,2].map(i => (
+                <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-xl h-52 animate-pulse" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </main>
   )
 
