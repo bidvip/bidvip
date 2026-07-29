@@ -629,16 +629,19 @@ function SubmitInner() {
 
   if (felfuggesztve) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
-        <div className="text-5xl mb-4">🔒</div>
-        <h2 className="text-2xl font-bold mb-2">Account suspended</h2>
-        <p className="text-gray-400 mb-2 text-center">Your account has been temporarily suspended pending review.</p>
-        <div className="bg-red-900/20 border border-red-800 rounded-xl px-5 py-3 mb-6 text-sm text-red-300 max-w-md text-center">
-          <strong>Reason:</strong> {felfuggesztve}
+      <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6 text-center">
+        <div className="text-6xl mb-5">🚫</div>
+        <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-red-400 uppercase bg-red-950/40 border border-red-800/40 px-4 py-2 rounded-full mb-6">
+          Fiók felfüggesztve
+        </span>
+        <h2 className="text-2xl font-black mb-2">A fiókod felfüggesztésre került</h2>
+        <p className="text-gray-400 mb-4 max-w-sm">Az admin felülvizsgálja a beküldésedet és e-mailben értesítünk az eredményről.</p>
+        <div className="bg-red-950/30 border border-red-800/50 rounded-xl px-5 py-3 mb-8 text-sm text-red-300 max-w-md">
+          <strong>Ok:</strong> {felfuggesztve}
         </div>
-        <p className="text-gray-500 text-sm text-center max-w-sm">An admin will review your submission and you will be notified by email of the outcome.</p>
-        <button onClick={() => router.push('/dashboard')} className="mt-6 border border-gray-700 text-gray-400 hover:text-white transition px-6 py-3 rounded-full">
-          Back to Dashboard
+        <button onClick={() => router.push('/dashboard')}
+          className="border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition px-6 py-3 rounded-xl font-semibold text-sm">
+          ← Dashboard
         </button>
       </main>
     )
