@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, outbidEmail } from '@/lib/email'
 import { getNapiAnonNev } from '@/lib/anon-nev'
 
 export const dynamic = 'force-dynamic'
