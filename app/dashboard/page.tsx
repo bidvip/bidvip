@@ -355,14 +355,20 @@ export default function Dashboard() {
           <div className={szerepkor === 'mindketto' ? 'mt-12 pt-12 border-t border-gray-800' : ''}>
           {szerepkor === 'mindketto' && <h2 className="text-2xl font-bold mb-6">My Bids</h2>}
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                <p className="text-gray-400 text-sm mb-1">Bids Placed</p>
-                <p className="text-3xl font-bold">{sajatLicitek.length}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
+              <div className="bg-gray-900 border border-gray-800 hover:border-gray-700 transition rounded-2xl p-5">
+                <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">Leadott licitek</p>
+                <p className="text-3xl font-black tabular-nums">{sajatLicitek.length}</p>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                <p className="text-gray-400 text-sm mb-1">Böngéssz az Aukciós Házban</p>
-                <a href="/marketplace" className="text-violet-400 font-semibold hover:text-violet-300 transition">Aukciós Ház megnyitása →</a>
+              <div className="bg-gray-900 border border-green-900/40 hover:border-green-800/60 transition rounded-2xl p-5">
+                <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">Nyerő licitek</p>
+                <p className="text-3xl font-black text-green-400 tabular-nums">
+                  {sajatLicitek.filter((l: any) => topBids[l.projekt_id] != null && l.osszeg >= topBids[l.projekt_id] && l.projektek?.statusz !== 'lezart').length}
+                </p>
+              </div>
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+                <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">Aukciós Ház</p>
+                <a href="/marketplace" className="text-violet-400 font-semibold hover:text-violet-300 transition text-sm">Megnyitás →</a>
               </div>
             </div>
 
