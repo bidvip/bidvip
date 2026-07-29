@@ -7,12 +7,12 @@ import { useRouter } from 'next/navigation'
 const ADMIN_EMAIL = 'info.webbloki@gmail.com'
 
 const badge_info: Record<string, string> = {
-  idea: '🌱 Concept',
-  prototype: '🛠️ Prototype',
-  proven: '✅ Proven',
+  papir:       '🌱 Concept',
+  prototipus:  '🛠️ Prototype',
+  bizonyitott: '✅ Proven',
 }
 
-const GYANUS_AR: Record<string, number> = { idea: 5000, prototype: 20000, proven: 100000 }
+const GYANUS_AR: Record<string, number> = { papir: 5000, prototipus: 20000, bizonyitott: 100000 }
 
 type Projekt = {
   id: string
