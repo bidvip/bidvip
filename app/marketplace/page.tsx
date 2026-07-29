@@ -131,6 +131,11 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
               </div>
             </div>
 
+            {bidderCount != null && bidderCount > 0 && (
+              <p className="mt-2 text-[10px] text-gray-500 text-center">
+                👥 {bidderCount} {bidderCount === 1 ? 'bidder' : 'bidders'}
+              </p>
+            )}
             <div className="mt-2 text-center text-[11px] font-semibold py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition"
               style={{ background: info.color, color: '#000' }}>
               Click to Bid →
