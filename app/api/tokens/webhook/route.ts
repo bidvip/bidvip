@@ -35,14 +35,15 @@ export async function POST(req: NextRequest) {
         .from('projektek')
         .update({ statusz: 'sold', vevo_email })
         .eq('id', projekt_id)
-        .select('nev, user_email, reszletes_leiras, fajlok')
+        .select('nev, user_id, reszletes_leiras, fajlok')
         .single()
 
       if (projekt) {
         // Email seller
-        if (projekt.user_email) {
+        const { data: { user: sellerUser } } = await supabase.auth.admin.getUserById(projekt.user_id)
+        if (sellerUser?.email) {
           const { subject, html } = purchaseSellerEmail(projekt.nev, osszeg, vevo_email || '')
-          await sendEmail(projekt.user_email, subject, html)
+          await sendEmail(sellerUser.email, subject, html)
         }
         // Email buyer with full details
         if (vevo_email) {
