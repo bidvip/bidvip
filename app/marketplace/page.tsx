@@ -452,7 +452,7 @@ export default function Marketplace() {
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-1">
             <span className="text-3xl">📺</span>
-            <h1 className="text-4xl font-black tracking-tight">Auction House</h1>
+            <h1 className="text-4xl font-black tracking-tight">Aukciós Ház</h1>
           </div>
           <p className="text-gray-500 text-sm tracking-widest uppercase font-mono">
             <span className="text-green-500 animate-pulse">●</span> 9 live channels · tune in · place your bid
