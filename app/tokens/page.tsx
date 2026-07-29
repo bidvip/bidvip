@@ -223,24 +223,33 @@ export default function TokensPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-gray-800">
+      <nav className="flex items-center justify-between px-8 py-4 border-b border-white/5 backdrop-blur-sm">
         <a href="/" className="text-2xl font-bold tracking-tight">Bid<span className="text-violet-500">Vip</span></a>
-        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">← Dashboard</a>
+        <div className="flex items-center gap-3">
+          {egyenleg !== null && (
+            <div className="flex items-center gap-1.5 text-sm bg-violet-950/50 border border-violet-800/40 rounded-full px-3 py-1.5">
+              <span className="text-violet-400">⚡</span>
+              <span className="font-bold text-violet-300 tabular-nums">{egyenleg}</span>
+              <span className="text-gray-500 text-xs">tokens</span>
+            </div>
+          )}
+          <a href="/dashboard" className="text-gray-500 text-sm hover:text-white transition">← Dashboard</a>
+        </div>
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-14">
 
         {status === 'success' && (
-          <div className="bg-green-900/30 border border-green-800 rounded-2xl px-6 py-4 text-center text-green-400 font-semibold mb-8">
-            🎉 Payment successful! Your tokens have been added.
+          <div className="bg-green-950/40 border border-green-800/60 rounded-2xl px-6 py-4 text-center text-green-400 font-semibold mb-8">
+            🎉 Sikeres fizetés! A tokenek hozzáadva a fiókodhoz.
             {new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('redirect') && (
-              <p className="text-green-300 text-sm font-normal mt-1">Redirecting you back...</p>
+              <p className="text-green-300 text-sm font-normal mt-1">Visszairányítás...</p>
             )}
           </div>
         )}
         {status === 'cancelled' && (
-          <div className="bg-red-900/30 border border-red-800 rounded-2xl px-6 py-4 text-center text-red-400 mb-8">
-            Payment cancelled. No charge was made.
+          <div className="bg-red-950/30 border border-red-800/40 rounded-2xl px-6 py-4 text-center text-red-400 mb-8">
+            Fizetés megszakítva. Semmilyen összeg nem lett terhelve.
           </div>
         )}
 
