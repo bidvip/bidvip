@@ -73,6 +73,7 @@ export default function Dashboard() {
   const [tokenEgyenleg, setTokenEgyenleg] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [ujrakuldes, setUjrakuldes] = useState<string | null>(null)
+  const [topBids, setTopBids] = useState<Record<string, number>>({})
   const router = useRouter()
   const supabase = createClient()
 
