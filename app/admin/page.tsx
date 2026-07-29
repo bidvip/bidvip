@@ -366,9 +366,10 @@ export default function AdminPage() {
                   <p className="text-gray-400">No completed transactions yet.</p>
                 </div>
               ) : eladt.map(p => {
+                const sellerEmail = userEmailek[p.user_id]
                 const max_ar = p.ai_ertekeles ? Math.round(p.ai_ertekeles * 1.5) : (GYANUS_AR[p.badge] ?? 5000)
                 const magas_ar = p.kikialtasi_ar > max_ar
-                const par = p.user_email && p.vevo_email ? [p.user_email, p.vevo_email].sort().join('|') : null
+                const par = sellerEmail && p.vevo_email ? [sellerEmail, p.vevo_email].sort().join('|') : null
                 const ismetlo_par = par && parok[par] > 1
                 const gyanus = magas_ar || ismetlo_par
                 return (
