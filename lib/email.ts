@@ -7,6 +7,20 @@ export async function sendEmail(to: string, subject: string, html: string) {
   await resend.emails.send({ from: FROM, to, subject, html })
 }
 
+export function outbidEmail(projektNev: string, ujOsszeg: number, linkUrl: string) {
+  return {
+    subject: `You've been outbid on: ${projektNev}`,
+    html: `
+      <p>Hi,</p>
+      <p>Someone placed a higher bid of <strong>€${ujOsszeg.toLocaleString()}</strong> on <strong>${projektNev}</strong>.</p>
+      <p style="margin:20px 0;">
+        <a href="${linkUrl}" style="background:#7c3aed;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Place a new bid →</a>
+      </p>
+      <p>— BidVip Team</p>
+    `,
+  }
+}
+
 export function bidEmail(projektNev: string, osszeg: number) {
   return {
     subject: `New bid on your project: ${projektNev}`,
