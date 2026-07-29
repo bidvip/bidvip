@@ -369,12 +369,16 @@ export default function Marketplace() {
     const aktivIdk = (aktivProjektek || []).map(p => p.id)
     if (aktivIdk.length > 0) {
       const { data: licitData } = await supabase
-        .from('licitek').select('projekt_id, osszeg').in('projekt_id', aktivIdk)
+        .from('licitek').select('projekt_id, osszeg, user_id').in('projekt_id', aktivIdk)
       const topMap: Record<string, number> = {}
+      const bidderMap: Record<string, Set<string>> = {}
       for (const l of licitData || []) {
         if (!topMap[l.projekt_id] || l.osszeg > topMap[l.projekt_id]) topMap[l.projekt_id] = l.osszeg
+        if (!bidderMap[l.projekt_id]) bidderMap[l.projekt_id] = new Set()
+        bidderMap[l.projekt_id].add(l.user_id)
       }
       setTopLicitek(topMap)
+      setLicitekSzama(Object.fromEntries(Object.entries(bidderMap).map(([k, v]) => [k, v.size])))
     }
 
     const { data: sorban } = await supabase
