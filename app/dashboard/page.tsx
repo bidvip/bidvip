@@ -251,7 +251,7 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2 flex-wrap">
           <h1 className="text-3xl font-black" style={{ letterSpacing: '-0.03em' }}>
