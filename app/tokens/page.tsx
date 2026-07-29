@@ -146,7 +146,13 @@ export default function TokensPage() {
 
   return (
     <main className="min-h-screen" style={{ background: '#100C0F', color: '#F5F0E8' }}>
-      <nav className="flex items-center justify-between px-8 py-4" style={{ borderBottom: '1px solid #2E2028' }}>
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(234,179,8,0.05) 0%, transparent 65%)' }} />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.04) 0%, transparent 70%)' }} />
+      </div>
+      <nav className="relative z-10 flex items-center justify-between px-8 py-4" style={{ borderBottom: '1px solid #2E2028', backdropFilter: 'blur(8px)' }}>
         <a href="/" className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Bid<span style={{ color: '#DC2626' }}>Vip</span></a>
         <div className="flex items-center gap-3">
           {egyenleg !== null && (
