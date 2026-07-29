@@ -153,7 +153,7 @@ const howItWorks = [
   {
     tokens: '1–10',
     action: 'Listing Priority Boost',
-    desc: 'Move your project up the Auction House queue. The more tokens you spend, the higher you rank.',
+    desc: 'Move your project up the Aukciós Ház queue. The more tokens you spend, the higher you rank.',
   },
   {
     tokens: '0',
@@ -250,7 +250,7 @@ export default function TokensPage() {
             <div>
               <h1 className="text-3xl font-bold">Get Tokens</h1>
               <p className="text-gray-500 mt-2 text-sm max-w-md">
-                Tokens power AI features on BidVip — analyse any project before you bid, or boost your listing to the top of the Auction House.
+                Tokens power AI features on BidVip — analyse any project before you bid, or boost your listing to the top of the Aukciós Ház.
               </p>
             </div>
             {egyenleg !== null && (
@@ -370,7 +370,7 @@ export default function TokensPage() {
                 </div>
               </div>
               <h3 className="font-bold text-white mb-1.5">Listing Priority Boost</h3>
-              <p className="text-gray-500 text-xs leading-relaxed">Spend tokens to move your project up the Auction House queue. The more you spend, the higher your ranking — outbid competitors for top placement.</p>
+              <p className="text-gray-500 text-xs leading-relaxed">Spend tokens to move your project up the Aukciós Ház queue. The more you spend, the higher your ranking — outbid competitors for top placement.</p>
             </div>
 
             {/* AI Overview — free */}
