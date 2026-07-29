@@ -344,6 +344,27 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="relative z-10 border-t border-white/5 px-6 py-20">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-widest text-gray-600 uppercase mb-3">FAQ</p>
+            <h2 className="text-3xl font-bold">Frequently asked questions</h2>
+          </div>
+          <div className="flex flex-col gap-3">
+            {[
+              { q: 'How does the auction work?', a: 'Each project gets a time slot — Fast (3 min), Standard (5 min), or Premium (20 min). The highest bidder at the end wins. You can also use proxy bidding to auto-bid up to your maximum.' },
+              { q: 'What is escrow protection?', a: 'The winning buyer pays through Stripe. BidVip holds the funds. The seller delivers all files and credentials — only then is the payment released. Neither party can lose money.' },
+              { q: 'Do I need tokens to bid?', a: "No. Bidding is free. Tokens are only used for AI features (project analysis for €1 each) and seller priority boosting to move up the queue." },
+              { q: 'How is my identity protected?', a: 'All buyers and sellers appear under randomly generated anonymous names. Real identities are only exchanged after a successful sale, as part of the handover.' },
+              { q: "What's the platform fee?", a: 'BidVip takes 10% of the final sale price, paid by the seller. There are no listing fees or buyer fees — just pay if you sell.' },
+            ].map((faq, i) => (
+              <FaqItem key={i} q={faq.q} a={faq.a} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Trust footer strip */}
       <div className="relative z-10 border-t border-white/5 py-8 px-6">
         <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-6 md:gap-10">
