@@ -60,6 +60,7 @@ export default function AdminPage() {
   const [feliratkozokSzam, setFeliratkozokSzam] = useState<number>(0)
   const [launchAllapot, setLaunchAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
   const [launchEredmeny, setLaunchEredmeny] = useState<{ sent: number; failed: number } | null>(null)
+  const [userEmailek, setUserEmailek] = useState<Record<string, string>>({})
   const router = useRouter()
   const supabase = createClient()
 
