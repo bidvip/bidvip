@@ -209,7 +209,7 @@ export default function Home() {
           <div className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest text-violet-400 uppercase bg-violet-950/50 border border-violet-800/40 px-4 py-2 rounded-full mb-8">
               <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
-              Startup Project Marketplace
+              Aukciós Ház · Startup Projects
             </span>
 
             <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.08] tracking-tight mb-6">
