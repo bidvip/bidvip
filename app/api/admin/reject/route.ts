@@ -16,14 +16,15 @@ export async function POST(req: NextRequest) {
     .from('projektek')
     .update({ statusz: 'elutasitva' })
     .eq('id', projekt_id)
-    .select('nev, user_email')
+    .select('nev, user_id')
     .single()
 
   if (error || !projekt) return NextResponse.json({ ok: false }, { status: 500 })
 
-  if (projekt.user_email) {
+  const { data: { user: seller } } = await supabase.auth.admin.getUserById(projekt.user_id)
+  if (seller?.email) {
     const { subject, html } = rejectionEmail(projekt.nev)
-    await sendEmail(projekt.user_email, subject, html)
+    await sendEmail(seller.email, subject, html)
   }
 
   return NextResponse.json({ ok: true })
