@@ -308,18 +308,23 @@ export default function Home() {
 
       {/* ── STATS STRIP ── */}
       <ScrollReveal>
-        <div className="relative z-10 py-8 px-6" style={{ borderTop: '1px solid #2E2028', borderBottom: '1px solid #2E2028' }}>
+        <div className="relative z-10 py-10 px-6" style={{ borderTop: '1px solid #2E2028', borderBottom: '1px solid #2E2028', background: 'linear-gradient(90deg, rgba(220,38,38,0.03) 0%, transparent 50%, rgba(234,179,8,0.03) 100%)' }}>
           <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-10 md:gap-20">
             {[
-              { val: '3 min', label: 'Fastest auction' },
-              { val: '10%',   label: 'Platform fee' },
-              { val: '100%',  label: 'Escrow protected' },
-              { val: 'AI',    label: 'Powered validation' },
-            ].map(s => (
-              <div key={s.label} className="text-center">
-                <p className="text-2xl font-black tabular-nums" style={{ color: '#EAB308', letterSpacing: '-0.02em' }}>{s.val}</p>
-                <p className="text-xs uppercase tracking-widest mt-1" style={{ color: '#5A4F4A' }}>{s.label}</p>
-              </div>
+              { val: '3 min', label: 'Fastest auction', icon: '⚡' },
+              { val: '10%',   label: 'Platform fee',    icon: '💎' },
+              { val: '100%',  label: 'Escrow protected', icon: '🔒' },
+              { val: 'AI',    label: 'Powered validation', icon: '🤖' },
+            ].map((s, i) => (
+              <ScrollReveal key={s.label} delay={i * 80}>
+                <div className="text-center group cursor-default">
+                  <div className="text-lg mb-1" style={{ filter: 'grayscale(0.3)' }}>{s.icon}</div>
+                  <p className="text-2xl font-black tabular-nums transition-all duration-300 group-hover:scale-110"
+                    style={{ color: '#EAB308', letterSpacing: '-0.02em', display: 'inline-block',
+                      textShadow: '0 0 20px rgba(234,179,8,0.3)' }}>{s.val}</p>
+                  <p className="text-xs uppercase tracking-widest mt-1" style={{ color: '#5A4F4A' }}>{s.label}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -338,22 +343,21 @@ export default function Home() {
           </ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: '#2E2028', borderRadius: '8px', overflow: 'hidden' }}>
             {[
-              { step: 'Step 1', title: 'AI Development',  desc: 'Our AI helps you structure, validate, and document your project with expert feedback before it hits the market.' },
-              { step: 'Step 2', title: 'Aukciós Ház',     desc: 'Time-limited bidding in our Auction House — Fast (3 min), Standard (5 min), or Premium (20 min) channels.' },
-              { step: 'Step 3', title: 'Secure Handover', desc: 'Buyer pays via Stripe. We hold funds in escrow. Seller gets paid only after delivering all files and credentials.' },
+              { step: '01', title: 'AI Development',  desc: 'Our AI helps you structure, validate, and document your project with expert feedback before it hits the market.', icon: '🤖', accent: '#DC2626' },
+              { step: '02', title: 'Aukciós Ház',     desc: 'Time-limited bidding in our Auction House — Fast (3 min), Standard (5 min), or Premium (20 min) channels.', icon: '🏛️', accent: '#EAB308' },
+              { step: '03', title: 'Secure Handover', desc: 'Buyer pays via Stripe. We hold funds in escrow. Seller gets paid only after delivering all files and credentials.', icon: '🔒', accent: '#16A34A' },
             ].map((s, i) => (
-              <ScrollReveal key={i} delay={i * 100}>
-                <div className="group p-7 h-full transition-colors duration-200"
-                  style={{ background: '#1A1217' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#221820')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#1A1217')}>
-                  <p className="text-xs font-black tracking-widest uppercase mb-4" style={{ color: '#DC2626' }}>{s.step}</p>
-                  <h3 className="font-black text-lg mb-3 transition-colors duration-200"
-                    style={{ color: '#F5F0E8', letterSpacing: '-0.02em' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#EAB308')}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#F5F0E8')}>
-                    {s.title}
-                  </h3>
+              <ScrollReveal key={i} delay={i * 120}>
+                <div className="p-7 h-full relative overflow-hidden"
+                  style={{ background: '#1A1217', transition: 'background 0.3s' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#221820' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#1A1217' }}>
+                  <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: `linear-gradient(90deg, ${s.accent}66, transparent)` }} />
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className="text-2xl">{s.icon}</span>
+                    <span className="text-xs font-black tracking-widest uppercase" style={{ color: s.accent }}>{s.step}</span>
+                  </div>
+                  <h3 className="font-black text-lg mb-3" style={{ color: '#F5F0E8', letterSpacing: '-0.02em' }}>{s.title}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: '#9C8B7A' }}>{s.desc}</p>
                 </div>
               </ScrollReveal>
