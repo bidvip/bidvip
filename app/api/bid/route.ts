@@ -85,10 +85,8 @@ export async function POST(req: NextRequest) {
         }])
       } else {
         // Notify they were outbid
-        await sendEmail(prevUser.email,
-          `You've been outbid on: ${projekt.nev}`,
-          `<p>Hi,</p><p>Someone placed a higher bid of <strong>€${valodiBid.toLocaleString()}</strong> on <strong>${projekt.nev}</strong>.</p><p><a href="${process.env.NEXT_PUBLIC_BASE_URL}/project/${projekt_id}">Place a new bid →</a></p><p>— BidVip Team</p>`
-        ).catch(() => {})
+        const { subject, html } = outbidEmail(projekt.nev, valodiBid, `${process.env.NEXT_PUBLIC_BASE_URL}/project/${projekt_id}`)
+        await sendEmail(prevUser.email, subject, html).catch(() => {})
       }
     }
   }
