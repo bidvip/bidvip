@@ -166,7 +166,7 @@ export default function Home() {
         </span>
         <div className="hidden md:flex items-center gap-6">
           {[
-            { label: 'Aukciós Ház', href: '/auth' },
+            { label: 'Aukciós Ház', href: '/aukciosHaz' },
             { label: 'Hogyan működik?', href: '#how' },
             { label: 'FAQ', href: '#faq' },
           ].map(link => (
@@ -525,9 +525,9 @@ export default function Home() {
               <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#5A4F4A' }}>Platform</p>
               <div className="flex flex-col gap-2.5">
                 {[
-                  { label: 'Aukciós Ház', href: '/auth' },
+                  { label: 'Aukciós Ház', href: '/aukciosHaz' },
                   { label: 'Projekt beküldése', href: '/submit' },
-                  { label: 'Bejelentkezés', href: '/auth' },
+                  { label: 'Bejelentkezés', href: '/aukciosHaz' },
                 ].map(l => (
                   <a key={l.label} href={l.href} className="text-xs transition-colors"
                     style={{ color: '#9C8B7A' }}

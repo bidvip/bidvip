@@ -544,7 +544,69 @@ export default function Marketplace() {
         )}
       </div>
 
-      {kivalasztott && <BidModal projekt={kivalasztott} user={user} onZar={() => setKivalasztott(null)} />}
+      {kivalasztott && user && <BidModal projekt={kivalasztott} user={user} onZar={() => setKivalasztott(null)} />}
+      {kivalasztott && !user && <RegisterModal projekt={kivalasztott} onZar={() => setKivalasztott(null)} />}
     </main>
+  )
+}
+
+function RegisterModal({ projekt, onZar }: { projekt: Projekt; onZar: () => void }) {
+  const info = SAV_INFO[projekt.sav as keyof typeof SAV_INFO]
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={e => { if (e.target === e.currentTarget) onZar() }}>
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onZar} />
+      <div className="relative w-full max-w-sm rounded-2xl overflow-hidden"
+        style={{ background: '#1A1217', border: `1px solid ${info?.color}44`, boxShadow: `0 0 60px ${info?.color}22, 0 25px 50px rgba(0,0,0,0.5)` }}>
+
+        {/* Top accent bar */}
+        <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${info?.color}, transparent)` }} />
+
+        <div className="p-8 text-center">
+          {/* Icon */}
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-5"
+            style={{ background: `${info?.color}12`, border: `1px solid ${info?.color}25` }}>
+            🏛️
+          </div>
+
+          {/* Project name */}
+          <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: info?.color }}>
+            {info?.label} · LIVE
+          </p>
+          <h3 className="font-black text-xl mb-1" style={{ color: '#F5F0E8', letterSpacing: '-0.02em' }}>
+            {projekt.nev}
+          </h3>
+          <p className="text-xs mb-6" style={{ color: '#5A4F4A' }}>
+            Licitáláshoz regisztráció szükséges
+          </p>
+
+          {/* CTA buttons */}
+          <div className="flex flex-col gap-3">
+            <a href="/auth?tab=register"
+              className="block w-full py-3.5 rounded-xl font-black text-sm text-center transition-all"
+              style={{ background: `linear-gradient(135deg, ${info?.color}, ${info?.color}cc)`, color: info?.color === '#EAB308' ? '#100C0F' : '#fff', boxShadow: `0 4px 20px ${info?.color}44` }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
+              onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
+              Regisztrálok →
+            </a>
+            <a href="/auth"
+              className="block w-full py-3 rounded-xl font-bold text-sm text-center transition-all"
+              style={{ border: '1px solid #2E2028', color: '#9C8B7A' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#5A4F4A'; e.currentTarget.style.color = '#F5F0E8' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
+              Van már fiókom
+            </a>
+          </div>
+
+          <button onClick={onZar}
+            className="mt-5 text-xs transition-colors"
+            style={{ color: '#3D3035' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#9C8B7A')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#3D3035')}>
+            Folytatom böngészésként
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
