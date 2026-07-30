@@ -11,7 +11,6 @@ const PREVIEW_AUCTIONS = [
   { id: 3, nev: 'GreenTrack',   kat: 'Healthtech',      bid: 320,  badge: 'Concept',   sav: 'FAST',     color: '#EAB308', time: 54  },
 ]
 
-/* ── Scroll-reveal ── */
 function ScrollReveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -27,30 +26,26 @@ function ScrollReveal({ children, delay = 0, className = '' }: { children: React
   )
 }
 
-/* ── FAQ accordion with smooth height transition ── */
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
   const [height, setHeight] = useState(0)
   useEffect(() => { if (bodyRef.current) setHeight(open ? bodyRef.current.scrollHeight : 0) }, [open])
   return (
-    <div style={{ border: '1px solid #2E2028', background: open ? '#1A1217' : 'transparent', borderRadius: '8px', overflow: 'hidden', transition: 'background 0.2s' }}>
+    <div style={{ border: '1px solid #2E2028', background: open ? '#1A1217' : 'transparent', borderRadius: '10px', overflow: 'hidden', transition: 'background 0.2s' }}>
       <button onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left"
-        style={{ color: '#F5F0E8' }}
-        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,240,232,0.02)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+        className="w-full flex items-center justify-between px-6 py-5 text-left"
+        style={{ color: '#F5F0E8' }}>
         <span className="font-semibold text-sm pr-4">{q}</span>
-        <span style={{ color: '#DC2626', fontSize: '1.1rem', fontWeight: 900, transition: 'transform 0.3s ease', transform: open ? 'rotate(45deg)' : 'none', display: 'inline-block', flexShrink: 0 }}>+</span>
+        <span style={{ color: '#DC2626', fontSize: '1.2rem', fontWeight: 900, transition: 'transform 0.3s ease', transform: open ? 'rotate(45deg)' : 'none', display: 'inline-block', flexShrink: 0 }}>+</span>
       </button>
       <div ref={bodyRef} style={{ maxHeight: `${height}px`, overflow: 'hidden', transition: 'max-height 0.35s ease' }}>
-        <div className="px-5 pb-4 pt-1 text-sm leading-relaxed" style={{ color: '#9C8B7A', borderTop: '1px solid #2E2028' }}>{a}</div>
+        <div className="px-6 pb-5 pt-1 text-sm leading-relaxed" style={{ color: '#9C8B7A', borderTop: '1px solid #2E2028' }}>{a}</div>
       </div>
     </div>
   )
 }
 
-/* ── Live auction card with micro-interactions ── */
 function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number }) {
   const [bid, setBid] = useState(a.bid)
   const [time, setTime] = useState(a.time)
@@ -79,8 +74,8 @@ function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number })
       style={{
         background: hover ? '#221820' : '#1A1217',
         border: `1px solid ${flash ? a.color : hover ? `${a.color}66` : `${a.color}33`}`,
-        boxShadow: flash ? `0 0 32px ${a.color}44, 0 8px 32px rgba(0,0,0,0.4)` : hover ? `0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px ${a.color}22` : '0 2px 8px rgba(0,0,0,0.2)',
-        borderRadius: '8px', overflow: 'hidden',
+        boxShadow: flash ? `0 0 32px ${a.color}44, 0 8px 32px rgba(0,0,0,0.4)` : hover ? `0 8px 24px rgba(0,0,0,0.3)` : '0 2px 8px rgba(0,0,0,0.2)',
+        borderRadius: '10px', overflow: 'hidden',
         transform: hover ? 'translateY(-3px)' : 'translateY(0)',
         transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
       }}>
@@ -88,7 +83,7 @@ function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number })
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: a.color }} />
           <span className="text-[10px] font-black tracking-widest font-mono" style={{ color: a.color }}>{a.sav}</span>
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 8px rgba(220,38,38,0.5)' }}>LIVE</span>
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: '#DC2626', color: '#fff' }}>LIVE</span>
         </div>
         <span className="text-[9px] font-mono" style={{ color: '#5A4F4A' }}>#{idx + 1}</span>
       </div>
@@ -102,19 +97,14 @@ function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number })
           <div>
             <p className="text-[9px] uppercase tracking-widest mb-0.5" style={{ color: '#5A4F4A' }}>Current bid</p>
             <p className="text-base font-black tabular-nums font-mono"
-              style={{
-                color: flash ? '#EAB308' : a.color,
-                transform: bidJump ? 'scale(1.15)' : 'scale(1)',
-                transition: 'color 0.3s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                display: 'inline-block',
-              }}>
+              style={{ color: flash ? '#EAB308' : a.color, transform: bidJump ? 'scale(1.15)' : 'scale(1)', transition: 'color 0.3s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)', display: 'inline-block' }}>
               €{bid.toLocaleString()}
             </p>
           </div>
           <div className="text-right">
             <p className="text-[9px] uppercase tracking-widest mb-0.5" style={{ color: '#5A4F4A' }}>Time left</p>
             <p className="text-base font-black font-mono tabular-nums"
-              style={{ color: urgent ? '#DC2626' : '#F5F0E8', animation: urgent ? 'urgentPulse 1s infinite' : 'none' }}>
+              style={{ color: urgent ? '#DC2626' : '#F5F0E8' }}>
               {label}
             </p>
           </div>
@@ -124,7 +114,6 @@ function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number })
   )
 }
 
-/* ── Main page ── */
 export default function Home() {
   const [email, setEmail]       = useState('')
   const [allapot, setAllapot]   = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
@@ -157,208 +146,233 @@ export default function Home() {
   }
 
   return (
-    <main style={{ background: '#100C0F', color: '#F5F0E8' }} className="min-h-screen overflow-hidden">
+    <main style={{ background: '#0D0A0C', color: '#F5F0E8' }} className="min-h-screen overflow-hidden">
 
-      {/* Subtle background texture */}
-      <div className="fixed inset-0 pointer-events-none" style={{ opacity: 0.018,
-        backgroundImage: 'radial-gradient(circle, #F5F0E8 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
-      {/* Warm ambient glow */}
+      {/* ── BACKGROUND ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 left-1/3 w-[800px] h-[800px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.08) 0%, rgba(220,38,38,0.02) 40%, transparent 70%)' }} />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(234,179,8,0.05) 0%, transparent 65%)' }} />
-        <div className="absolute top-1/2 -left-40 w-[400px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.03) 0%, transparent 70%)' }} />
+        {/* Mesh gradient aurora */}
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(220,38,38,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 50%, rgba(234,179,8,0.05) 0%, transparent 50%), radial-gradient(ellipse 40% 60% at 10% 80%, rgba(220,38,38,0.04) 0%, transparent 60%)'
+        }} />
+        {/* Dot grid */}
+        <div className="absolute inset-0" style={{ opacity: 0.015, backgroundImage: 'radial-gradient(circle, #F5F0E8 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
       </div>
 
       {/* ── NAV ── */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-5"
-        style={{ borderBottom: '1px solid #2E2028', backdropFilter: 'blur(8px)' }}>
-        <span className="text-2xl font-black tracking-tight" style={{ letterSpacing: '-0.03em' }}>
+      <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-4"
+        style={{ borderBottom: '1px solid rgba(46,32,40,0.6)', backdropFilter: 'blur(12px)', background: 'rgba(13,10,12,0.8)' }}>
+        <span className="text-xl font-black tracking-tight" style={{ letterSpacing: '-0.03em' }}>
           Bid<span style={{ color: '#DC2626' }}>Vip</span>
         </span>
-        <div className="flex items-center gap-3">
-          <a href="/marketplace" className="text-sm transition px-4 py-2 rounded-lg"
-            style={{ color: '#9C8B7A' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>
-            Aukciós Ház
+        <div className="hidden md:flex items-center gap-6">
+          {[
+            { label: 'Aukciós Ház', href: '/marketplace' },
+            { label: 'Hogyan működik?', href: '#how' },
+            { label: 'FAQ', href: '#faq' },
+          ].map(link => (
+            <a key={link.label} href={link.href}
+              className="text-sm transition-colors"
+              style={{ color: '#9C8B7A' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>
+              {link.label}
+            </a>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <a href="/marketplace" className="hidden sm:block text-sm px-4 py-2 rounded-lg transition-colors"
+            style={{ color: '#9C8B7A', border: '1px solid #2E2028' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#F5F0E8'; e.currentTarget.style.borderColor = '#5A4F4A' }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#9C8B7A'; e.currentTarget.style.borderColor = '#2E2028' }}>
+            Böngészés
           </a>
-          <a href="/auth" className="text-sm font-bold px-5 py-2.5 rounded-lg transition"
-            style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.25)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
-            {launched ? 'Get Started →' : 'Bejelentkezés'}
+          <a href="/auth" className="text-sm font-bold px-5 py-2.5 rounded-lg transition-all"
+            style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.3)' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#EF4444'; e.currentTarget.style.boxShadow = '0 0 30px rgba(220,38,38,0.5)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#DC2626'; e.currentTarget.style.boxShadow = '0 0 20px rgba(220,38,38,0.3)' }}>
+            {launched ? 'Kezdés →' : 'Bejelentkezés'}
           </a>
         </div>
       </nav>
 
       {/* ── HERO ── */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-12 lg:pt-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 pt-20 lg:pt-28 pb-16 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-        {/* Left: copy + form */}
-        <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: 'all 0.7s ease' }}>
-
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 text-xs font-black tracking-widest uppercase mb-8"
-            style={{ color: '#EAB308', background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)', padding: '6px 14px', borderRadius: '4px' }}>
+        {/* Left */}
+        <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(28px)', transition: 'all 0.8s ease' }}>
+          <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase mb-8"
+            style={{ color: '#EAB308', background: 'rgba(234,179,8,0.07)', border: '1px solid rgba(234,179,8,0.18)', padding: '6px 14px', borderRadius: '6px' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#EAB308' }} />
             Startup · Aukciós Ház
           </div>
 
-          {/* Headline */}
-          <h1 style={{ fontSize: 'clamp(2.8rem, 6vw, 4.5rem)', fontWeight: 900, lineHeight: 0.93, letterSpacing: '-0.04em', marginBottom: '1.5rem' }}>
+          <h1 style={{ fontSize: 'clamp(3rem, 6.5vw, 5rem)', fontWeight: 900, lineHeight: 0.92, letterSpacing: '-0.04em', marginBottom: '1.75rem' }}>
             <span className="block" style={{ color: '#F5F0E8' }}>Buy &amp; sell</span>
-            <span className="block" style={{ color: '#DC2626' }}>validated</span>
+            <span className="block" style={{ color: '#DC2626', textShadow: '0 0 60px rgba(220,38,38,0.3)' }}>validated</span>
             <span className="block" style={{ color: '#F5F0E8' }}>startups.</span>
           </h1>
 
-          <p className="mb-10 leading-relaxed" style={{ color: '#9C8B7A', fontSize: '1.05rem', maxWidth: '440px' }}>
-            Develop your idea with AI, then auction it to serious buyers — transparently, securely, with full escrow protection.
+          <p className="mb-10 leading-relaxed text-base" style={{ color: '#9C8B7A', maxWidth: '420px' }}>
+            Fejleszd az ötletedet AI-jal, majd árverezd el komoly vevőknek — átláthatóan, biztonságosan, teljes letéti védelemmel.
           </p>
 
-          {/* Waitlist form */}
           {allapot === 'siker' ? (
-            <div style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.25)', borderRadius: '8px', padding: '28px 32px' }} className="text-center max-w-md">
-              <p className="font-black text-lg mb-1" style={{ color: '#DC2626' }}>You&apos;re on the list.</p>
-              <p className="text-sm mb-5" style={{ color: '#9C8B7A' }}>We&apos;ll notify you the moment we launch.</p>
+            <div style={{ background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: '12px', padding: '28px 32px' }} className="max-w-md">
+              <p className="font-black text-lg mb-1" style={{ color: '#DC2626' }}>Felkerültél a listára!</p>
+              <p className="text-sm mb-5" style={{ color: '#9C8B7A' }}>Értesítünk amint elindulunk.</p>
               <a href="/marketplace" className="inline-block text-sm font-bold px-5 py-2.5 rounded-lg"
                 style={{ background: '#DC2626', color: '#fff' }}>
-                Browse live auctions →
+                Élő aukciók böngészése →
               </a>
             </div>
           ) : (
-            <form onSubmit={subscribe} className="flex flex-col sm:flex-row gap-2 max-w-md">
+            <form onSubmit={subscribe} className="flex flex-col sm:flex-row gap-2.5 max-w-md">
               <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="Your email address"
-                className="flex-1 text-sm focus:outline-none transition"
-                style={{ background: '#1A1217', border: '1px solid #2E2028', borderRadius: '8px',
-                  padding: '12px 18px', color: '#F5F0E8' }}
+                placeholder="E-mail cím"
+                className="flex-1 text-sm focus:outline-none transition-all"
+                style={{ background: '#1A1217', border: '1px solid #2E2028', borderRadius: '10px', padding: '13px 18px', color: '#F5F0E8' }}
                 onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
                 onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
               <button type="submit" disabled={allapot === 'loading'}
-                className="text-sm font-black whitespace-nowrap transition"
-                style={{ background: '#DC2626', color: '#fff', borderRadius: '8px', padding: '12px 22px',
-                  boxShadow: '0 0 24px rgba(220,38,38,0.3)', opacity: allapot === 'loading' ? 0.6 : 1 }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
-                {allapot === 'loading' ? 'Sending...' : 'Join Waitlist'}
+                className="text-sm font-black whitespace-nowrap transition-all"
+                style={{ background: 'linear-gradient(135deg, #DC2626, #EF4444)', color: '#fff', borderRadius: '10px', padding: '13px 24px', boxShadow: '0 4px 20px rgba(220,38,38,0.35)', opacity: allapot === 'loading' ? 0.6 : 1 }}
+                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 30px rgba(220,38,38,0.55)')}
+                onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(220,38,38,0.35)')}>
+                {allapot === 'loading' ? 'Küldés...' : 'Csatlakozás →'}
               </button>
             </form>
           )}
 
-          {allapot === 'hiba' && <p className="text-xs mt-2" style={{ color: '#EF4444' }}>Something went wrong. Please try again.</p>}
+          {allapot === 'hiba' && <p className="text-xs mt-2" style={{ color: '#EF4444' }}>Hiba történt. Kérjük próbáld újra.</p>}
 
-          <div className="flex flex-wrap items-center gap-4 mt-4">
-            <p className="text-xs" style={{ color: '#5A4F4A' }}>No spam. Unsubscribe anytime.</p>
-            <a href="/marketplace" className="text-xs transition"
-              style={{ color: '#5A4F4A' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#EAB308')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>
-              Browse without signing up →
-            </a>
-          </div>
-
-          {/* Progress bar */}
+          {/* Waitlist progress */}
           <div className="mt-8 max-w-md">
-            <div className="flex justify-between text-xs mb-2">
+            <div className="flex justify-between text-xs mb-2.5">
               <span style={{ color: '#9C8B7A' }}>
                 {waitlist !== null
-                  ? <><span className="font-black tabular-nums" style={{ color: '#EAB308' }}>{display.toLocaleString()}</span> early signups</>
-                  : <span style={{ color: '#5A4F4A' }}>Loading...</span>}
+                  ? <><span className="font-black tabular-nums" style={{ color: '#EAB308' }}>{display.toLocaleString()}</span> korai feliratkozó</>
+                  : <span style={{ color: '#5A4F4A' }}>Betöltés...</span>}
               </span>
-              <span style={{ color: '#5A4F4A' }}>{MAX_WAITLIST.toLocaleString()} goal</span>
+              <span style={{ color: '#5A4F4A' }}>{MAX_WAITLIST.toLocaleString()} a cél</span>
             </div>
             <div className="w-full h-0.5 rounded-full overflow-hidden" style={{ background: '#2E2028' }}>
               <div className="h-full rounded-full transition-all duration-1000 ease-out"
-                style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #EAB308, #F59E0B)', boxShadow: '0 0 10px rgba(234,179,8,0.5)' }} />
+                style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #EAB308, #F59E0B)', boxShadow: '0 0 12px rgba(234,179,8,0.6)' }} />
             </div>
             <p className="text-xs mt-2" style={{ color: '#5A4F4A' }}>
               {launched
-                ? <span style={{ color: '#EAB308', fontWeight: 700 }}>Platform is live</span>
-                : waitlist !== null ? `${(MAX_WAITLIST - waitlist).toLocaleString()} spots left until full launch` : ''}
+                ? <span style={{ color: '#EAB308', fontWeight: 700 }}>Platform élő</span>
+                : waitlist !== null ? `Még ${(MAX_WAITLIST - waitlist).toLocaleString()} hely a teljes elindulásig` : ''}
             </p>
+          </div>
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap gap-3 mt-8">
+            {[
+              { icon: '🔒', label: 'Letéti védelem' },
+              { icon: '💳', label: 'Stripe fizetés' },
+              { icon: '🎭', label: 'Anonim licitálás' },
+            ].map(b => (
+              <span key={b.label} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                style={{ color: '#5A4F4A', border: '1px solid #2E2028' }}>
+                <span>{b.icon}</span>{b.label}
+              </span>
+            ))}
           </div>
         </div>
 
-        {/* Right: live auction preview */}
-        <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(32px)', transition: 'all 0.7s 0.25s ease' }}>
+        {/* Right: Live auction preview */}
+        <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(32px)', transition: 'all 0.8s 0.2s ease' }}>
           <div className="relative max-w-sm mx-auto lg:ml-auto lg:mr-0">
-            {/* ambient glow behind cards */}
-            <div className="absolute inset-6 blur-3xl rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.08), transparent)' }} />
-            <div className="relative flex flex-col gap-2.5">
-              <div className="flex items-center gap-2 mb-1 pl-0.5">
+            <div className="absolute inset-0 blur-3xl rounded-full pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.1), transparent)' }} />
+            <div className="relative p-4 rounded-2xl" style={{ background: 'rgba(26,18,23,0.8)', border: '1px solid #2E2028', backdropFilter: 'blur(12px)' }}>
+              <div className="flex items-center gap-2 mb-3 px-1">
                 <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#DC2626' }} />
                 <span className="text-[10px] font-black tracking-widest uppercase" style={{ color: '#5A4F4A' }}>Élő Aukciós Ház Preview</span>
               </div>
-              {PREVIEW_AUCTIONS.map((a, i) => <AuctionCard key={a.id} a={a} idx={i} />)}
-              <p className="text-center text-xs mt-1" style={{ color: '#5A4F4A' }}>
-                Real projects · real bids · real money ·{' '}
-                <a href="/marketplace" className="transition"
-                  style={{ color: '#EAB308' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#FBBF24')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#EAB308')}>
-                  View all →
-                </a>
+              <div className="flex flex-col gap-2.5">
+                {PREVIEW_AUCTIONS.map((a, i) => <AuctionCard key={a.id} a={a} idx={i} />)}
+              </div>
+              <p className="text-center text-xs mt-3" style={{ color: '#5A4F4A' }}>
+                Valós projektek · valós ajánlatok ·{' '}
+                <a href="/marketplace" style={{ color: '#EAB308' }}>Összes megtekintése →</a>
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── STATS STRIP ── */}
+      {/* ── STATS / TRUST STRIP ── */}
       <ScrollReveal>
-        <div className="relative z-10 py-10 px-6" style={{ borderTop: '1px solid #2E2028', borderBottom: '1px solid #2E2028', background: 'linear-gradient(90deg, rgba(220,38,38,0.03) 0%, transparent 50%, rgba(234,179,8,0.03) 100%)' }}>
-          <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-10 md:gap-20">
-            {[
-              { val: '3 min', label: 'Fastest auction', icon: '⚡' },
-              { val: '10%',   label: 'Platform fee',    icon: '💎' },
-              { val: '100%',  label: 'Escrow protected', icon: '🔒' },
-              { val: 'AI',    label: 'Powered validation', icon: '🤖' },
-            ].map((s, i) => (
-              <ScrollReveal key={s.label} delay={i * 80}>
-                <div className="text-center group cursor-default">
-                  <div className="text-lg mb-1" style={{ filter: 'grayscale(0.3)' }}>{s.icon}</div>
-                  <p className="text-2xl font-black tabular-nums transition-all duration-300 group-hover:scale-110"
-                    style={{ color: '#EAB308', letterSpacing: '-0.02em', display: 'inline-block',
-                      textShadow: '0 0 20px rgba(234,179,8,0.3)' }}>{s.val}</p>
-                  <p className="text-xs uppercase tracking-widest mt-1" style={{ color: '#5A4F4A' }}>{s.label}</p>
-                </div>
-              </ScrollReveal>
-            ))}
+        <div className="relative z-10 py-12 px-6" style={{ borderTop: '1px solid #1F1519', borderBottom: '1px solid #1F1519', background: 'rgba(26,18,23,0.5)' }}>
+          <div className="max-w-4xl mx-auto">
+            <p className="text-center text-xs font-bold tracking-widest uppercase mb-8" style={{ color: '#5A4F4A' }}>Miért bíznak bennünk</p>
+            <div className="flex flex-wrap items-center justify-center gap-10 md:gap-20">
+              {[
+                { val: '3 perc', label: 'Leggyorsabb aukció', icon: '⚡' },
+                { val: '10%',    label: 'Platform díj',       icon: '💎' },
+                { val: '100%',   label: 'Letéti védelem',     icon: '🔒' },
+                { val: 'AI',     label: 'Validáció',          icon: '🤖' },
+              ].map((s, i) => (
+                <ScrollReveal key={s.label} delay={i * 80}>
+                  <div className="text-center group cursor-default">
+                    <div className="text-xl mb-2">{s.icon}</div>
+                    <p className="text-2xl font-black tabular-nums transition-all duration-300 group-hover:scale-110"
+                      style={{ color: '#EAB308', letterSpacing: '-0.02em', display: 'inline-block', textShadow: '0 0 20px rgba(234,179,8,0.3)' }}>{s.val}</p>
+                    <p className="text-xs uppercase tracking-widest mt-1" style={{ color: '#5A4F4A' }}>{s.label}</p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
         </div>
       </ScrollReveal>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="relative z-10 px-6 py-20">
+      <section id="how" className="relative z-10 px-6 py-24">
         <div className="max-w-5xl mx-auto">
           <ScrollReveal>
-            <div className="mb-14">
-              <p className="text-xs font-black tracking-widest uppercase mb-3" style={{ color: '#DC2626' }}>The process</p>
-              <h2 className="font-black" style={{ fontSize: '2rem', letterSpacing: '-0.03em', color: '#F5F0E8' }}>
-                How BidVip works
+            <div className="text-center mb-16">
+              <p className="text-xs font-black tracking-widest uppercase mb-3" style={{ color: '#DC2626' }}>A folyamat</p>
+              <h2 className="font-black" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', letterSpacing: '-0.03em', color: '#F5F0E8' }}>
+                Hogyan működik a BidVip?
               </h2>
+              <p className="mt-4 text-sm max-w-md mx-auto" style={{ color: '#9C8B7A' }}>
+                Három egyszerű lépés az ötlettől az eladásig
+              </p>
             </div>
           </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: '#2E2028', borderRadius: '8px', overflow: 'hidden' }}>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { step: '01', title: 'AI Development',  desc: 'Our AI helps you structure, validate, and document your project with expert feedback before it hits the market.', icon: '🤖', accent: '#DC2626' },
-              { step: '02', title: 'Aukciós Ház',     desc: 'Time-limited bidding in our Auction House — Fast (3 min), Standard (5 min), or Premium (20 min) channels.', icon: '🏛️', accent: '#EAB308' },
-              { step: '03', title: 'Secure Handover', desc: 'Buyer pays via Stripe. We hold funds in escrow. Seller gets paid only after delivering all files and credentials.', icon: '🔒', accent: '#16A34A' },
+              {
+                step: '01', icon: '🤖', accent: '#DC2626',
+                title: 'AI Fejlesztés',
+                desc: 'Az AI segít strukturálni, validálni és dokumentálni a projektedet — szakértői visszajelzéssel mielőtt piacra kerülne.',
+              },
+              {
+                step: '02', icon: '🏛️', accent: '#EAB308',
+                title: 'Aukciós Ház',
+                desc: 'Időkorlátozott licitálás — Gyors (3 perc), Standard (5 perc) vagy Prémium (20 perc) csatornán.',
+              },
+              {
+                step: '03', icon: '🔒', accent: '#16A34A',
+                title: 'Biztonságos átadás',
+                desc: 'A vevő Stripe-on fizet. A pénzt letétben tartjuk. Az eladó csak az összes fájl és hozzáférés átadása után kap fizetést.',
+              },
             ].map((s, i) => (
               <ScrollReveal key={i} delay={i * 120}>
-                <div className="p-7 h-full relative overflow-hidden"
-                  style={{ background: '#1A1217', transition: 'background 0.3s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#221820' }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#1A1217' }}>
-                  <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: `linear-gradient(90deg, ${s.accent}66, transparent)` }} />
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="text-2xl">{s.icon}</span>
-                    <span className="text-xs font-black tracking-widest uppercase" style={{ color: s.accent }}>{s.step}</span>
+                <div className="relative p-7 rounded-2xl h-full overflow-hidden group"
+                  style={{ background: '#130F12', border: '1px solid #2E2028', transition: 'border-color 0.3s, transform 0.3s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = s.accent + '55'; e.currentTarget.style.transform = 'translateY(-4px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.transform = 'translateY(0)' }}>
+                  <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `linear-gradient(90deg, ${s.accent}88, transparent)` }} />
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5"
+                    style={{ background: `${s.accent}12`, border: `1px solid ${s.accent}25` }}>
+                    {s.icon}
                   </div>
+                  <span className="text-xs font-black tracking-widest uppercase mb-3 block" style={{ color: s.accent }}>{s.step}</span>
                   <h3 className="font-black text-lg mb-3" style={{ color: '#F5F0E8', letterSpacing: '-0.02em' }}>{s.title}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: '#9C8B7A' }}>{s.desc}</p>
                 </div>
@@ -368,24 +382,93 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── FEATURES BENTO ── */}
+      <section className="relative z-10 px-6 pb-24">
+        <div className="max-w-5xl mx-auto">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <p className="text-xs font-black tracking-widest uppercase mb-3" style={{ color: '#DC2626' }}>Funkciók</p>
+              <h2 className="font-black" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', letterSpacing: '-0.03em', color: '#F5F0E8' }}>
+                Mindent ami kell
+              </h2>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { icon: '⚡', title: 'Valós idejű licitálás', desc: 'Live ajánlatok frissítése, visszaszámlálás és automatikus nyertes meghatározás.', accent: '#EAB308' },
+              { icon: '🤖', title: 'AI Validáció', desc: 'Automatikus projekt elemzés, piaci pozicionálás és értékelési javaslat.', accent: '#DC2626' },
+              { icon: '🔒', title: 'Letéti védelem', desc: 'A pénz biztonságban van amíg az átadás meg nem történik — mindkét félnek.', accent: '#16A34A' },
+              { icon: '🎭', title: 'Anonim licitálás', desc: 'Valódi identitás csak sikeres eladás után kerül megosztásra.', accent: '#8B5CF6' },
+              { icon: '💳', title: 'Stripe fizetés', desc: 'Biztonságos, azonnali fizetési feldolgozás minden főbb kártyával.', accent: '#3B82F6' },
+              { icon: '📊', title: 'Részletes statisztikák', desc: 'Projekt nézettség, licit előzmények és piaci trendek elemzése.', accent: '#F97316' },
+            ].map((f, i) => (
+              <ScrollReveal key={i} delay={i * 60}>
+                <div className="p-6 rounded-2xl group cursor-default"
+                  style={{ background: '#130F12', border: '1px solid #2E2028', transition: 'all 0.3s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = f.accent + '44'; e.currentTarget.style.background = '#180E15' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.background = '#130F12' }}>
+                  <div className="text-2xl mb-4">{f.icon}</div>
+                  <h3 className="font-bold text-sm mb-2" style={{ color: '#F5F0E8' }}>{f.title}</h3>
+                  <p className="text-xs leading-relaxed" style={{ color: '#9C8B7A' }}>{f.desc}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIAL ── */}
+      <ScrollReveal>
+        <section className="relative z-10 px-6 pb-24">
+          <div className="max-w-3xl mx-auto">
+            <div className="relative p-10 rounded-2xl overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #1A0E1A 0%, #1A1228 100%)', border: '1px solid rgba(139,92,246,0.2)' }}>
+              <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 0%, rgba(139,92,246,0.08) 0%, transparent 70%)' }} />
+              <div className="relative">
+                <div className="text-4xl mb-6 opacity-30" style={{ color: '#8B5CF6', fontFamily: 'Georgia, serif' }}>&ldquo;</div>
+                <p className="text-lg font-medium leading-relaxed mb-8" style={{ color: '#F5F0E8' }}>
+                  &ldquo;A BidVip teljesen megváltoztatta ahogy startup ötleteket értékesítünk. Az AI validáció és a letéti védelem miatt nem volt kockázat — az első héten 4800 eurót kaptam az ötletemért.&rdquo;
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black"
+                    style={{ background: 'linear-gradient(135deg, #8B5CF6, #DC2626)', color: '#fff' }}>
+                    MK
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm" style={{ color: '#F5F0E8' }}>Molnár Krisztián</p>
+                    <p className="text-xs" style={{ color: '#9C8B7A' }}>Szoftver fejlesztő, Budapest</p>
+                  </div>
+                  <div className="ml-auto flex gap-0.5">
+                    {Array(5).fill(0).map((_, i) => (
+                      <span key={i} style={{ color: '#EAB308', fontSize: '0.9rem' }}>★</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
+
       {/* ── FAQ ── */}
-      <section className="relative z-10 px-6 py-20" style={{ borderTop: '1px solid #2E2028' }}>
-        <div className="max-w-2xl mx-auto">
+      <section id="faq" className="relative z-10 px-6 pb-24" style={{ borderTop: '1px solid #1F1519' }}>
+        <div className="max-w-2xl mx-auto pt-24">
           <ScrollReveal>
             <div className="mb-12">
               <p className="text-xs font-black tracking-widest uppercase mb-3" style={{ color: '#DC2626' }}>FAQ</p>
-              <h2 className="font-black" style={{ fontSize: '2rem', letterSpacing: '-0.03em', color: '#F5F0E8' }}>
-                Frequently asked questions
+              <h2 className="font-black" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', letterSpacing: '-0.03em', color: '#F5F0E8' }}>
+                Gyakran ismételt kérdések
               </h2>
             </div>
           </ScrollReveal>
           <div className="flex flex-col gap-2">
             {[
-              { q: 'How does the auction work?', a: 'Each project gets a time slot — Fast (3 min), Standard (5 min), or Premium (20 min). The highest bidder at the end wins. You can also use proxy bidding to auto-bid up to your maximum.' },
-              { q: 'What is escrow protection?', a: 'The winning buyer pays through Stripe. BidVip holds the funds. The seller delivers all files and credentials — only then is the payment released. Neither party can lose money.' },
-              { q: 'Do I need tokens to bid?', a: 'No. Bidding is free. Tokens are only used for AI features (project analysis for €1 each) and seller priority boosting to move up the queue.' },
-              { q: 'How is my identity protected?', a: 'All buyers and sellers appear under randomly generated anonymous names. Real identities are only exchanged after a successful sale, as part of the handover.' },
-              { q: "What's the platform fee?", a: 'BidVip takes 10% of the final sale price, paid by the seller. There are no listing fees or buyer fees — just pay if you sell.' },
+              { q: 'Hogyan működik az aukció?', a: 'Minden projekt egy időkeretet kap — Gyors (3 perc), Standard (5 perc) vagy Prémium (20 perc). Az aukció végén a legmagasabb ajánlatot tevő nyer. Automatikus licitálással is beállíthatod a maximumodat.' },
+              { q: 'Mi az a letéti védelem?', a: 'A nyertes vevő Stripe-on keresztül fizet. A BidVip tárolja a pénzt. Az eladó átadja az összes fájlt és hozzáférést — csak ezután kerül kifizetésre. Egyik fél sem veszíthet.' },
+              { q: 'Kell tokeneket venni a licitáláshoz?', a: 'Nem. A licitálás ingyenes. A tokenek csak AI funkciókhoz (projekt elemzés, 1 €/db) és eladói sorrend-előnyhöz szükségesek.' },
+              { q: 'Hogyan védett az identitásom?', a: 'Minden vevő és eladó véletlenszerűen generált névvel jelenik meg. Valódi személyazonosság csak sikeres eladás után, az átadás részeként kerül megosztásra.' },
+              { q: 'Mennyi a platform díj?', a: 'A BidVip a végső eladási ár 10%-át veszi el, amit az eladó fizet. Nincs listázási vagy vevői díj — csak sikeres eladásnál fizetsz.' },
             ].map((faq, i) => (
               <ScrollReveal key={i} delay={i * 50}>
                 <FaqItem q={faq.q} a={faq.a} />
@@ -395,30 +478,101 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <div className="relative z-10 px-6 py-12" style={{ background: 'linear-gradient(180deg, transparent, rgba(220,38,38,0.03))', borderTop: '1px solid transparent', backgroundClip: 'padding-box', position: 'relative' }}>
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(220,38,38,0.4), rgba(234,179,8,0.3), transparent)' }} />
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <span className="font-black text-xl" style={{ color: '#F5F0E8', letterSpacing: '-0.03em' }}>
-            Bid<span style={{ color: '#DC2626', textShadow: '0 0 20px rgba(220,38,38,0.4)' }}>Vip</span>
-          </span>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {[
-              { label: 'Stripe Payments', icon: '💳' },
-              { label: 'AI-Powered', icon: '🤖' },
-              { label: 'Escrow Protected', icon: '🔒' },
-              { label: 'Anonymous Bidding', icon: '🎭' },
-            ].map(t => (
-              <span key={t.label} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-                style={{ color: '#5A4F4A', border: '1px solid #2E2028', background: 'rgba(245,240,232,0.02)' }}>
-                <span style={{ fontSize: '0.7rem' }}>{t.icon}</span>
-                {t.label}
-              </span>
-            ))}
+      {/* ── BOTTOM CTA ── */}
+      <ScrollReveal>
+        <section className="relative z-10 px-6 pb-24">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="relative p-14 rounded-2xl overflow-hidden"
+              style={{ background: '#130F12', border: '1px solid #2E2028' }}>
+              <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(220,38,38,0.08) 0%, transparent 70%)' }} />
+              <div className="relative">
+                <p className="text-xs font-black tracking-widest uppercase mb-4" style={{ color: '#DC2626' }}>Készen állsz?</p>
+                <h2 className="font-black mb-4" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', letterSpacing: '-0.03em', color: '#F5F0E8' }}>
+                  Kezdd el ma az első<br />aukciót
+                </h2>
+                <p className="text-sm mb-8" style={{ color: '#9C8B7A', maxWidth: '380px', margin: '0 auto 2rem' }}>
+                  Csatlakozz a várólistához és értesítünk az induláskor. Nincs spam, bármikor leiratkozhatsz.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <a href="/marketplace"
+                    className="text-sm font-black px-8 py-3.5 rounded-xl transition-all"
+                    style={{ background: 'linear-gradient(135deg, #DC2626, #EF4444)', color: '#fff', boxShadow: '0 4px 20px rgba(220,38,38,0.4)' }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 30px rgba(220,38,38,0.6)')}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(220,38,38,0.4)')}>
+                    Aukciók böngészése →
+                  </a>
+                  <a href="/auth"
+                    className="text-sm font-bold px-8 py-3.5 rounded-xl transition-all"
+                    style={{ border: '1px solid #2E2028', color: '#9C8B7A' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#5A4F4A'; e.currentTarget.style.color = '#F5F0E8' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
+                    Regisztráció
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-xs" style={{ color: '#5A4F4A' }}>© 2026 BidVip</p>
+        </section>
+      </ScrollReveal>
+
+      {/* ── FOOTER ── */}
+      <footer className="relative z-10 px-6 lg:px-10 py-12" style={{ borderTop: '1px solid #1F1519' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+            <div>
+              <span className="font-black text-xl block mb-3" style={{ letterSpacing: '-0.03em' }}>
+                Bid<span style={{ color: '#DC2626' }}>Vip</span>
+              </span>
+              <p className="text-xs leading-relaxed" style={{ color: '#5A4F4A', maxWidth: '220px' }}>
+                A startup ötlet aukciós piactér — AI validációval és letéti védelemmel.
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#5A4F4A' }}>Platform</p>
+              <div className="flex flex-col gap-2.5">
+                {[
+                  { label: 'Aukciós Ház', href: '/marketplace' },
+                  { label: 'Projekt beküldése', href: '/submit' },
+                  { label: 'Bejelentkezés', href: '/auth' },
+                ].map(l => (
+                  <a key={l.label} href={l.href} className="text-xs transition-colors"
+                    style={{ color: '#9C8B7A' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
+                    onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#5A4F4A' }}>Értesítés induláskor</p>
+              <form onSubmit={subscribe} className="flex gap-2">
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="E-mail cím"
+                  className="flex-1 text-xs focus:outline-none"
+                  style={{ background: '#1A1217', border: '1px solid #2E2028', borderRadius: '8px', padding: '10px 14px', color: '#F5F0E8' }}
+                  onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+                <button type="submit"
+                  className="text-xs font-bold px-4 py-2 rounded-lg transition-all"
+                  style={{ background: '#DC2626', color: '#fff' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+                  Küldés
+                </button>
+              </form>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8" style={{ borderTop: '1px solid #1F1519' }}>
+            <p className="text-xs" style={{ color: '#3D3035' }}>© 2026 BidVip. Minden jog fenntartva.</p>
+            <div className="flex items-center gap-4">
+              {['Stripe', 'Supabase', 'Vercel'].map(t => (
+                <span key={t} className="text-xs" style={{ color: '#3D3035' }}>{t}</span>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </footer>
     </main>
   )
 }
