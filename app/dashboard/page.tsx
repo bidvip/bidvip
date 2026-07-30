@@ -236,7 +236,7 @@ export default function Dashboard() {
           Bid<span style={{ color: '#DC2626' }}>Vip</span>
         </a>
         <div className="flex items-center gap-2">
-          <a href="/marketplace" className="text-sm px-3 py-2 rounded-lg transition" style={{ color: '#9C8B7A' }}
+          <a href="/aukciosHaz" className="text-sm px-3 py-2 rounded-lg transition" style={{ color: '#9C8B7A' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#F5F0E8'; e.currentTarget.style.background = '#1A1217' }}
             onMouseLeave={e => { e.currentTarget.style.color = '#9C8B7A'; e.currentTarget.style.background = 'transparent' }}>
             Aukciós Ház
@@ -392,7 +392,7 @@ export default function Dashboard() {
               <div className="rounded-lg p-5 flex flex-col justify-between"
                 style={{ background: '#1A1217', border: '1px solid #2E2028' }}>
                 <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#5A4F4A' }}>Aukciós Ház</p>
-                <a href="/marketplace" className="text-sm font-bold transition" style={{ color: '#EAB308' }}
+                <a href="/aukciosHaz" className="text-sm font-bold transition" style={{ color: '#EAB308' }}
                   onMouseEnter={e => (e.currentTarget.style.color = '#FBBF24')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#EAB308')}>
                   Megnyitás →
@@ -405,7 +405,7 @@ export default function Dashboard() {
                 style={{ background: '#1A1217', border: '1px dashed #3E3040' }}>
                 <h2 className="text-xl font-black mb-2" style={{ letterSpacing: '-0.02em' }}>No bids yet</h2>
                 <p className="text-sm mb-6" style={{ color: '#9C8B7A' }}>Böngéssz az Aukciós Házban és add be az első ajánlatod!</p>
-                <a href="/marketplace" className="text-sm font-black px-6 py-3 rounded-lg transition"
+                <a href="/aukciosHaz" className="text-sm font-black px-6 py-3 rounded-lg transition"
                   style={{ background: '#DC2626', color: '#fff' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
                   onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>

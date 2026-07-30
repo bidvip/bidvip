@@ -575,7 +575,7 @@ function SubmitInner() {
                 onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
                 Dashboard →
               </button>
-              <button onClick={() => router.push('/marketplace')} className="px-6 py-3 rounded-lg font-semibold text-sm transition"
+              <button onClick={() => router.push('/aukciosHaz')} className="px-6 py-3 rounded-lg font-semibold text-sm transition"
                 style={{ border: '1px solid #2E2028', color: '#9C8B7A', background: 'transparent' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#3E3040'; e.currentTarget.style.color = '#F5F0E8' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>

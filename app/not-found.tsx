@@ -29,7 +29,7 @@ export default function NotFound() {
             This channel doesn&apos;t exist — or the auction has already ended. Try tuning to another frequency.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/marketplace"
+            <Link href="/aukciosHaz"
               className="font-black text-sm px-6 py-3 rounded-lg transition"
               style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 24px rgba(220,38,38,0.25)' }}
               onMouseEnter={undefined}>

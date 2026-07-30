@@ -193,7 +193,7 @@ export default function ProjectDetail() {
           Bid<span style={{ color: '#DC2626' }}>Vip</span>
         </a>
         <div className="flex items-center gap-2 text-sm">
-          <a href="/marketplace" className="transition" style={{ color: '#9C8B7A' }}
+          <a href="/aukciosHaz" className="transition" style={{ color: '#9C8B7A' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
             onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>Aukciós Ház</a>
           <span style={{ color: '#3E3040' }}>/</span>

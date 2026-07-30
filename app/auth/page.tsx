@@ -63,7 +63,7 @@ export default function AuthPage() {
         <a href="/" className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>
           Bid<span style={{ color: '#DC2626' }}>Vip</span>
         </a>
-        <a href="/marketplace" className="text-sm transition" style={{ color: '#9C8B7A' }}
+        <a href="/aukciosHaz" className="text-sm transition" style={{ color: '#9C8B7A' }}
           onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
           onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>
           Aukciós Ház →

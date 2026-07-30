@@ -525,7 +525,7 @@ export default function Home() {
               <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#5A4F4A' }}>Platform</p>
               <div className="flex flex-col gap-2.5">
                 {[
-                  { label: 'Aukciós Ház', href: '/marketplace' },
+                  { label: 'Aukciós Ház', href: '/auth' },
                   { label: 'Projekt beküldése', href: '/submit' },
                   { label: 'Bejelentkezés', href: '/auth' },
                 ].map(l => (
