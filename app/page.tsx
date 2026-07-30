@@ -180,12 +180,6 @@ export default function Home() {
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <a href="/marketplace" className="hidden sm:block text-sm px-4 py-2 rounded-lg transition-colors"
-            style={{ color: '#9C8B7A', border: '1px solid #2E2028' }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#F5F0E8'; e.currentTarget.style.borderColor = '#5A4F4A' }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#9C8B7A'; e.currentTarget.style.borderColor = '#2E2028' }}>
-            Böngészés
-          </a>
           <a href="/auth" className="text-sm font-bold px-5 py-2.5 rounded-lg transition-all"
             style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.3)' }}
             onMouseEnter={e => { e.currentTarget.style.background = '#EF4444'; e.currentTarget.style.boxShadow = '0 0 30px rgba(220,38,38,0.5)' }}
