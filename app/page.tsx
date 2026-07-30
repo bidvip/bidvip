@@ -214,7 +214,7 @@ export default function Home() {
             <div style={{ background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: '12px', padding: '28px 32px' }} className="max-w-md">
               <p className="font-black text-lg mb-1" style={{ color: '#DC2626' }}>Felkerültél a listára!</p>
               <p className="text-sm mb-5" style={{ color: '#9C8B7A' }}>Értesítünk amint elindulunk.</p>
-              <a href="/marketplace" className="inline-block text-sm font-bold px-5 py-2.5 rounded-lg"
+              <a href="/auth" className="inline-block text-sm font-bold px-5 py-2.5 rounded-lg"
                 style={{ background: '#DC2626', color: '#fff' }}>
                 Élő aukciók böngészése →
               </a>
@@ -290,7 +290,7 @@ export default function Home() {
               </div>
               <p className="text-center text-xs mt-3" style={{ color: '#5A4F4A' }}>
                 Valós projektek · valós ajánlatok ·{' '}
-                <a href="/marketplace" style={{ color: '#EAB308' }}>Összes megtekintése →</a>
+                <a href="/auth" style={{ color: '#EAB308' }}>Összes megtekintése →</a>
               </p>
             </div>
           </div>
@@ -488,7 +488,7 @@ export default function Home() {
                   Csatlakozz a várólistához és értesítünk az induláskor. Nincs spam, bármikor leiratkozhatsz.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <a href="/marketplace"
+                  <a href="/auth"
                     className="text-sm font-black px-8 py-3.5 rounded-xl transition-all"
                     style={{ background: 'linear-gradient(135deg, #DC2626, #EF4444)', color: '#fff', boxShadow: '0 4px 20px rgba(220,38,38,0.4)' }}
                     onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 30px rgba(220,38,38,0.6)')}
