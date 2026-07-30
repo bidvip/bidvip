@@ -166,7 +166,7 @@ export default function Home() {
         </span>
         <div className="hidden md:flex items-center gap-6">
           {[
-            { label: 'Aukciós Ház', href: '/marketplace' },
+            { label: 'Aukciós Ház', href: '/auth' },
             { label: 'Hogyan működik?', href: '#how' },
             { label: 'FAQ', href: '#faq' },
           ].map(link => (
