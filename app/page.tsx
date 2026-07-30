@@ -412,39 +412,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TESTIMONIAL ── */}
-      <ScrollReveal>
-        <section className="relative z-10 px-6 pb-24">
-          <div className="max-w-3xl mx-auto">
-            <div className="relative p-10 rounded-2xl overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #1A0E1A 0%, #1A1228 100%)', border: '1px solid rgba(139,92,246,0.2)' }}>
-              <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 0%, rgba(139,92,246,0.08) 0%, transparent 70%)' }} />
-              <div className="relative">
-                <div className="text-4xl mb-6 opacity-30" style={{ color: '#8B5CF6', fontFamily: 'Georgia, serif' }}>&ldquo;</div>
-                <p className="text-lg font-medium leading-relaxed mb-8" style={{ color: '#F5F0E8' }}>
-                  &ldquo;A BidVip teljesen megváltoztatta ahogy startup ötleteket értékesítünk. Az AI validáció és a letéti védelem miatt nem volt kockázat — az első héten 4800 eurót kaptam az ötletemért.&rdquo;
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black"
-                    style={{ background: 'linear-gradient(135deg, #8B5CF6, #DC2626)', color: '#fff' }}>
-                    MK
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm" style={{ color: '#F5F0E8' }}>Molnár Krisztián</p>
-                    <p className="text-xs" style={{ color: '#9C8B7A' }}>Szoftver fejlesztő, Budapest</p>
-                  </div>
-                  <div className="ml-auto flex gap-0.5">
-                    {Array(5).fill(0).map((_, i) => (
-                      <span key={i} style={{ color: '#EAB308', fontSize: '0.9rem' }}>★</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
-
       {/* ── FAQ ── */}
       <section id="faq" className="relative z-10 px-6 pb-24" style={{ borderTop: '1px solid #1F1519' }}>
         <div className="max-w-2xl mx-auto pt-24">
