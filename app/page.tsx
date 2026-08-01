@@ -114,6 +114,212 @@ function AuctionCard({ a, idx }: { a: typeof PREVIEW_AUCTIONS[0]; idx: number })
   )
 }
 
+const KAT_SZIN: Record<string, string> = {
+  'SaaS / Software': '#8B5CF6',
+  'E-commerce':      '#F97316',
+  'Mobile App':      '#3B82F6',
+  'Content / Blog':  '#F43F5E',
+  'Marketplace':     '#14B8A6',
+  'Fintech':         '#06B6D4',
+  'Edtech':          '#3B82F6',
+  'Healthtech':      '#EC4899',
+  'Környezet':       '#22C55E',
+  'Oktatás':         '#60A5FA',
+  'Egészség':        '#F472B6',
+  'Tech / SaaS':     '#A78BFA',
+  'Mezőgazdaság':    '#F59E0B',
+  'Pénzügy':         '#22D3EE',
+  'Közlekedés':      '#FB923C',
+  'Ingatlan':        '#2DD4BF',
+  'Sport / Wellness':'#84CC16',
+  'AI / Robotika':   '#C084FC',
+  'Other':           '#94A3B8',
+}
+
+type LiveProjekt = {
+  id: string; nev: string; rovid_leiras: string; kategoria: string
+  badge: string; kikialtasi_ar: number; lejarat: string | null
+}
+
+function LiveCountdown({ lejarat }: { lejarat: string | null }) {
+  const [label, setLabel] = useState('--:--')
+  useEffect(() => {
+    if (!lejarat) return
+    const tick = () => {
+      const diff = Math.max(0, new Date(lejarat).getTime() - Date.now())
+      const h = Math.floor(diff / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      const s = Math.floor((diff % 60000) / 1000)
+      setLabel(h > 0 ? `${h}ó ${m}p` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`)
+    }
+    tick()
+    const i = setInterval(tick, 1000)
+    return () => clearInterval(i)
+  }, [lejarat])
+  return <span>{label}</span>
+}
+
+function LiveListings() {
+  const [projektek, setProjektek] = useState<LiveProjekt[]>([])
+  const [aktKat, setAktKat] = useState('Összes')
+  const [kereses, setKereses] = useState('')
+
+  useEffect(() => {
+    supabase
+      .from('projektek')
+      .select('id, nev, rovid_leiras, kategoria, badge, kikialtasi_ar, lejarat')
+      .eq('statusz', 'aktiv')
+      .order('created_at', { ascending: false })
+      .limit(50)
+      .then(({ data }) => { if (data) setProjektek(data) })
+  }, [])
+
+  const kategoriak = ['Összes', ...Array.from(new Set(projektek.map(p => p.kategoria).filter(Boolean)))]
+
+  const szurt = projektek.filter(p => {
+    const katOk = aktKat === 'Összes' || p.kategoria === aktKat
+    const kOk = !kereses || p.nev.toLowerCase().includes(kereses.toLowerCase()) || p.rovid_leiras.toLowerCase().includes(kereses.toLowerCase())
+    return katOk && kOk
+  })
+
+  const badgeLabel: Record<string, string> = { idea: 'Concept', prototype: 'Prototype', proven: 'Proven' }
+  const badgeColor: Record<string, string> = { idea: '#22C55E', prototype: '#EAB308', proven: '#DC2626' }
+
+  return (
+    <section className="relative z-10 px-6 pb-24" style={{ borderTop: '1px solid #1F1519' }}>
+      <div className="max-w-5xl mx-auto pt-24">
+        <ScrollReveal>
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#DC2626' }} />
+              <p className="text-xs font-black tracking-widest uppercase" style={{ color: '#DC2626' }}>Élő aukciók</p>
+            </div>
+            <h2 className="font-black mb-3" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', letterSpacing: '-0.03em', color: '#F5F0E8' }}>
+              Mit lehet most megvenni?
+            </h2>
+            <p className="text-sm" style={{ color: '#9C8B7A' }}>
+              Böngészés ingyenes — licitáláshoz regisztráció szükséges
+            </p>
+          </div>
+        </ScrollReveal>
+
+        {/* Kereső */}
+        <ScrollReveal>
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder="Keresés az ötletek között..."
+              value={kereses}
+              onChange={e => setKereses(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition"
+              style={{ background: '#1A1217', border: '1px solid #2E2028', color: '#F5F0E8' }}
+              onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
+              onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')}
+            />
+          </div>
+        </ScrollReveal>
+
+        {/* Kategória szűrő */}
+        {kategoriak.length > 1 && (
+          <ScrollReveal>
+            <div className="flex flex-wrap gap-2 mb-8">
+              {kategoriak.map(k => {
+                const szin = k === 'Összes' ? '#DC2626' : (KAT_SZIN[k] ?? '#94A3B8')
+                const aktiv = aktKat === k
+                return (
+                  <button
+                    key={k}
+                    onClick={() => setAktKat(k)}
+                    className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+                    style={{
+                      border: `1.5px solid ${aktiv ? szin : '#2E2028'}`,
+                      background: aktiv ? `${szin}18` : 'transparent',
+                      color: aktiv ? szin : '#5A4F4A',
+                    }}>
+                    {k}
+                  </button>
+                )
+              })}
+            </div>
+          </ScrollReveal>
+        )}
+
+        {/* Lista */}
+        {projektek.length === 0 ? (
+          <div className="text-center py-16" style={{ color: '#3D3035' }}>
+            <p className="text-2xl mb-2">—</p>
+            <p className="text-sm">Hamarosan érkeznek az első aukciók</p>
+          </div>
+        ) : szurt.length === 0 ? (
+          <div className="text-center py-12" style={{ color: '#5A4F4A' }}>
+            <p className="text-sm">Nincs találat</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {szurt.map((p, i) => {
+              const szin = KAT_SZIN[p.kategoria] ?? '#94A3B8'
+              return (
+                <ScrollReveal key={p.id} delay={i * 40}>
+                  <div className="flex items-center gap-4 px-5 py-4 rounded-xl transition-all"
+                    style={{ background: '#1A1217', border: `1px solid #2E2028` }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${szin}44`; e.currentTarget.style.background = '#1F141C' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.background = '#1A1217' }}>
+
+                    {/* Színes bal sáv */}
+                    <div className="w-1 self-stretch rounded-full flex-shrink-0" style={{ background: szin }} />
+
+                    {/* Tartalom */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: szin }}>{p.kategoria}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ color: badgeColor[p.badge] ?? '#94A3B8', background: `${badgeColor[p.badge] ?? '#94A3B8'}18` }}>
+                          {badgeLabel[p.badge] ?? p.badge}
+                        </span>
+                      </div>
+                      <p className="font-bold text-sm truncate" style={{ color: '#F5F0E8' }}>{p.nev}</p>
+                      <p className="text-xs truncate mt-0.5" style={{ color: '#5A4F4A' }}>{p.rovid_leiras}</p>
+                    </div>
+
+                    {/* Ár + idő */}
+                    <div className="text-right flex-shrink-0 hidden sm:block">
+                      <p className="text-xs mb-0.5" style={{ color: '#5A4F4A' }}>Kikiáltási ár</p>
+                      <p className="font-black text-sm tabular-nums" style={{ color: '#F5F0E8' }}>€{p.kikialtasi_ar.toLocaleString()}</p>
+                      <p className="text-[10px] tabular-nums mt-0.5" style={{ color: '#DC2626' }}>
+                        <LiveCountdown lejarat={p.lejarat} />
+                      </p>
+                    </div>
+
+                    {/* CTA */}
+                    <a href="/auth?tab=register"
+                      className="flex-shrink-0 text-xs font-black px-4 py-2 rounded-lg transition-all"
+                      style={{ background: `${szin}18`, color: szin, border: `1px solid ${szin}44` }}
+                      onMouseEnter={e => { e.currentTarget.style.background = `${szin}30` }}
+                      onMouseLeave={e => { e.currentTarget.style.background = `${szin}18` }}>
+                      Regisztrálj →
+                    </a>
+                  </div>
+                </ScrollReveal>
+              )
+            })}
+          </div>
+        )}
+
+        {szurt.length > 0 && (
+          <div className="text-center mt-8">
+            <a href="/aukciosHaz"
+              className="text-sm font-bold transition-colors"
+              style={{ color: '#DC2626' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#F87171')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#DC2626')}>
+              Összes aukció megtekintése →
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 export default function Home() {
   const [email, setEmail]       = useState('')
   const [allapot, setAllapot]   = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
