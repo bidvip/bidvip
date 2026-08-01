@@ -149,6 +149,124 @@ function Aurora() {
   )
 }
 
+/* ═══════════════════════  haladásjelző  ═══════════════════════ */
+
+/** Vékony sáv a lap tetején: megmutatja hol tart az olvasó. */
+function HaladasSav() {
+  const [arany, setArany] = useState(0)
+  useEffect(() => {
+    const f = () => {
+      const t = document.documentElement.scrollHeight - window.innerHeight
+      setArany(t > 0 ? Math.min(100, (window.scrollY / t) * 100) : 0)
+    }
+    f(); window.addEventListener('scroll', f, { passive: true })
+    window.addEventListener('resize', f)
+    return () => { window.removeEventListener('scroll', f); window.removeEventListener('resize', f) }
+  }, [])
+  return (
+    <div className="fixed top-0 inset-x-0 z-[60] h-0.5" style={{ background: 'transparent' }} aria-hidden="true">
+      <div style={{
+        height: '100%', width: `${arany}%`,
+        background: 'linear-gradient(90deg, var(--v-lila), var(--v-rozsa))',
+        transition: 'width .1s linear',
+      }} />
+    </div>
+  )
+}
+
+/* ═══════════════════════  útvonalválasztó  ═══════════════════════ */
+
+/**
+ * A lap két különböző embert szolgál ki. Ha nem mondjuk meg nekik
+ * melyik út az övék, mindkettő végigolvassa a másiknak szóló részt is —
+ * és egyik sem cselekszik. Itt kettéválik a két út.
+ */
+function Utvonal() {
+  const utak = [
+    {
+      cim: 'Van egy ötleted',
+      alcim: 'Eladóként',
+      szin: 'var(--v-lila-2)',
+      hatter: 'rgba(124,58,237,.09)',
+      keret: 'rgba(124,58,237,.32)',
+      lepesek: ['Kiválasztod a szakterületet', 'Az AI segít kidolgozni és felbecsülni', 'Aukcióra kerül, te kapod a bevételt'],
+      gomb: 'Beküldöm az ötletem',
+      hova: '/submit',
+    },
+    {
+      cim: 'Ötletet keresel',
+      alcim: 'Vevőként',
+      szin: 'var(--v-rozsa-2)',
+      hatter: 'rgba(244,63,94,.09)',
+      keret: 'rgba(244,63,94,.32)',
+      lepesek: ['Böngészed a tételeket ingyen', 'Regisztrálsz és licitálsz', 'Letéti védelemmel veszed át'],
+      gomb: 'Megnézem a tételeket',
+      hova: '#tetelek',
+    },
+  ]
+
+  return (
+    <section className="mx-auto max-w-5xl px-6 pb-20">
+      <Feltunik>
+        <p className="text-center text-sm mb-8" style={{ color: 'var(--v-szoveg-3)' }}>
+          Kezdd itt — válaszd ki melyik vagy
+        </p>
+      </Feltunik>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {utak.map((u, i) => (
+          <Feltunik key={u.cim} keses={i * 110}>
+            <div className="rounded-2xl p-6 h-full flex flex-col transition-all"
+              style={{ background: u.hatter, border: `1px solid ${u.keret}` }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 14px 40px ${u.keret}` }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none' }}>
+
+              <p className="text-[10px] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: u.szin }}>{u.alcim}</p>
+              <h3 className="text-2xl font-black mb-5 tracking-tight" style={{ color: 'var(--v-szoveg)', letterSpacing: '-0.02em' }}>{u.cim}</h3>
+
+              <ol className="flex flex-col gap-3 mb-7 flex-1">
+                {u.lepesek.map((l, j) => (
+                  <li key={l} className="flex gap-3 items-start">
+                    <span className="shrink-0 h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                      style={{ background: `${u.szin}22`, color: u.szin }}>{j + 1}</span>
+                    <span className="text-sm leading-snug" style={{ color: 'var(--v-szoveg-2)' }}>{l}</span>
+                  </li>
+                ))}
+              </ol>
+
+              <a href={u.hova} className="block text-center px-5 py-3 rounded-xl text-sm font-bold transition-all"
+                style={{ border: `1px solid ${u.szin}`, color: u.szin }}
+                onMouseEnter={e => { e.currentTarget.style.background = u.szin; e.currentTarget.style.color = 'var(--v-bg)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = u.szin }}>
+                {u.gomb} →
+              </a>
+            </div>
+          </Feltunik>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════  szekció-átvezetés  ═══════════════════════ */
+
+/** Zárja a szekciót és megmondja hova tovább — hogy ne akadjon el az olvasó. */
+function Tovabb({ szoveg, hova }: { szoveg: string; hova: string }) {
+  return (
+    <Feltunik>
+      <div className="text-center pt-10">
+        <a href={hova} className="inline-flex items-center gap-2 text-sm font-semibold transition-all"
+          style={{ color: 'var(--v-szoveg-3)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-lila-2)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>
+          {szoveg}
+          <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </Feltunik>
+  )
+}
+
 /* ═══════════════════════  fejléc  ═══════════════════════ */
 
 function Fejlec() {
