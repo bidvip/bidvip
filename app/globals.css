@@ -1,28 +1,76 @@
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════════════════════════
-   BidVip — Árverési katalógus
-   Papír és tinta, nem képernyő. A tételek katalógusban állnak:
-   tételszám, hajszálvonal, táblázatos szám. A szín ritka és drága.
+   BidVip — élő aukció, sötét felület
+   Mély indigó alap, mozgó fény, üveges lapok. A bíbor a licité:
+   ott és csak ott jelenik meg, ahol pénz mozog.
    ══════════════════════════════════════════════════════════════ */
 :root {
-  --kat-papir:     #F7F4ED;  /* katalóguslap */
-  --kat-papir-2:   #EFEAE0;  /* mélyedés, sáv */
-  --kat-papir-3:   #E5DFD2;  /* kiemelt mező */
-  --kat-tinta:     #1A1512;  /* főszöveg */
-  --kat-tinta-2:   #6B6055;  /* másodlagos */
-  --kat-tinta-3:   #9A9082;  /* halvány, adat */
-  --kat-vonal:     #DDD5C7;  /* hajszálvonal */
-  --kat-vonal-2:   #C8BDA9;  /* erősebb elválasztás */
-  --kat-bibor:     #8B1E24;  /* licit, élő, hangsúly */
-  --kat-bibor-2:   #A82830;
-  --kat-arany:     #A67C00;  /* prémium jelölés */
+  --v-bg:      #07050D;  /* legmélyebb alap */
+  --v-bg-2:    #0D0918;  /* lap */
+  --v-bg-3:    #150F26;  /* kiemelt lap */
+  --v-bg-4:    #1E1633;  /* hover */
+  --v-vonal:   #241B3D;
+  --v-vonal-2: #362A57;
+  --v-szoveg:  #F3F0FA;
+  --v-szoveg-2:#A79FC4;
+  --v-szoveg-3:#6B6288;
+  --v-lila:    #7C3AED;
+  --v-lila-2:  #A78BFA;
+  --v-rozsa:   #F43F5E;  /* élő licit */
+  --v-rozsa-2: #FB7185;
+  --v-arany:   #FBBF24;  /* prémium */
+  --v-zold:    #34D399;  /* megerősítés */
 }
 
-/* A katalógus szándékosan egyetlen világban él: papír és tinta.
-   Nincs sötét változata — ahogy egy árverési katalógusnak sincs.
-   Ez a döntés hordozza a márka karakterét, ezért nem követi a
-   rendszertémát. */
+/* ── Mozgás ── */
+@keyframes v-aurora {
+  0%,100% { transform: translate3d(-8%,-4%,0) scale(1);    }
+  33%     { transform: translate3d(6%,3%,0)  scale(1.15);  }
+  66%     { transform: translate3d(-3%,6%,0) scale(0.95);  }
+}
+@keyframes v-aurora-2 {
+  0%,100% { transform: translate3d(5%,4%,0)  scale(1.1); }
+  50%     { transform: translate3d(-6%,-5%,0) scale(0.9); }
+}
+@keyframes v-fel {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes v-lüktet {
+  0%,100% { opacity: 1;   transform: scale(1);   }
+  50%     { opacity: .45; transform: scale(.82); }
+}
+@keyframes v-csusz {
+  from { background-position: 0% 50%; }
+  to   { background-position: 200% 50%; }
+}
+@keyframes v-forog {
+  to { transform: rotate(360deg); }
+}
+
+.v-be { animation: v-fel .7s cubic-bezier(.22,.61,.36,1) both; }
+
+/* Élő licit szövegének futó fénye */
+.v-fenylo {
+  background: linear-gradient(90deg, var(--v-rozsa) 0%, var(--v-arany) 25%, var(--v-rozsa) 50%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  animation: v-csusz 3.5s linear infinite;
+}
+
+/* Üveges lap */
+.v-uveg {
+  background: linear-gradient(160deg, rgba(124,58,237,.07), rgba(13,9,24,.55));
+  border: 1px solid var(--v-vonal);
+  backdrop-filter: blur(12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v-be, .v-fenylo { animation: none !important; }
+  .v-aurora-elem   { animation: none !important; }
+}
 
 /* ── Régi sötét paletta — a még át nem tervezett oldalak használják ── */
 :root {
