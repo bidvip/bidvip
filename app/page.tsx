@@ -478,7 +478,8 @@ function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) 
 
   const q = kereses.trim().toLowerCase()
   const szurtElo = elo.filter(p => !q || p.nev.toLowerCase().includes(q) || p.kategoria.toLowerCase().includes(q))
-  const szurtSor = sorban.filter(k => !q || k.cimke.toLowerCase().includes(q))
+  const szurtSor = sorban.filter(k =>
+    !q || k.cimke.toLowerCase().includes(q) || k.nev.toLowerCase().includes(q) || k.leiras.toLowerCase().includes(q))
   const lathatoSor = mind ? szurtSor : szurtSor.slice(0, 10)
 
   return (
