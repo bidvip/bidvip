@@ -675,15 +675,10 @@ function SubmitInner() {
                   onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
               </div>
               <div>
-                <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>Category *</label>
-                <select value={form.kategoria} onChange={e => frissit('kategoria', e.target.value)}
-                  className="w-full px-4 py-3 focus:outline-none transition"
-                  style={inputStyle}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')}>
-                  <option value="">Select a category...</option>
-                  {categories.map(k => <option key={k} value={k}>{k}</option>)}
-                </select>
+                <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>
+                  Category * <span style={{ color: '#5A4F4A' }}>— ez alapján elemzi az AI az ötleted</span>
+                </label>
+                <KategoriaValaszto ertek={form.kategoria} onValt={t => frissit('kategoria', t)} />
               </div>
             </div>
 
