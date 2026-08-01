@@ -500,9 +500,9 @@ function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) 
             onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')} />
         </div>
 
-        <p className="text-sm mb-8" style={{ color: 'var(--v-szoveg-3)', maxWidth: '58ch' }}>
-          A böngészés ingyenes. A sorban álló tételek részletei az aukció indulásakor derülnek ki —
-          addig védve vannak a másolástól.
+        <p className="text-sm mb-8" style={{ color: 'var(--v-szoveg-3)', maxWidth: '62ch' }}>
+          A böngészés ingyenes. Minden tételnél látod, miről szól — a részletes kifejtést,
+          a dokumentumokat és a fájlokat viszont csak a nyertes vevő kapja meg.
         </p>
       </Feltunik>
 
