@@ -24,7 +24,12 @@ If invalid (spam, gibberish, test data, too vague, or not a real business idea):
 Badge levels (pick one):
 - "idea" — idea only, no code, no users, no revenue
 - "prototype" — something tangible exists: code, mockup, domain, or early users, but no real revenue
-- "proven" — real revenue or proven measurable traction`
+- "proven" — real revenue or proven measurable traction
+
+Calibrate these levels to the field — "prototype" means something different in software than in
+biotech, hardware or energy. In lab- or hardware-based fields a validated experiment, a working
+bench unit, a patent filing or a pilot installation counts as prototype-level maturity.
+${szakertoiKontextus(kategoria)}`
 
   const kepTartalom = kepUrlok.slice(0, 3).map((url: string) => ({
     type: 'image' as const,
