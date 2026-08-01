@@ -42,6 +42,7 @@ Project:
 - Short description: ${rovid_leiras}
 - Detailed description: ${reszletes_leiras}
 ${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s).` : ''}${dokumentumSzoveg}
+${szakertoiKontextus(kategoria)}
 
 Respond ONLY with this exact JSON (no markdown):
 {
