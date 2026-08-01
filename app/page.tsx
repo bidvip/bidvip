@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { kirakatba, KIRAKAT_MEZOK, type KirakatElem } from '@/lib/kirakat'
+import { type KirakatElem } from '@/lib/kirakat'
 
 const MAX_WAITLIST = 2000
 
