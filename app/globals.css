@@ -17,7 +17,6 @@
   --kat-bibor:     #8B1E24;  /* licit, élő, hangsúly */
   --kat-bibor-2:   #A82830;
   --kat-arany:     #A67C00;  /* prémium jelölés */
-  --kat-zold:      #3F6B३C;
 }
 
 @media (prefers-color-scheme: dark) {
