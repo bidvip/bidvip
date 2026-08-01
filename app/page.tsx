@@ -618,6 +618,8 @@ export default function Home() {
         </div>
       </section>
 
+      <LiveListings />
+
       {/* ── FAQ ── */}
       <section id="faq" className="relative z-10 px-6 pb-24" style={{ borderTop: '1px solid #1F1519' }}>
         <div className="max-w-2xl mx-auto pt-24">
