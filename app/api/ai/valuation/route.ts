@@ -35,11 +35,13 @@ Project:
 - Stage: ${badge} (typical range for this stage: €${range.min.toLocaleString()} – €${range.max.toLocaleString()})
 - Short description: ${rovid_leiras}
 - Detailed description: ${reszletes_leiras}${dokumentumok}${scoreInfo}
+${szakertoiKontextus(kategoria)}
 
 Consider:
 - How developed and detailed is the idea?
 - Is there real IP, documentation, or assets?
-- Market size and competition
+- Market size and competition within this specific field
+- Typical deal sizes and buyer budgets in this field
 - Stage maturity
 - Quality of the attached materials
 
