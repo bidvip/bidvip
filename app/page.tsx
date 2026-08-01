@@ -89,13 +89,19 @@ function Szamlalo({ ig, utotag = '', ido = 1400 }: { ig: number; utotag?: string
     if (!lathato) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setErtek(ig); return }
     let kere = 0
-    const kezd = performance.now()
+    // Az indulást az első képkockán rögzítjük. A rAF időbélyege a képkocka
+    // kezdete, ami korábbi lehet egy előre kiolvasott performance.now()-nál —
+    // abból negatív eltelt idő, a lassuló görbén pedig negatív szám lenne.
+    let kezd: number | null = null
+
     const lep = (most: number) => {
-      const t = Math.min(1, (most - kezd) / ido)
+      if (kezd === null) kezd = most
+      const t = Math.min(1, Math.max(0, (most - kezd) / ido))
       const lassul = 1 - Math.pow(1 - t, 3)
-      setErtek(Math.round(ig * lassul))
+      setErtek(t >= 1 ? ig : Math.round(ig * lassul))
       if (t < 1) kere = requestAnimationFrame(lep)
     }
+
     kere = requestAnimationFrame(lep)
     return () => cancelAnimationFrame(kere)
   }, [lathato, ig, ido])
