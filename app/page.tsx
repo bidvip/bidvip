@@ -737,6 +737,8 @@ function Menete() {
           ))}
         </div>
       </div>
+
+      <Tovabb szoveg="Van még kérdésed?" hova="#kerdesek" />
     </section>
   )
 }
