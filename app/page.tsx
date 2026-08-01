@@ -259,10 +259,60 @@ function LiveListings() {
 
         {/* Lista */}
         {projektek.length === 0 ? (
-          <div className="text-center py-16" style={{ color: '#3D3035' }}>
-            <p className="text-2xl mb-2">—</p>
-            <p className="text-sm">Hamarosan érkeznek az első aukciók</p>
-          </div>
+          sorban.length === 0 ? (
+            <div className="text-center py-16" style={{ color: '#3D3035' }}>
+              <p className="text-2xl mb-2">—</p>
+              <p className="text-sm">Hamarosan érkeznek az első ötletek</p>
+            </div>
+          ) : (
+            <div>
+              <div className="text-center mb-6">
+                <p className="text-sm mb-1" style={{ color: '#F5F0E8' }}>
+                  <span className="font-black">{sorban.length}</span> ötlet vár az első aukcióra
+                </p>
+                <p className="text-xs" style={{ color: '#5A4F4A' }}>
+                  A részletek induláskor derülnek ki — addig védve vannak a másolástól
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {sorban.map((k, i) => (
+                  <ScrollReveal key={k.id} delay={i * 40}>
+                    <div className="rounded-xl overflow-hidden h-full"
+                      style={{ background: '#1A1217', border: '1px solid #2E2028' }}>
+                      <div className="h-0.5 w-full" style={{ background: k.szin }} />
+                      <div className="p-4">
+                        <p className="text-[10px] font-black tracking-widest uppercase mb-2 truncate" style={{ color: k.szin }}>
+                          {k.cimke}
+                        </p>
+                        <p className="text-sm font-bold mb-1" style={{ color: '#3D3035', letterSpacing: '0.15em' }}>
+                          ● ● ● ● ● ● ●
+                        </p>
+                        <p className="text-[11px] mb-3" style={{ color: '#5A4F4A' }}>
+                          Induláskor derül ki
+                        </p>
+                        <div className="flex items-center justify-between pt-2.5" style={{ borderTop: '1px solid #2E2028' }}>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                            style={{ color: k.szin, background: `${k.szin}18` }}>{k.erettseg}</span>
+                          <span className="text-[11px] tabular-nums" style={{ color: '#9C8B7A' }}>{k.arsav}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+
+              <div className="text-center mt-8">
+                <a href="/auth?tab=register"
+                  className="inline-block px-6 py-3 rounded-xl font-black text-sm transition-all"
+                  style={{ background: '#DC2626', color: '#fff' }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
+                  Értesíts amikor indul →
+                </a>
+              </div>
+            </div>
+          )
         ) : szurt.length === 0 ? (
           <div className="text-center py-12" style={{ color: '#5A4F4A' }}>
             <p className="text-sm">Nincs találat</p>
