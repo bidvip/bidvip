@@ -167,24 +167,13 @@ function LiveListings() {
   const [kereses, setKereses] = useState('')
 
   useEffect(() => {
-    // Élő aukciók teljes tartalommal
-    supabase
-      .from('projektek')
-      .select('id, nev, rovid_leiras, kategoria, badge, kikialtasi_ar, lejarat')
-      .eq('statusz', 'aktiv')
-      .order('created_at', { ascending: false })
-      .limit(50)
-      .then(({ data }) => { if (data) setProjektek(data) })
-
-    // Sorban álló ötletek — kizárólag anonimizálva
-    supabase
-      .from('projektek')
-      .select(KIRAKAT_MEZOK)
-      .eq('statusz', 'varakozas')
-      .order('priority_tokens', { ascending: false })
-      .order('varakozas_kezd', { ascending: true })
-      .limit(24)
-      .then(({ data }) => { if (data) setSorban(data.map((p, i) => kirakatba(p, i + 1))) })
+    // A projektek táblát RLS védi, anon kulccsal nem olvasható. A publikus
+    // kirakat szerveroldalon készül, és a várólistáról csak anonimizált
+    // mezőket ad vissza.
+    fetch('/api/kirakat')
+      .then(r => r.json())
+      .then(d => { setProjektek(d.elo ?? []); setSorban(d.sorban ?? []) })
+      .catch(() => {})
   }, [])
 
   const kategoriak = ['Összes', ...Array.from(new Set(projektek.map(p => p.kategoria).filter(Boolean)))]
