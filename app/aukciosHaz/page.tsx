@@ -367,11 +367,13 @@ export default function Marketplace() {
       setLicitekSzama(Object.fromEntries(Object.entries(bidderMap).map(([k, v]) => [k, v.size])))
     }
 
-    // Csak anonimizált mezők — a várólistán álló ötletek neve és leírása
-    // nem hagyhatja el a szervert, különben vétel nélkül lemásolhatók.
-    const { data: sorban } = await supabase.from('projektek').select(KIRAKAT_MEZOK)
-      .eq('statusz', 'varakozas').order('priority_tokens', { ascending: false }).order('varakozas_kezd', { ascending: true }).limit(12)
-    setSor((sorban || []).map((p, i) => kirakatba(p, i + 1)))
+    // A várólista szerveroldalon anonimizálódik — a név és a leírás nem
+    // hagyhatja el a szervert, különben vétel nélkül lemásolható az ötlet.
+    try {
+      const r = await fetch('/api/kirakat')
+      const d = await r.json()
+      setSor(d.sorban ?? [])
+    } catch { /* a kirakat hiánya ne törje el az oldalt */ }
 
     const { data: { user: u } } = await supabase.auth.getUser()
     setUser(u)
