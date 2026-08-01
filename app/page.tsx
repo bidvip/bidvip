@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { type KirakatElem } from '@/lib/kirakat'
+import { KATEGORIA_FA } from '@/lib/kategoriak'
 
 const INDULAS_KUSZOB = 2000
 
@@ -11,71 +12,142 @@ type EloProjekt = {
   badge: string; kikialtasi_ar: number; lejarat: string | null
 }
 
-/* ─────────────────────────  segédek  ───────────────────────── */
+/* ═══════════════════════  mozgás-segédek  ═══════════════════════ */
 
-function Feltunik({ children, keses = 0 }: { children: React.ReactNode; keses?: number }) {
-  const ref = useRef<HTMLDivElement>(null)
+function useLathato<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
   const [lathato, setLathato] = useState(false)
   useEffect(() => {
     const el = ref.current; if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setLathato(true); return }
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setLathato(true); obs.disconnect() } }, { threshold: 0.05 })
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setLathato(true); obs.disconnect() }
+    }, { threshold: 0.12 })
     obs.observe(el); return () => obs.disconnect()
   }, [])
+  return { ref, lathato }
+}
+
+function Feltunik({ children, keses = 0, className = '' }: {
+  children: React.ReactNode; keses?: number; className?: string
+}) {
+  const { ref, lathato } = useLathato<HTMLDivElement>()
   return (
-    <div ref={ref} style={{
-      transitionDelay: `${keses}ms`,
-      transition: 'opacity .6s ease, transform .6s ease',
+    <div ref={ref} className={className} style={{
       opacity: lathato ? 1 : 0,
-      transform: lathato ? 'none' : 'translateY(14px)',
+      transform: lathato ? 'none' : 'translateY(26px)',
+      transition: `opacity .75s cubic-bezier(.22,.61,.36,1) ${keses}ms, transform .75s cubic-bezier(.22,.61,.36,1) ${keses}ms`,
     }}>{children}</div>
   )
 }
 
-function Vonal({ eros = false }: { eros?: boolean }) {
-  return <div style={{ height: 1, background: eros ? 'var(--kat-vonal-2)' : 'var(--kat-vonal)' }} />
+/** Nullától a célértékig számol, amikor képernyőre ér. */
+function Szamlalo({ ig, utotag = '', ido = 1400 }: { ig: number; utotag?: string; ido?: number }) {
+  const { ref, lathato } = useLathato<HTMLSpanElement>()
+  const [ertek, setErtek] = useState(0)
+
+  useEffect(() => {
+    if (!lathato) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setErtek(ig); return }
+    let kere = 0
+    const kezd = performance.now()
+    const lep = (most: number) => {
+      const t = Math.min(1, (most - kezd) / ido)
+      const lassul = 1 - Math.pow(1 - t, 3)
+      setErtek(Math.round(ig * lassul))
+      if (t < 1) kere = requestAnimationFrame(lep)
+    }
+    kere = requestAnimationFrame(lep)
+    return () => cancelAnimationFrame(kere)
+  }, [lathato, ig, ido])
+
+  return <span ref={ref} style={{ fontVariantNumeric: 'tabular-nums' }}>{ertek.toLocaleString('hu-HU')}{utotag}</span>
 }
 
-function Rovat({ children, szin }: { children: React.ReactNode; szin?: string }) {
-  return <p className="kat-rovat" style={{ color: szin ?? 'var(--kat-tinta-3)' }}>{children}</p>
+/* ═══════════════════════  aurora háttér  ═══════════════════════ */
+
+function Aurora() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div className="v-aurora-elem absolute rounded-full"
+        style={{
+          width: '58vw', height: '58vw', maxWidth: 900, maxHeight: 900,
+          top: '-22%', left: '50%', marginLeft: '-29vw',
+          background: 'radial-gradient(circle, rgba(124,58,237,.5) 0%, rgba(124,58,237,.16) 38%, transparent 68%)',
+          filter: 'blur(60px)',
+          animation: 'v-aurora 19s ease-in-out infinite',
+        }} />
+      <div className="v-aurora-elem absolute rounded-full"
+        style={{
+          width: '42vw', height: '42vw', maxWidth: 680, maxHeight: 680,
+          top: '-8%', left: '18%',
+          background: 'radial-gradient(circle, rgba(244,63,94,.34) 0%, rgba(244,63,94,.1) 42%, transparent 70%)',
+          filter: 'blur(70px)',
+          animation: 'v-aurora-2 24s ease-in-out infinite',
+        }} />
+      <div className="v-aurora-elem absolute rounded-full"
+        style={{
+          width: '40vw', height: '40vw', maxWidth: 620, maxHeight: 620,
+          top: '2%', right: '10%',
+          background: 'radial-gradient(circle, rgba(56,189,248,.24) 0%, transparent 66%)',
+          filter: 'blur(80px)',
+          animation: 'v-aurora 27s ease-in-out infinite reverse',
+        }} />
+      {/* finom rács a mélységért */}
+      <div className="absolute inset-0" style={{
+        backgroundImage: 'linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px)',
+        backgroundSize: '64px 64px',
+        maskImage: 'radial-gradient(ellipse 80% 55% at 50% 0%, #000 30%, transparent 78%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 80% 55% at 50% 0%, #000 30%, transparent 78%)',
+      }} />
+    </div>
+  )
 }
 
-/* ─────────────────────────  fejléc  ───────────────────────── */
+/* ═══════════════════════  fejléc  ═══════════════════════ */
 
 function Fejlec() {
   const [gorgetve, setGorgetve] = useState(false)
   useEffect(() => {
-    const f = () => setGorgetve(window.scrollY > 8)
+    const f = () => setGorgetve(window.scrollY > 12)
     f(); window.addEventListener('scroll', f, { passive: true })
     return () => window.removeEventListener('scroll', f)
   }, [])
 
   return (
-    <header className="sticky top-0 z-50" style={{
-      background: gorgetve ? 'color-mix(in srgb, var(--kat-papir) 92%, transparent)' : 'var(--kat-papir)',
-      backdropFilter: gorgetve ? 'blur(8px)' : 'none',
-      borderBottom: `1px solid ${gorgetve ? 'var(--kat-vonal)' : 'transparent'}`,
-      transition: 'border-color .3s, background .3s',
+    <header className="fixed top-0 inset-x-0 z-50" style={{
+      background: gorgetve ? 'rgba(7,5,13,.72)' : 'transparent',
+      backdropFilter: gorgetve ? 'blur(16px)' : 'none',
+      borderBottom: `1px solid ${gorgetve ? 'var(--v-vonal)' : 'transparent'}`,
+      transition: 'all .4s ease',
     }}>
-      <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between gap-6">
-        <a href="/" className="flex items-baseline gap-2 shrink-0">
-          <span className="kat-cim" style={{ fontSize: '1.5rem', color: 'var(--kat-tinta)' }}>BidVip</span>
-          <span className="kat-rovat hidden sm:block" style={{ color: 'var(--kat-tinta-3)' }}>Aukciósház</span>
+      <div className="mx-auto max-w-6xl px-6 h-[72px] flex items-center justify-between gap-6">
+        <a href="/" className="flex items-center gap-2.5 shrink-0 group">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full rounded-full opacity-70"
+              style={{ background: 'var(--v-rozsa)', animation: 'v-lüktet 2s ease-in-out infinite' }} />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: 'var(--v-rozsa)' }} />
+          </span>
+          <span className="text-lg font-bold tracking-tight" style={{ color: 'var(--v-szoveg)' }}>BidVip</span>
         </a>
 
-        <nav className="hidden md:flex items-center gap-8">
-          {[['Tételek', '#tetelek'], ['Menete', '#menete'], ['Kérdések', '#kerdesek']].map(([cim, hova]) => (
-            <a key={hova} href={hova} className="text-sm transition-colors"
-              style={{ color: 'var(--kat-tinta-2)' }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'var(--kat-tinta)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'var(--kat-tinta-2)')}>{cim}</a>
+        <nav className="hidden md:flex items-center gap-1">
+          {[['Tételek', '#tetelek'], ['Területek', '#teruletek'], ['Menete', '#menete'], ['Kérdések', '#kerdesek']].map(([c, h]) => (
+            <a key={h} href={h} className="text-sm px-3.5 py-2 rounded-lg transition-all"
+              style={{ color: 'var(--v-szoveg-2)' }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--v-szoveg)'; e.currentTarget.style.background = 'rgba(255,255,255,.05)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--v-szoveg-2)'; e.currentTarget.style.background = 'transparent' }}>
+              {c}
+            </a>
           ))}
         </nav>
 
-        <a href="/auth" className="text-sm px-4 py-2 shrink-0 transition-colors"
-          style={{ border: '1px solid var(--kat-vonal-2)', color: 'var(--kat-tinta)' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--kat-tinta)'; e.currentTarget.style.color = 'var(--kat-papir)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--kat-tinta)' }}>
+        <a href="/auth" className="text-sm font-semibold px-5 py-2.5 rounded-xl shrink-0 transition-all"
+          style={{
+            background: 'linear-gradient(135deg, var(--v-lila), var(--v-rozsa))',
+            color: '#fff', boxShadow: '0 6px 22px rgba(124,58,237,.34)',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(124,58,237,.5)' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 6px 22px rgba(124,58,237,.34)' }}>
           Belépés
         </a>
       </div>
@@ -83,73 +155,250 @@ function Fejlec() {
   )
 }
 
-/* ─────────────────────────  hero  ───────────────────────── */
+/* ═══════════════════════  élő licit kártya  ═══════════════════════ */
 
-function Hero({ varolista, elo }: { varolista: number; elo: number }) {
+function LicitKartya({ cimke, szin, kezdoAr, keses }: {
+  cimke: string; szin: string; kezdoAr: number; keses: number
+}) {
+  const [ar, setAr] = useState(kezdoAr)
+  const [villan, setVillan] = useState(false)
+  const [ido, setIdo] = useState(180 + keses * 40)
+
+  useEffect(() => {
+    const t = setInterval(() => setIdo(s => (s > 0 ? s - 1 : 240)), 1000)
+    const l = setInterval(() => {
+      setAr(p => p + Math.floor(Math.random() * 120 + 40))
+      setVillan(true); setTimeout(() => setVillan(false), 550)
+    }, 3800 + keses * 1900)
+    return () => { clearInterval(t); clearInterval(l) }
+  }, [keses])
+
+  const p = Math.floor(ido / 60), m = ido % 60
+  const surgos = ido < 45
+
   return (
-    <section className="mx-auto max-w-6xl px-6">
-      <div className="pt-10 pb-5 flex items-baseline justify-between gap-4 flex-wrap">
-        <Rovat>Árverési katalógus · {new Date().getFullYear()}</Rovat>
-        <Rovat szin={elo > 0 ? 'var(--kat-bibor)' : undefined}>
-          {elo > 0 ? `${elo} tétel élőben` : `${varolista} tétel vár az első aukcióra`}
-        </Rovat>
+    <div className="v-uveg rounded-2xl p-4 transition-all"
+      style={{
+        borderColor: villan ? szin : 'var(--v-vonal)',
+        boxShadow: villan ? `0 0 32px ${szin}44` : 'none',
+      }}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: szin, animation: 'v-lüktet 1.6s ease-in-out infinite' }} />
+          <span className="text-[10px] font-bold tracking-[0.14em] uppercase truncate" style={{ color: szin }}>{cimke}</span>
+        </div>
+        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0"
+          style={{ background: 'var(--v-rozsa)', color: '#fff' }}>ÉLŐ</span>
       </div>
-      <Vonal eros />
 
-      <div className="grid lg:grid-cols-12 gap-x-10 gap-y-8 pt-14 pb-16">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--v-szoveg-3)' }}>Ajánlat</p>
+          <p className="text-xl font-black" style={{
+            color: villan ? 'var(--v-arany)' : 'var(--v-szoveg)',
+            fontVariantNumeric: 'tabular-nums',
+            transform: villan ? 'scale(1.09)' : 'none',
+            transition: 'color .3s, transform .35s cubic-bezier(.34,1.56,.64,1)',
+          }}>
+            {ar.toLocaleString('hu-HU')} €
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--v-szoveg-3)' }}>Hátra</p>
+          <p className="text-xl font-black" style={{
+            color: surgos ? 'var(--v-rozsa)' : 'var(--v-szoveg-2)',
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {String(p).padStart(2, '0')}:{String(m).padStart(2, '0')}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════  hero  ═══════════════════════ */
+
+function Hero({ varolista }: { varolista: number }) {
+  return (
+    <section className="relative pt-[72px]">
+      <Aurora />
+      <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-24 grid lg:grid-cols-12 gap-x-12 gap-y-16 items-center">
+
         <div className="lg:col-span-7">
-          <h1 className="kat-cim" style={{ fontSize: 'clamp(2.9rem, 7.5vw, 5.5rem)', color: 'var(--kat-tinta)' }}>
+          <div className="v-be inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full mb-7"
+            style={{ animationDelay: '0ms', background: 'rgba(124,58,237,.12)', border: '1px solid rgba(124,58,237,.3)' }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--v-lila-2)', animation: 'v-lüktet 2s ease-in-out infinite' }} />
+            <span className="text-xs font-semibold" style={{ color: 'var(--v-lila-2)' }}>
+              {varolista > 0 ? `${varolista} ötlet vár az első aukcióra` : 'Hamarosan indul az első aukció'}
+            </span>
+          </div>
+
+          <h1 className="v-be font-black tracking-tight" style={{
+            animationDelay: '90ms',
+            fontSize: 'clamp(2.6rem, 6.4vw, 4.6rem)',
+            lineHeight: 1.03,
+            letterSpacing: '-0.035em',
+            color: 'var(--v-szoveg)',
+          }}>
             Minden ötletben<br />van potenciál.<br />
-            <span style={{ fontStyle: 'italic', color: 'var(--kat-bibor)' }}>Megmutatjuk mekkora.</span>
+            <span className="v-fenylo">Megmutatjuk mekkora.</span>
           </h1>
 
-          <p className="mt-7 text-base leading-relaxed" style={{ color: 'var(--kat-tinta-2)', maxWidth: '46ch' }}>
-            Nem kell kész terméked legyen. Hozd az ötletet — segítünk kidolgozni,
-            felmérjük mennyit ér, és árverésre bocsátjuk komoly vevők előtt.
+          <p className="v-be mt-7 text-base leading-relaxed" style={{
+            animationDelay: '180ms', color: 'var(--v-szoveg-2)', maxWidth: '48ch',
+          }}>
+            Nem kell kész terméked legyen. Hozd az ötletet — az AI segít kidolgozni,
+            felmérjük mennyit ér, és élő aukcióra bocsátjuk komoly vevők előtt.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <a href="/submit" className="px-6 py-3 text-sm font-medium transition-opacity"
-              style={{ background: 'var(--kat-bibor)', color: '#FBF8F2' }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = '.88')}
-              onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
-              Eladom az ötletem
+          <div className="v-be mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: '270ms' }}>
+            <a href="/submit" className="px-6 py-3.5 rounded-xl text-sm font-bold transition-all"
+              style={{
+                background: 'linear-gradient(135deg, var(--v-lila), var(--v-rozsa))',
+                color: '#fff', boxShadow: '0 8px 30px rgba(124,58,237,.4)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 14px 42px rgba(124,58,237,.58)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(124,58,237,.4)' }}>
+              Eladom az ötletem →
             </a>
-            <a href="#tetelek" className="px-6 py-3 text-sm font-medium transition-colors"
-              style={{ border: '1px solid var(--kat-vonal-2)', color: 'var(--kat-tinta)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--kat-papir-2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+            <a href="#tetelek" className="px-6 py-3.5 rounded-xl text-sm font-bold transition-all"
+              style={{ border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,.06)'; e.currentTarget.style.borderColor = 'var(--v-lila)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--v-vonal-2)' }}>
               Ötletet keresek
             </a>
           </div>
         </div>
 
-        {/* Katalógus-mutató */}
-        <div className="lg:col-span-5 lg:pl-10" style={{ borderLeft: '1px solid var(--kat-vonal)' }}>
-          <Rovat>A katalógusról</Rovat>
-          <dl className="mt-5 flex flex-col">
-            {[
-              ['Tételek a sorban', String(varolista)],
-              ['Szakterületek', '25'],
-              ['Jutalék sikeres eladásnál', '10%'],
-              ['Belépés eladóként', 'Ingyenes'],
-            ].map(([cim, ertek], i) => (
-              <div key={cim}>
-                {i > 0 && <Vonal />}
-                <div className="flex items-baseline justify-between gap-4 py-3.5">
-                  <dt className="text-sm" style={{ color: 'var(--kat-tinta-2)' }}>{cim}</dt>
-                  <dd className="kat-szam text-sm" style={{ color: 'var(--kat-tinta)' }}>{ertek}</dd>
-                </div>
-              </div>
-            ))}
-          </dl>
+        <div className="lg:col-span-5 v-be" style={{ animationDelay: '340ms' }}>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--v-rozsa)', animation: 'v-lüktet 1.6s ease-in-out infinite' }} />
+            <span className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: 'var(--v-szoveg-3)' }}>
+              Így néz ki egy élő aukció
+            </span>
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <LicitKartya cimke="Energia · Napenergia" szin="#FBBF24" kezdoAr={6500} keses={0} />
+            <LicitKartya cimke="AI · Ügynökök" szin="#A78BFA" kezdoAr={28000} keses={1} />
+            <LicitKartya cimke="Víz · Szivárgás" szin="#38BDF8" kezdoAr={9500} keses={2} />
+          </div>
         </div>
       </div>
     </section>
   )
 }
 
-/* ─────────────────────────  tételek  ───────────────────────── */
+/* ═══════════════════════  számok  ═══════════════════════ */
+
+function Szamok({ varolista }: { varolista: number }) {
+  const adat: [number, string, string][] = [
+    [varolista, '', 'ötlet a sorban'],
+    [25, '', 'szakterület'],
+    [290, '', 'kategória'],
+    [10, '%', 'jutalék, csak sikeres eladásnál'],
+  ]
+  return (
+    <section className="mx-auto max-w-6xl px-6 pb-24">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {adat.map(([szam, utotag, cimke], i) => (
+          <Feltunik key={cimke} keses={i * 90}>
+            <div className="v-uveg rounded-2xl px-5 py-6 h-full transition-all"
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--v-vonal-2)'; e.currentTarget.style.transform = 'translateY(-3px)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.transform = 'none' }}>
+              <p className="text-3xl font-black mb-1.5" style={{ color: 'var(--v-szoveg)' }}>
+                <Szamlalo ig={szam} utotag={utotag} />
+              </p>
+              <p className="text-xs leading-snug" style={{ color: 'var(--v-szoveg-3)' }}>{cimke}</p>
+            </div>
+          </Feltunik>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════  területek  ═══════════════════════ */
+
+function Teruletek() {
+  const [aktiv, setAktiv] = useState<string | null>(null)
+  const valasztott = KATEGORIA_FA.find(c => c.nev === aktiv)
+
+  return (
+    <section id="teruletek" className="mx-auto max-w-6xl px-6 py-24">
+      <Feltunik>
+        <p className="text-xs font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--v-lila-2)' }}>Szakterületek</p>
+        <h2 className="font-black mb-4 tracking-tight" style={{ fontSize: 'clamp(1.9rem, 4vw, 3rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
+          Bármilyen ötleted van, itt a helye
+        </h2>
+        <p className="text-sm mb-10" style={{ color: 'var(--v-szoveg-2)', maxWidth: '54ch' }}>
+          A napenergiától a vízgazdálkodáson át a csillagászatig — huszonöt szakterület,
+          közel háromszáz kategória. Kattints, hogy lásd mi tartozik bele.
+        </p>
+      </Feltunik>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+        {KATEGORIA_FA.map((cs, i) => {
+          const nyitva = aktiv === cs.nev
+          return (
+            <Feltunik key={cs.nev} keses={Math.min(i, 12) * 45}>
+              <button onClick={() => setAktiv(nyitva ? null : cs.nev)}
+                className="w-full text-left rounded-xl overflow-hidden transition-all h-full"
+                style={{
+                  background: nyitva ? `${cs.szin}18` : 'var(--v-bg-2)',
+                  border: `1px solid ${nyitva ? cs.szin : 'var(--v-vonal)'}`,
+                  boxShadow: nyitva ? `0 0 26px ${cs.szin}33` : 'none',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = cs.szin
+                  e.currentTarget.style.transform = 'translateY(-3px)'
+                  e.currentTarget.style.boxShadow = `0 8px 26px ${cs.szin}2E`
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = nyitva ? cs.szin : 'var(--v-vonal)'
+                  e.currentTarget.style.transform = 'none'
+                  e.currentTarget.style.boxShadow = nyitva ? `0 0 26px ${cs.szin}33` : 'none'
+                }}>
+                <div style={{ height: 2, background: cs.szin }} />
+                <div className="px-3.5 py-3">
+                  <p className="text-[11px] font-bold leading-snug mb-1" style={{ color: cs.szin }}>{cs.nev}</p>
+                  <p className="text-[10px]" style={{ color: 'var(--v-szoveg-3)' }}>{cs.temak.length} kategória</p>
+                </div>
+              </button>
+            </Feltunik>
+          )
+        })}
+      </div>
+
+      {/* Kinyitott terület témái */}
+      <div style={{
+        maxHeight: valasztott ? 420 : 0,
+        opacity: valasztott ? 1 : 0,
+        overflow: 'hidden',
+        transition: 'max-height .45s cubic-bezier(.22,.61,.36,1), opacity .35s ease',
+      }}>
+        {valasztott && (
+          <div className="mt-4 rounded-2xl p-5"
+            style={{ background: 'var(--v-bg-2)', border: `1px solid ${valasztott.szin}44` }}>
+            <p className="text-[11px] font-bold tracking-[0.16em] uppercase mb-3.5" style={{ color: valasztott.szin }}>
+              {valasztott.nev}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {valasztott.temak.map(t => (
+                <span key={t} className="text-xs px-2.5 py-1.5 rounded-lg transition-colors"
+                  style={{ background: `${valasztott.szin}12`, border: `1px solid ${valasztott.szin}2E`, color: 'var(--v-szoveg-2)' }}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════  tételek  ═══════════════════════ */
 
 function EloSor({ p }: { p: EloProjekt }) {
   const [hatra, setHatra] = useState('')
@@ -164,23 +413,19 @@ function EloSor({ p }: { p: EloProjekt }) {
   }, [p.lejarat])
 
   return (
-    <a href={`/project/${p.id}`} className="block transition-colors"
-      onMouseEnter={e => (e.currentTarget.style.background = 'var(--kat-papir-2)')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-      <div className="grid grid-cols-12 gap-4 items-baseline py-5 px-3">
-        <span className="kat-szam col-span-2 sm:col-span-1 text-xs" style={{ color: 'var(--kat-bibor)' }}>ÉLŐ</span>
-        <div className="col-span-10 sm:col-span-7">
-          <p className="text-base" style={{ color: 'var(--kat-tinta)' }}>{p.nev}</p>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--kat-tinta-2)' }}>{p.rovid_leiras}</p>
-          <p className="kat-rovat mt-2" style={{ color: 'var(--kat-tinta-3)' }}>{p.kategoria}</p>
-        </div>
-        <div className="col-span-6 sm:col-span-2 text-left sm:text-right">
-          <p className="kat-szam text-base" style={{ color: 'var(--kat-tinta)' }}>{p.kikialtasi_ar.toLocaleString('hu-HU')} €</p>
-        </div>
-        <div className="col-span-6 sm:col-span-2 text-right">
-          <p className="kat-szam text-sm" style={{ color: 'var(--kat-bibor)' }}>{hatra}</p>
-        </div>
+    <a href={`/project/${p.id}`} className="flex items-center gap-4 px-4 py-4 rounded-xl transition-all"
+      style={{ background: 'var(--v-bg-2)', border: '1px solid rgba(244,63,94,.3)' }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(4px)'; e.currentTarget.style.borderColor = 'var(--v-rozsa)' }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = 'rgba(244,63,94,.3)' }}>
+      <span className="text-[9px] font-black px-2 py-1 rounded shrink-0" style={{ background: 'var(--v-rozsa)', color: '#fff' }}>ÉLŐ</span>
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-sm truncate" style={{ color: 'var(--v-szoveg)' }}>{p.nev}</p>
+        <p className="text-xs truncate mt-0.5" style={{ color: 'var(--v-szoveg-3)' }}>{p.kategoria}</p>
       </div>
+      <p className="text-sm font-black shrink-0" style={{ color: 'var(--v-szoveg)', fontVariantNumeric: 'tabular-nums' }}>
+        {p.kikialtasi_ar.toLocaleString('hu-HU')} €
+      </p>
+      <p className="text-xs font-bold shrink-0 w-14 text-right" style={{ color: 'var(--v-rozsa)', fontVariantNumeric: 'tabular-nums' }}>{hatra}</p>
     </a>
   )
 }
@@ -188,164 +433,159 @@ function EloSor({ p }: { p: EloProjekt }) {
 function SorbanSor({ k }: { k: KirakatElem }) {
   const [csoport, tema] = k.cimke.includes(' · ') ? k.cimke.split(' · ') : [k.cimke, '']
   return (
-    <div className="grid grid-cols-12 gap-4 items-baseline py-5 px-3 transition-colors"
-      onMouseEnter={e => (e.currentTarget.style.background = 'var(--kat-papir-2)')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-      <span className="kat-szam col-span-2 sm:col-span-1 text-sm" style={{ color: 'var(--kat-tinta-3)' }}>
+    <div className="flex items-center gap-4 px-4 py-4 rounded-xl transition-all"
+      style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(4px)'; e.currentTarget.style.borderColor = `${k.szin}88`; e.currentTarget.style.boxShadow = `0 6px 22px ${k.szin}22` }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.boxShadow = 'none' }}>
+      <span className="text-xs shrink-0 w-6" style={{ color: 'var(--v-szoveg-3)', fontVariantNumeric: 'tabular-nums' }}>
         {String(k.sorszam).padStart(2, '0')}
       </span>
-
-      <div className="col-span-10 sm:col-span-7 flex items-baseline gap-3 min-w-0">
-        <span className="shrink-0 translate-y-px" style={{ width: 7, height: 7, background: k.szin, borderRadius: 1 }} />
-        <div className="min-w-0">
-          <p className="text-base truncate" style={{ color: 'var(--kat-tinta)' }}>{tema || csoport}</p>
-          <p className="kat-rovat mt-1.5" style={{ color: 'var(--kat-tinta-3)' }}>{csoport}</p>
+      <span className="w-1 h-9 rounded-full shrink-0" style={{ background: k.szin }} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-[10px] font-bold tracking-widest uppercase truncate" style={{ color: k.szin }}>{csoport}</span>
         </div>
+        <p className="text-sm font-semibold truncate" style={{ color: 'var(--v-szoveg-2)' }}>
+          {tema || csoport}
+        </p>
       </div>
-
-      <div className="col-span-6 sm:col-span-2 text-left sm:text-right">
-        <p className="text-sm" style={{ color: 'var(--kat-tinta-2)' }}>{k.erettseg}</p>
+      <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+        {[0, 1, 2, 3, 4, 5].map(i => (
+          <span key={i} className="rounded-full" style={{ width: 4, height: 4, background: 'var(--v-vonal-2)' }} />
+        ))}
       </div>
-      <div className="col-span-6 sm:col-span-2 text-right">
-        <p className="kat-szam text-sm" style={{ color: 'var(--kat-tinta)' }}>{k.arsav}</p>
-      </div>
+      <span className="text-[10px] font-bold px-2 py-1 rounded shrink-0" style={{ background: `${k.szin}18`, color: k.szin }}>
+        {k.erettseg}
+      </span>
+      <p className="text-xs font-bold shrink-0 hidden sm:block" style={{ color: 'var(--v-szoveg-2)', fontVariantNumeric: 'tabular-nums' }}>{k.arsav}</p>
     </div>
   )
 }
 
 function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) {
   const [kereses, setKereses] = useState('')
-  const [mutatMind, setMutatMind] = useState(false)
+  const [mind, setMind] = useState(false)
 
   const q = kereses.trim().toLowerCase()
   const szurtElo = elo.filter(p => !q || p.nev.toLowerCase().includes(q) || p.kategoria.toLowerCase().includes(q))
   const szurtSor = sorban.filter(k => !q || k.cimke.toLowerCase().includes(q))
-  const lathatoSor = mutatMind ? szurtSor : szurtSor.slice(0, 12)
-  const ures = szurtElo.length === 0 && szurtSor.length === 0
+  const lathatoSor = mind ? szurtSor : szurtSor.slice(0, 10)
 
   return (
-    <section id="tetelek" className="mx-auto max-w-6xl px-6 pt-20 pb-24">
-      <div className="flex items-end justify-between gap-6 flex-wrap mb-6">
-        <div>
-          <Rovat>Tételek</Rovat>
-          <h2 className="kat-cim mt-3" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', color: 'var(--kat-tinta)' }}>
-            Mi kerül kalapács alá
-          </h2>
+    <section id="tetelek" className="mx-auto max-w-5xl px-6 py-24">
+      <Feltunik>
+        <div className="flex items-end justify-between gap-6 flex-wrap mb-8">
+          <div>
+            <p className="text-xs font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--v-rozsa)' }}>Tételek</p>
+            <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(1.9rem, 4vw, 3rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
+              Mi kerül kalapács alá
+            </h2>
+          </div>
+          <input value={kereses} onChange={e => setKereses(e.target.value)}
+            placeholder="Keresés szakterületre…"
+            className="text-sm px-4 py-2.5 rounded-xl w-full sm:w-64 focus:outline-none transition-colors"
+            style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg)' }}
+            onFocus={e => (e.currentTarget.style.borderColor = 'var(--v-lila)')}
+            onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')} />
         </div>
-        <input
-          value={kereses} onChange={e => setKereses(e.target.value)}
-          placeholder="Keresés szakterületre…"
-          className="text-sm px-3 py-2 w-full sm:w-64 focus:outline-none"
-          style={{ background: 'transparent', borderBottom: '1px solid var(--kat-vonal-2)', color: 'var(--kat-tinta)' }}
-        />
-      </div>
 
-      <p className="text-sm mb-7" style={{ color: 'var(--kat-tinta-2)', maxWidth: '58ch' }}>
-        A böngészés ingyenes. A sorban álló tételek részletei az aukció indulásakor
-        derülnek ki — addig védve vannak a másolástól. Licitálni regisztráció után lehet.
-      </p>
+        <p className="text-sm mb-8" style={{ color: 'var(--v-szoveg-3)', maxWidth: '58ch' }}>
+          A böngészés ingyenes. A sorban álló tételek részletei az aukció indulásakor derülnek ki —
+          addig védve vannak a másolástól.
+        </p>
+      </Feltunik>
 
-      <Vonal eros />
-
-      {ures ? (
-        <p className="py-20 text-center text-sm" style={{ color: 'var(--kat-tinta-3)' }}>
+      {szurtElo.length === 0 && szurtSor.length === 0 ? (
+        <p className="py-20 text-center text-sm" style={{ color: 'var(--v-szoveg-3)' }}>
           {q ? 'Erre a keresésre nincs tétel.' : 'Hamarosan érkeznek az első tételek.'}
         </p>
       ) : (
-        <>
-          {szurtElo.length > 0 && (
-            <div>
-              {szurtElo.map((p, i) => (
-                <div key={p.id}>{i > 0 && <Vonal />}<Feltunik keses={i * 25}><EloSor p={p} /></Feltunik></div>
-              ))}
-              <Vonal eros />
-            </div>
-          )}
+        <div className="flex flex-col gap-2">
+          {szurtElo.map((p, i) => <Feltunik key={p.id} keses={i * 40}><EloSor p={p} /></Feltunik>)}
+          {lathatoSor.map((k, i) => <Feltunik key={k.id} keses={Math.min(i, 10) * 40}><SorbanSor k={k} /></Feltunik>)}
+        </div>
+      )}
 
-          {lathatoSor.map((k, i) => (
-            <div key={k.id}>
-              {(i > 0 || szurtElo.length > 0) && <Vonal />}
-              <Feltunik keses={Math.min(i, 12) * 25}><SorbanSor k={k} /></Feltunik>
-            </div>
-          ))}
-          <Vonal eros />
-
-          {szurtSor.length > 12 && (
-            <div className="pt-7 text-center">
-              <button onClick={() => setMutatMind(m => !m)} className="text-sm transition-colors"
-                style={{ color: 'var(--kat-bibor)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--kat-bibor-2)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--kat-bibor)')}>
-                {mutatMind ? 'Kevesebb' : `Mind a ${szurtSor.length} tétel megtekintése`} →
-              </button>
-            </div>
-          )}
-        </>
+      {szurtSor.length > 10 && (
+        <div className="pt-8 text-center">
+          <button onClick={() => setMind(m => !m)}
+            className="text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+            style={{ border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg-2)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--v-lila)'; e.currentTarget.style.color = 'var(--v-szoveg)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal-2)'; e.currentTarget.style.color = 'var(--v-szoveg-2)' }}>
+            {mind ? 'Kevesebb' : `Mind a ${szurtSor.length} tétel`} →
+          </button>
+        </div>
       )}
     </section>
   )
 }
 
-/* ─────────────────────────  menete  ───────────────────────── */
+/* ═══════════════════════  menete  ═══════════════════════ */
 
 function Menete() {
-  const lepesek = [
-    ['Beküldöd', 'Kiválasztod a szakterületet, és leírod az ötleted. Nem kell kész termék — elég egy komoly elgondolás.'],
-    ['Kidolgozzuk', 'Az adott terület szakértőjeként gondolkodó AI kérdez vissza, rámutat a gyenge pontokra, és segít piacképessé formálni.'],
-    ['Felbecsüljük', 'Megbecsüljük a valós piaci értéket az adott szakterület tényleges alkuméretei alapján.'],
-    ['Kalapács alá kerül', 'Időkorlátos árverés. A licit anonim, a legmagasabb ajánlat nyer.'],
-    ['Letétben zárul', 'A vevő fizet, a pénzt letétben tartjuk. Az eladó átadja az anyagot — csak utána fizetünk ki.'],
+  const lepesek: [string, string, string][] = [
+    ['Beküldöd', 'Kiválasztod a szakterületet és leírod az ötleted. Nem kell kész termék.', '#A78BFA'],
+    ['Kidolgozzuk', 'Az adott terület szakértőjeként gondolkodó AI kérdez vissza és piacképessé formálja.', '#38BDF8'],
+    ['Felbecsüljük', 'Megbecsüljük a valós piaci értéket a szakterület tényleges alkuméretei alapján.', '#34D399'],
+    ['Kalapács alá kerül', 'Időkorlátos, anonim élő aukció. A legmagasabb ajánlat nyer.', '#FBBF24'],
+    ['Letétben zárul', 'A pénzt letétben tartjuk. Az eladó átad, csak utána fizetünk ki.', '#F43F5E'],
   ]
   return (
-    <section id="menete" className="mx-auto max-w-6xl px-6 py-20" style={{ borderTop: '1px solid var(--kat-vonal)' }}>
-      <Rovat>Az árverés menete</Rovat>
-      <h2 className="kat-cim mt-3 mb-12" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', color: 'var(--kat-tinta)' }}>
-        Ötlettől a kalapácsig
-      </h2>
+    <section id="menete" className="mx-auto max-w-4xl px-6 py-24">
+      <Feltunik>
+        <p className="text-xs font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--v-lila-2)' }}>Az aukció menete</p>
+        <h2 className="font-black mb-12 tracking-tight" style={{ fontSize: 'clamp(1.9rem, 4vw, 3rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
+          Ötlettől a kalapácsig
+        </h2>
+      </Feltunik>
 
-      <div>
-        <Vonal eros />
-        {lepesek.map(([cim, leiras], i) => (
-          <div key={cim}>
-            {i > 0 && <Vonal />}
-            <Feltunik keses={i * 50}>
-              <div className="grid grid-cols-12 gap-x-6 gap-y-2 py-7">
-                <span className="kat-szam col-span-12 sm:col-span-1 text-sm" style={{ color: 'var(--kat-tinta-3)' }}>
+      <div className="relative">
+        <div className="absolute left-[19px] top-3 bottom-3 w-px hidden sm:block"
+          style={{ background: 'linear-gradient(180deg, var(--v-lila), var(--v-rozsa))', opacity: .35 }} />
+        <div className="flex flex-col gap-3">
+          {lepesek.map(([cim, leiras, szin], i) => (
+            <Feltunik key={cim} keses={i * 90}>
+              <div className="flex gap-5 items-start group">
+                <span className="hidden sm:flex shrink-0 h-10 w-10 rounded-full items-center justify-center text-xs font-black relative z-10 transition-transform"
+                  style={{ background: 'var(--v-bg-3)', border: `1px solid ${szin}66`, color: szin }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="kat-cim col-span-12 sm:col-span-4" style={{ fontSize: '1.5rem', color: 'var(--kat-tinta)' }}>{cim}</h3>
-                <p className="col-span-12 sm:col-span-7 text-sm leading-relaxed" style={{ color: 'var(--kat-tinta-2)' }}>{leiras}</p>
+                <div className="flex-1 rounded-2xl px-5 py-4 transition-all"
+                  style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = `${szin}66`; e.currentTarget.style.transform = 'translateX(4px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.transform = 'none' }}>
+                  <h3 className="font-bold text-base mb-1" style={{ color: 'var(--v-szoveg)' }}>{cim}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--v-szoveg-2)' }}>{leiras}</p>
+                </div>
               </div>
             </Feltunik>
-          </div>
-        ))}
-        <Vonal eros />
+          ))}
+        </div>
       </div>
     </section>
   )
 }
 
-/* ─────────────────────────  kérdések  ───────────────────────── */
+/* ═══════════════════════  kérdések  ═══════════════════════ */
 
 function Kerdes({ k, v }: { k: string; v: string }) {
   const [nyitva, setNyitva] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLParagraphElement>(null)
   const [magassag, setMagassag] = useState(0)
   useEffect(() => { if (ref.current) setMagassag(nyitva ? ref.current.scrollHeight : 0) }, [nyitva])
 
   return (
-    <div>
+    <div className="rounded-2xl overflow-hidden transition-all"
+      style={{ background: nyitva ? 'var(--v-bg-3)' : 'var(--v-bg-2)', border: `1px solid ${nyitva ? 'var(--v-vonal-2)' : 'var(--v-vonal)'}` }}>
       <button onClick={() => setNyitva(n => !n)} aria-expanded={nyitva}
-        className="w-full flex items-baseline justify-between gap-6 py-5 text-left">
-        <span className="text-base" style={{ color: 'var(--kat-tinta)' }}>{k}</span>
-        <span className="kat-szam shrink-0 text-lg leading-none" style={{
-          color: 'var(--kat-bibor)',
-          transform: nyitva ? 'rotate(45deg)' : 'none',
-          transition: 'transform .3s',
-        }}>+</span>
+        className="w-full flex items-center justify-between gap-5 px-5 py-4 text-left">
+        <span className="text-sm font-semibold" style={{ color: 'var(--v-szoveg)' }}>{k}</span>
+        <span className="shrink-0 text-lg font-black leading-none"
+          style={{ color: 'var(--v-rozsa)', transform: nyitva ? 'rotate(135deg)' : 'none', transition: 'transform .35s cubic-bezier(.34,1.56,.64,1)' }}>+</span>
       </button>
-      <div style={{ maxHeight: magassag, overflow: 'hidden', transition: 'max-height .35s ease' }}>
-        <p ref={ref} className="pb-6 text-sm leading-relaxed" style={{ color: 'var(--kat-tinta-2)', maxWidth: '62ch' }}>{v}</p>
+      <div style={{ maxHeight: magassag, overflow: 'hidden', transition: 'max-height .4s cubic-bezier(.22,.61,.36,1)' }}>
+        <p ref={ref} className="px-5 pb-5 text-sm leading-relaxed" style={{ color: 'var(--v-szoveg-2)' }}>{v}</p>
       </div>
     </div>
   )
@@ -353,119 +593,139 @@ function Kerdes({ k, v }: { k: string; v: string }) {
 
 function Kerdesek() {
   const lista: [string, string][] = [
-    ['Nincs kész termékem, csak egy ötletem. Beküldhetem?', 'Igen — a katalógus túlnyomó része ilyen. A tételeket három érettségi szinten jelöljük: Ötlet, Prototípus és Bizonyított. A kész termék magasabb árat ér el, de a puszta ötletnek is van piaca.'],
+    ['Nincs kész termékem, csak egy ötletem. Beküldhetem?', 'Igen — a katalógus túlnyomó része ilyen. Három érettségi szintet jelölünk: Ötlet, Prototípus és Bizonyított. A kész termék magasabb árat ér el, de a puszta ötletnek is van piaca.'],
     ['Honnan tudom, hogy nem lopják el az ötletemet?', 'Az aukció indulásáig sem a tétel neve, sem a leírása nem jelenik meg — csak a szakterület, az érettség és egy ársáv. A részletes anyagot kizárólag a nyertes vevő kapja meg, az átadás részeként.'],
     ['Mibe kerül?', 'A beküldés és a böngészés ingyenes. Sikeres eladás után a végösszeg 10%-át számítjuk fel, amit az eladó fizet. Ha nem kel el a tétel, nem fizetsz semmit.'],
-    ['Milyen témában küldhetek be ötletet?', 'Huszonöt szakterületen, a napenergiától a vízgazdálkodáson át a csillagászatig — összesen közel háromszáz kategóriában. Ha valós problémát old meg és van aki megvenné, itt a helye.'],
-    ['Mikor indul az első aukció?', 'Amint összegyűlik a kellő számú érdeklődő. Addig a beküldött tételek a sorban állnak, és senki nem tud licitálni — így az első árverésen már valódi vevők lesznek jelen.'],
+    ['Milyen témában küldhetek be ötletet?', 'Huszonöt szakterületen, a napenergiától a vízgazdálkodáson át a csillagászatig — közel háromszáz kategóriában. Ha valós problémát old meg és van aki megvenné, itt a helye.'],
+    ['Mikor indul az első aukció?', 'Amint összegyűlik a kellő számú érdeklődő. Addig a beküldött tételek sorban állnak, és senki nem tud licitálni — így az első árverésen már valódi vevők lesznek jelen.'],
     ['Hogyan védett a személyazonosságom?', 'Az eladók és a vevők álnéven jelennek meg. A valódi személyazonosság kizárólag sikeres eladás után, az átadás részeként kerül megosztásra.'],
   ]
   return (
-    <section id="kerdesek" className="mx-auto max-w-3xl px-6 py-20" style={{ borderTop: '1px solid var(--kat-vonal)' }}>
-      <Rovat>Kérdések</Rovat>
-      <h2 className="kat-cim mt-3 mb-10" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', color: 'var(--kat-tinta)' }}>
-        Mielőtt belicitálsz
-      </h2>
-      <Vonal eros />
-      {lista.map(([k, v], i) => (
-        <div key={k}>{i > 0 && <Vonal />}<Kerdes k={k} v={v} /></div>
-      ))}
-      <Vonal eros />
+    <section id="kerdesek" className="mx-auto max-w-3xl px-6 py-24">
+      <Feltunik>
+        <p className="text-xs font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--v-lila-2)' }}>Kérdések</p>
+        <h2 className="font-black mb-10 tracking-tight" style={{ fontSize: 'clamp(1.9rem, 4vw, 3rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
+          Mielőtt belicitálsz
+        </h2>
+      </Feltunik>
+      <div className="flex flex-col gap-2.5">
+        {lista.map(([k, v], i) => <Feltunik key={k} keses={i * 60}><Kerdes k={k} v={v} /></Feltunik>)}
+      </div>
     </section>
   )
 }
 
-/* ─────────────────────────  feliratkozás  ───────────────────────── */
+/* ═══════════════════════  feliratkozás  ═══════════════════════ */
 
 function Feliratkozas({ szam, novel }: { szam: number; novel: () => void }) {
   const [email, setEmail] = useState('')
   const [allapot, setAllapot] = useState<'nyugalom' | 'kuld' | 'siker' | 'hiba'>('nyugalom')
+  const { ref, lathato } = useLathato<HTMLDivElement>()
 
   async function bekuld(e: React.FormEvent) {
     e.preventDefault()
     setAllapot('kuld')
     const { error } = await supabase.from('feliratkozok').insert([{ email }])
-    if (error) { setAllapot(error.code === '23505' ? 'siker' : 'hiba') }
+    if (error) setAllapot(error.code === '23505' ? 'siker' : 'hiba')
     else { setAllapot('siker'); setEmail(''); novel() }
   }
 
-  const szazalek = Math.min(100, Math.round((szam / INDULAS_KUSZOB) * 100))
+  const szazalek = Math.min(100, (szam / INDULAS_KUSZOB) * 100)
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-24" style={{ borderTop: '1px solid var(--kat-vonal)' }}>
-      <div className="grid lg:grid-cols-12 gap-x-10 gap-y-10">
-        <div className="lg:col-span-6">
-          <Rovat>Az első árverés</Rovat>
-          <h2 className="kat-cim mt-3" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', color: 'var(--kat-tinta)' }}>
-            Ott leszel,<br />amikor lecsap<br />
-            <span style={{ fontStyle: 'italic', color: 'var(--kat-bibor)' }}>a kalapács?</span>
-          </h2>
-          <p className="mt-6 text-sm leading-relaxed" style={{ color: 'var(--kat-tinta-2)', maxWidth: '48ch' }}>
-            Az árverés akkor indul, amikor összegyűlik a kellő számú érdeklődő.
-            Szólunk, mielőtt az első tétel kalapács alá kerül.
-          </p>
-        </div>
+    <section className="mx-auto max-w-4xl px-6 pb-28">
+      <Feltunik>
+        <div className="relative rounded-3xl overflow-hidden px-6 sm:px-12 py-14 text-center"
+          style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal-2)' }}>
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true" style={{
+            background: 'radial-gradient(ellipse 70% 90% at 50% 0%, rgba(124,58,237,.28) 0%, transparent 65%)',
+          }} />
 
-        <div className="lg:col-span-6 lg:pl-10" style={{ borderLeft: '1px solid var(--kat-vonal)' }}>
-          <div className="flex items-baseline justify-between gap-4">
-            <Rovat>Érdeklődők</Rovat>
-            <p className="kat-szam text-sm" style={{ color: 'var(--kat-tinta-2)' }}>
-              {szam.toLocaleString('hu-HU')} / {INDULAS_KUSZOB.toLocaleString('hu-HU')}
+          <div className="relative">
+            <h2 className="font-black mb-4 tracking-tight" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
+              Ott leszel, amikor<br /><span className="v-fenylo">lecsap a kalapács?</span>
+            </h2>
+            <p className="text-sm mb-9 mx-auto" style={{ color: 'var(--v-szoveg-2)', maxWidth: '44ch' }}>
+              Az aukció akkor indul, amikor összegyűlik a kellő számú érdeklődő.
+              Szólunk, mielőtt az első tétel kalapács alá kerül.
             </p>
-          </div>
 
-          <div className="mt-3 mb-8 h-px w-full" style={{ background: 'var(--kat-vonal)' }}>
-            <div style={{ height: 1, width: `${szazalek}%`, background: 'var(--kat-bibor)', transition: 'width 1s ease' }} />
-          </div>
-
-          {allapot === 'siker' ? (
-            <div className="py-4">
-              <p className="kat-cim" style={{ fontSize: '1.6rem', color: 'var(--kat-tinta)' }}>Felírtunk a listára.</p>
-              <p className="mt-2 text-sm" style={{ color: 'var(--kat-tinta-2)' }}>Az első árverés előtt keresünk.</p>
+            <div ref={ref} className="mx-auto mb-9" style={{ maxWidth: 420 }}>
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: 'var(--v-szoveg-3)' }}>Érdeklődők</span>
+                <span className="text-xs font-bold" style={{ color: 'var(--v-szoveg-2)', fontVariantNumeric: 'tabular-nums' }}>
+                  {szam.toLocaleString('hu-HU')} / {INDULAS_KUSZOB.toLocaleString('hu-HU')}
+                </span>
+              </div>
+              <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: 'var(--v-bg-4)' }}>
+                <div style={{
+                  height: '100%',
+                  width: lathato ? `${Math.max(szazalek, 1.5)}%` : '0%',
+                  background: 'linear-gradient(90deg, var(--v-lila), var(--v-rozsa))',
+                  borderRadius: 999,
+                  transition: 'width 1.6s cubic-bezier(.22,.61,.36,1) .2s',
+                }} />
+              </div>
             </div>
-          ) : (
-            <form onSubmit={bekuld} className="flex flex-col sm:flex-row gap-3">
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="nev@pelda.hu"
-                className="flex-1 text-sm px-3 py-3 focus:outline-none"
-                style={{ background: 'transparent', borderBottom: '1px solid var(--kat-vonal-2)', color: 'var(--kat-tinta)' }} />
-              <button type="submit" disabled={allapot === 'kuld'}
-                className="px-6 py-3 text-sm font-medium shrink-0 transition-opacity"
-                style={{ background: 'var(--kat-tinta)', color: 'var(--kat-papir)', opacity: allapot === 'kuld' ? .6 : 1 }}>
-                {allapot === 'kuld' ? 'Küldés…' : 'Értesítsetek'}
-              </button>
-            </form>
-          )}
-          {allapot === 'hiba' && (
-            <p className="mt-3 text-sm" style={{ color: 'var(--kat-bibor)' }}>Nem sikerült. Próbáld meg újra.</p>
-          )}
+
+            {allapot === 'siker' ? (
+              <div className="py-3">
+                <p className="text-xl font-black mb-1" style={{ color: 'var(--v-zold)' }}>Felírtunk a listára.</p>
+                <p className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>Az első aukció előtt keresünk.</p>
+              </div>
+            ) : (
+              <form onSubmit={bekuld} className="flex flex-col sm:flex-row gap-2.5 mx-auto" style={{ maxWidth: 420 }}>
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="nev@pelda.hu"
+                  className="flex-1 text-sm px-4 py-3 rounded-xl focus:outline-none transition-colors"
+                  style={{ background: 'var(--v-bg)', border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg)' }}
+                  onFocus={e => (e.currentTarget.style.borderColor = 'var(--v-lila)')}
+                  onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal-2)')} />
+                <button type="submit" disabled={allapot === 'kuld'}
+                  className="px-6 py-3 rounded-xl text-sm font-bold shrink-0 transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--v-lila), var(--v-rozsa))',
+                    color: '#fff', opacity: allapot === 'kuld' ? .6 : 1,
+                    boxShadow: '0 8px 26px rgba(124,58,237,.4)',
+                  }}
+                  onMouseEnter={e => { if (allapot !== 'kuld') e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}>
+                  {allapot === 'kuld' ? 'Küldés…' : 'Értesítsetek'}
+                </button>
+              </form>
+            )}
+            {allapot === 'hiba' && <p className="mt-3 text-sm" style={{ color: 'var(--v-rozsa)' }}>Nem sikerült. Próbáld meg újra.</p>}
+          </div>
         </div>
-      </div>
+      </Feltunik>
     </section>
   )
 }
 
-/* ─────────────────────────  lábléc  ───────────────────────── */
+/* ═══════════════════════  lábléc  ═══════════════════════ */
 
 function Lablec() {
   return (
-    <footer className="mx-auto max-w-6xl px-6 py-12" style={{ borderTop: '1px solid var(--kat-vonal-2)' }}>
-      <div className="flex flex-wrap items-baseline justify-between gap-6">
-        <span className="kat-cim" style={{ fontSize: '1.4rem', color: 'var(--kat-tinta)' }}>BidVip</span>
-        <nav className="flex flex-wrap gap-x-7 gap-y-2">
-          {[['Tételek', '#tetelek'], ['Menete', '#menete'], ['Kérdések', '#kerdesek'], ['Aukciósház', '/aukciosHaz'], ['Belépés', '/auth']].map(([c, h]) => (
-            <a key={h} href={h} className="text-sm transition-colors" style={{ color: 'var(--kat-tinta-2)' }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'var(--kat-tinta)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'var(--kat-tinta-2)')}>{c}</a>
+    <footer className="mx-auto max-w-6xl px-6 py-10" style={{ borderTop: '1px solid var(--v-vonal)' }}>
+      <div className="flex flex-wrap items-center justify-between gap-5">
+        <div className="flex items-center gap-2.5">
+          <span className="h-2 w-2 rounded-full" style={{ background: 'var(--v-rozsa)' }} />
+          <span className="font-bold" style={{ color: 'var(--v-szoveg)' }}>BidVip</span>
+        </div>
+        <nav className="flex flex-wrap gap-x-6 gap-y-2">
+          {[['Tételek', '#tetelek'], ['Területek', '#teruletek'], ['Menete', '#menete'], ['Kérdések', '#kerdesek'], ['Aukciósház', '/aukciosHaz']].map(([c, h]) => (
+            <a key={h} href={h} className="text-sm transition-colors" style={{ color: 'var(--v-szoveg-3)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>{c}</a>
           ))}
         </nav>
-        <p className="kat-szam text-xs" style={{ color: 'var(--kat-tinta-3)' }}>© {new Date().getFullYear()} BidVip</p>
+        <p className="text-xs" style={{ color: 'var(--v-szoveg-3)' }}>© {new Date().getFullYear()} BidVip</p>
       </div>
     </footer>
   )
 }
 
-/* ─────────────────────────  oldal  ───────────────────────── */
+/* ═══════════════════════  oldal  ═══════════════════════ */
 
 export default function Fooldal() {
   const [elo, setElo] = useState<EloProjekt[]>([])
@@ -484,10 +744,12 @@ export default function Fooldal() {
   }, [])
 
   return (
-    <div style={{ background: 'var(--kat-papir)', color: 'var(--kat-tinta)', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)', minHeight: '100vh', overflowX: 'hidden' }}>
       <Fejlec />
       <main>
-        <Hero varolista={sorban.length} elo={elo.length} />
+        <Hero varolista={sorban.length} />
+        <Szamok varolista={sorban.length} />
+        <Teruletek />
         <Tetelek elo={elo} sorban={sorban} />
         <Menete />
         <Kerdesek />
