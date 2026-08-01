@@ -127,10 +127,10 @@ body {
   font-family: var(--font-geist-sans), 'Arial Narrow', Arial, sans-serif;
 }
 
-/* ── Auction urgency pulse ── */
+/* ── Lejáró aukció lüktetése ── */
 @keyframes urgentPulse {
-  0%, 100% { border-color: #DC262699; box-shadow: 0 0 20px #DC262655; }
-  50%       { border-color: #DC2626CC; box-shadow: 0 0 36px #DC262677; }
+  0%, 100% { border-color: #F43F5E99; box-shadow: 0 0 20px #F43F5E55; }
+  50%      { border-color: #F43F5ECC; box-shadow: 0 0 36px #F43F5E77; }
 }
 
 @keyframes fadeInUp {
