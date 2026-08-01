@@ -137,3 +137,36 @@ export function keressTemat(query: string) {
   if (!q) return OSSZES_TEMA
   return OSSZES_TEMA.filter(t => t.nev.toLowerCase().includes(q) || t.csoport.toLowerCase().includes(q))
 }
+
+export function csoportjaTemanak(tema: string): KategoriaCsoport | null {
+  return KATEGORIA_FA.find(c => c.temak.includes(tema)) ?? null
+}
+
+/**
+ * A kiválasztott témából szakértői kontextust épít az AI promptokhoz.
+ * Enélkül a kategória csak egy címke — ezzel az AI az adott terület
+ * szakértőjeként értékel: releváns szabályozás, versenytársak, buktatók.
+ */
+export function szakertoiKontextus(tema: string): string {
+  const csoport = csoportjaTemanak(tema)
+  if (!csoport) {
+    return tema ? `\nDOMAIN: ${tema}\nEvaluate within the norms of this field.` : ''
+  }
+
+  const testverek = csoport.temak.filter(t => t !== tema).slice(0, 8)
+
+  return `
+DOMAIN EXPERTISE — the seller selected this field, so evaluate as a specialist in it:
+- Field: ${csoport.nev}
+- Specific area: ${tema}
+- Adjacent areas in this field: ${testverek.join(', ')}
+
+Judge this idea by the standards of ${csoport.nev}, not generic startup standards:
+- Who are the real buyers, incumbents and competitors in ${tema}?
+- What regulation, certification, licensing or safety requirements apply in this field?
+- What capital intensity, development timeline and technical risk are typical here?
+- What counts as meaningful proof of traction in ${tema} specifically?
+- Which pitfalls kill most projects in this exact area?
+
+An idea that is strong in software may be weak in ${csoport.nev} and vice versa — calibrate to the field.`
+}
