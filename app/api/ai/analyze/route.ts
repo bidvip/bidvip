@@ -25,6 +25,7 @@ Project details:
 - Stage: ${BADGE_LABELS[badge] || badge}
 - Starting bid: €${kikialtasi_ar}
 - Short description: ${rovid_leiras}
+${szakertoiKontextus(kategoria)}
 
 Note: Only public listing info is available — full documentation is unlocked for the winning buyer.
 
