@@ -8,9 +8,11 @@ export const dynamic = 'force-dynamic'
  * Publikus kirakat — bejelentkezés nélkül is hívható.
  *
  * A `projektek` táblát RLS védi, így a böngésző anon kulccsal semmit nem lát.
- * Ez a végpont service kulccsal olvas, de a várólistáról KIZÁRÓLAG az
- * anonimizált mezőket adja vissza: a név és a leírás el sem hagyja a szervert.
- * Így az anonimitás szerveroldali garancia, nem kliensoldali megállapodás.
+ * Ez a végpont service kulccsal olvas, de a várólistáról csak a `kirakatba()`
+ * által engedélyezett mezőket adja tovább: név, egymondatos leírás, szakterület,
+ * érettség és ársáv. A részletes kifejtés, a fájlok és az AI-elemzés le sem
+ * kérdeződik — így nem kliensoldali megállapodás védi őket, hanem az, hogy
+ * el sem hagyják az adatbázist.
  *
  * Élő aukciónál a teljes tartalom mehet — az már amúgy is nyilvános.
  */
