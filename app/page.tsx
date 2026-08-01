@@ -436,33 +436,38 @@ function EloSor({ p }: { p: EloProjekt }) {
 }
 
 function SorbanSor({ k }: { k: KirakatElem }) {
-  const [csoport, tema] = k.cimke.includes(' · ') ? k.cimke.split(' · ') : [k.cimke, '']
   return (
-    <div className="flex items-center gap-4 px-4 py-4 rounded-xl transition-all"
+    <div className="rounded-2xl overflow-hidden transition-all"
       style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(4px)'; e.currentTarget.style.borderColor = `${k.szin}88`; e.currentTarget.style.boxShadow = `0 6px 22px ${k.szin}22` }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = `${k.szin}88`; e.currentTarget.style.boxShadow = `0 10px 30px ${k.szin}26` }}
       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.boxShadow = 'none' }}>
-      <span className="text-xs shrink-0 w-6" style={{ color: 'var(--v-szoveg-3)', fontVariantNumeric: 'tabular-nums' }}>
-        {String(k.sorszam).padStart(2, '0')}
-      </span>
-      <span className="w-1 h-9 rounded-full shrink-0" style={{ background: k.szin }} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 mb-1">
-          <span className="text-[10px] font-bold tracking-widest uppercase truncate" style={{ color: k.szin }}>{csoport}</span>
+      <div style={{ height: 2, background: `linear-gradient(90deg, ${k.szin}, transparent)` }} />
+
+      <div className="px-5 py-4">
+        <div className="flex items-start gap-4">
+          <span className="text-xs shrink-0 pt-0.5 w-6" style={{ color: 'var(--v-szoveg-3)', fontVariantNumeric: 'tabular-nums' }}>
+            {String(k.sorszam).padStart(2, '0')}
+          </span>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5 truncate" style={{ color: k.szin }}>
+              {k.csoport} · {k.tema}
+            </p>
+            <h3 className="text-base font-bold mb-1.5" style={{ color: 'var(--v-szoveg)' }}>{k.nev}</h3>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--v-szoveg-2)' }}>{k.leiras}</p>
+
+            <div className="flex items-center gap-3 mt-3.5 flex-wrap">
+              <span className="text-[10px] font-bold px-2 py-1 rounded" style={{ background: `${k.szin}18`, color: k.szin }}>
+                {k.erettseg}
+              </span>
+              <span className="text-xs" style={{ color: 'var(--v-szoveg-2)', fontVariantNumeric: 'tabular-nums' }}>{k.arsav}</span>
+              <span className="text-[11px] ml-auto" style={{ color: 'var(--v-szoveg-3)' }}>
+                Részletek az aukción
+              </span>
+            </div>
+          </div>
         </div>
-        <p className="text-sm font-semibold truncate" style={{ color: 'var(--v-szoveg-2)' }}>
-          {tema || csoport}
-        </p>
       </div>
-      <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-        {[0, 1, 2, 3, 4, 5].map(i => (
-          <span key={i} className="rounded-full" style={{ width: 4, height: 4, background: 'var(--v-vonal-2)' }} />
-        ))}
-      </div>
-      <span className="text-[10px] font-bold px-2 py-1 rounded shrink-0" style={{ background: `${k.szin}18`, color: k.szin }}>
-        {k.erettseg}
-      </span>
-      <p className="text-xs font-bold shrink-0 hidden sm:block" style={{ color: 'var(--v-szoveg-2)', fontVariantNumeric: 'tabular-nums' }}>{k.arsav}</p>
     </div>
   )
 }
