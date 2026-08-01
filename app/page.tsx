@@ -165,6 +165,7 @@ function LiveListings() {
   const [kereses, setKereses] = useState('')
 
   useEffect(() => {
+    // Élő aukciók teljes tartalommal
     supabase
       .from('projektek')
       .select('id, nev, rovid_leiras, kategoria, badge, kikialtasi_ar, lejarat')
@@ -172,6 +173,16 @@ function LiveListings() {
       .order('created_at', { ascending: false })
       .limit(50)
       .then(({ data }) => { if (data) setProjektek(data) })
+
+    // Sorban álló ötletek — kizárólag anonimizálva
+    supabase
+      .from('projektek')
+      .select(KIRAKAT_MEZOK)
+      .eq('statusz', 'varakozas')
+      .order('priority_tokens', { ascending: false })
+      .order('varakozas_kezd', { ascending: true })
+      .limit(24)
+      .then(({ data }) => { if (data) setSorban(data.map((p, i) => kirakatba(p, i + 1))) })
   }, [])
 
   const kategoriak = ['Összes', ...Array.from(new Set(projektek.map(p => p.kategoria).filter(Boolean)))]
