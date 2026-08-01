@@ -386,13 +386,13 @@ function Teruletek() {
 
       {/* Kinyitott terület témái */}
       <div style={{
-        maxHeight: valasztott ? 420 : 0,
+        maxHeight: valasztott ? panelMagassag : 0,
         opacity: valasztott ? 1 : 0,
         overflow: 'hidden',
         transition: 'max-height .45s cubic-bezier(.22,.61,.36,1), opacity .35s ease',
       }}>
         {valasztott && (
-          <div className="mt-4 rounded-2xl p-5"
+          <div ref={panelRef} className="mt-4 rounded-2xl p-5"
             style={{ background: 'var(--v-bg-2)', border: `1px solid ${valasztott.szin}44` }}>
             <p className="text-[11px] font-bold tracking-[0.16em] uppercase mb-3.5" style={{ color: valasztott.szin }}>
               {valasztott.nev}
