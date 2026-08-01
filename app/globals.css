@@ -1,6 +1,42 @@
 @import "tailwindcss";
 
-/* ── BidVip Design Tokens — Auction House Luxe ── */
+/* ══════════════════════════════════════════════════════════════
+   BidVip — Árverési katalógus
+   Papír és tinta, nem képernyő. A tételek katalógusban állnak:
+   tételszám, hajszálvonal, táblázatos szám. A szín ritka és drága.
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --kat-papir:     #F7F4ED;  /* katalóguslap */
+  --kat-papir-2:   #EFEAE0;  /* mélyedés, sáv */
+  --kat-papir-3:   #E5DFD2;  /* kiemelt mező */
+  --kat-tinta:     #1A1512;  /* főszöveg */
+  --kat-tinta-2:   #6B6055;  /* másodlagos */
+  --kat-tinta-3:   #9A9082;  /* halvány, adat */
+  --kat-vonal:     #DDD5C7;  /* hajszálvonal */
+  --kat-vonal-2:   #C8BDA9;  /* erősebb elválasztás */
+  --kat-bibor:     #8B1E24;  /* licit, élő, hangsúly */
+  --kat-bibor-2:   #A82830;
+  --kat-arany:     #A67C00;  /* prémium jelölés */
+  --kat-zold:      #3F6B३C;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --kat-papir:   #14110E;
+    --kat-papir-2: #1C1815;
+    --kat-papir-3: #241F1A;
+    --kat-tinta:   #F2EDE3;
+    --kat-tinta-2: #A89C8B;
+    --kat-tinta-3: #6B6055;
+    --kat-vonal:   #2E2822;
+    --kat-vonal-2: #443C33;
+    --kat-bibor:   #C4444A;
+    --kat-bibor-2: #D65A60;
+    --kat-arany:   #C9A227;
+  }
+}
+
+/* ── Régi sötét paletta — a még át nem tervezett oldalak használják ── */
 :root {
   --bv-bg:          #100C0F;
   --bv-bg-card:     #1A1217;
