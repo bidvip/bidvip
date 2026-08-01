@@ -92,6 +92,8 @@ const { data: { user: winner } } = await supabase.auth.admin.getUserById(topLici
       }
     }
 
+    if (!elindultE) { eredmeny[sav] = 'prelaunch'; continue }
+
     // 2. Check how many slots are active (max 3 per lane)
     const { data: aktivLista } = await supabase
       .from('projektek')
