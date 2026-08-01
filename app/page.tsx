@@ -243,7 +243,7 @@ function SorbanKartya({ k, keses }: { k: KirakatElem; keses: number }) {
 
 /* ═══════════════════════  hero  ═══════════════════════ */
 
-function Hero({ varolista }: { varolista: number }) {
+function Hero({ varolista, elsoHarom }: { varolista: number; elsoHarom: KirakatElem[] }) {
   return (
     <section className="relative pt-[72px]">
       <Aurora />
