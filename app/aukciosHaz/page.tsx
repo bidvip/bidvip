@@ -338,7 +338,7 @@ function BidModal({ projekt, user, onZar }: { projekt: Projekt; user: User | nul
 export default function Marketplace() {
   const supabase = createClient()
   const [aktivak, setAktivak]   = useState<Record<string, Projekt[]>>({ fast: [], standard: [], premium: [] })
-  const [sor, setSor]           = useState<Projekt[]>([])
+  const [sor, setSor]           = useState<KirakatElem[]>([])
   const [topLicitek, setTopLicitek]   = useState<Record<string, number>>({})
   const [licitekSzama, setLicitekSzama] = useState<Record<string, number>>({})
   const [user, setUser]         = useState<User | null>(null)
