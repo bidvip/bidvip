@@ -30,8 +30,9 @@ Rules:
 - Do NOT start with the project name or a title
 - Do NOT use any markdown formatting (no #, no **, no -)
 - Sentence 1: what the product does and who it's for
-- Sentence 2: the market opportunity and timing
-- Sentence 3: why a buyer should be excited to acquire this now`,
+- Sentence 2: the market opportunity and timing, grounded in the real dynamics of the ${kategoria} field
+- Sentence 3: why a buyer should be excited to acquire this now
+- Use the vocabulary a professional in ${kategoria} would use — no generic startup buzzwords`,
     }],
   })
 
