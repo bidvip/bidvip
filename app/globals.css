@@ -145,5 +145,5 @@ body {
 
 /* ── Global resets ── */
 * { box-sizing: border-box; }
-::selection { background: #DC262633; color: #F5F0E8; }
-:focus-visible { outline: 2px solid var(--bv-gold); outline-offset: 2px; }
+::selection { background: #7C3AED4D; color: var(--v-szoveg); }
+:focus-visible { outline: 2px solid var(--v-lila-2); outline-offset: 2px; }
