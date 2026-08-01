@@ -371,28 +371,33 @@ function Teruletek() {
       </div>
 
       {/* Kinyitott terület témái */}
+      {/* A panel a tartalma természetes magasságára nyílik. A rácssor
+          0fr→1fr animálása mérés nélkül működik, így ablakátméretezéskor
+          és mobilon sem vág le semmit. */}
       <div style={{
-        maxHeight: valasztott ? panelMagassag : 0,
+        display: 'grid',
+        gridTemplateRows: valasztott ? '1fr' : '0fr',
         opacity: valasztott ? 1 : 0,
-        overflow: 'hidden',
-        transition: 'max-height .45s cubic-bezier(.22,.61,.36,1), opacity .35s ease',
+        transition: 'grid-template-rows .45s cubic-bezier(.22,.61,.36,1), opacity .35s ease',
       }}>
-        {valasztott && (
-          <div ref={panelRef} className="mt-4 rounded-2xl p-5"
-            style={{ background: 'var(--v-bg-2)', border: `1px solid ${valasztott.szin}44` }}>
-            <p className="text-[11px] font-bold tracking-[0.16em] uppercase mb-3.5" style={{ color: valasztott.szin }}>
-              {valasztott.nev}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {valasztott.temak.map(t => (
-                <span key={t} className="text-xs px-2.5 py-1.5 rounded-lg transition-colors"
-                  style={{ background: `${valasztott.szin}12`, border: `1px solid ${valasztott.szin}2E`, color: 'var(--v-szoveg-2)' }}>
-                  {t}
-                </span>
-              ))}
+        <div style={{ overflow: 'hidden', minHeight: 0 }}>
+          {valasztott && (
+            <div className="mt-4 rounded-2xl p-5"
+              style={{ background: 'var(--v-bg-2)', border: `1px solid ${valasztott.szin}44` }}>
+              <p className="text-[11px] font-bold tracking-[0.16em] uppercase mb-3.5" style={{ color: valasztott.szin }}>
+                {valasztott.nev}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {valasztott.temak.map(t => (
+                  <span key={t} className="text-xs px-2.5 py-1.5 rounded-lg"
+                    style={{ background: `${valasztott.szin}12`, border: `1px solid ${valasztott.szin}2E`, color: 'var(--v-szoveg-2)' }}>
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   )
