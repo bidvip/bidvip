@@ -15,8 +15,11 @@ The seller's project:
 - Short description: ${projekt.rovid_leiras}
 - Detailed description: ${projekt.reszletes_leiras}${fajlSzovegek.length > 0 ? `\n\nExtracted content from uploaded documents:\n${fajlSzovegek.map((s: string, i: number) => `[Document ${i + 1}]:\n${s}`).join('\n\n')}` : ''}
 
+${szakertoiKontextus(projekt.kategoria)}
+
 HOW TO RESPOND:
 - Give a real, professional opinion — like a VC would in a 15-minute meeting
+- Reference concrete realities of this specific field: named competitors, regulations, cost structures
 - Be direct and honest. If something is weak, name it specifically and explain why it matters
 - Don't just ask questions — give concrete suggestions, examples, and direction
 - Point out what's missing: target market, revenue model, competitive moat, proof points
