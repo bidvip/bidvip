@@ -14,16 +14,56 @@ type EloProjekt = {
 
 /* ═══════════════════════  mozgás-segédek  ═══════════════════════ */
 
+/**
+ * Jelzi, mikor ér az elem képernyőre.
+ *
+ * Az IntersectionObserver a fő út, de nem az egyetlen: ha valamiért nem
+ * sül el (háttérben lévő fül, korlátozott környezet), a görgetésre kötött
+ * ellenőrzés akkor is elvégzi. Enélkül a görgetésre feltűnő tartalom
+ * láthatatlan maradna, a felszámláló pedig nullán ragadna — vagyis egy
+ * elmaradó animációból tartalomvesztés lenne.
+ */
 function useLathato<T extends HTMLElement>() {
   const ref = useRef<T>(null)
   const [lathato, setLathato] = useState(false)
+
   useEffect(() => {
-    const el = ref.current; if (!el) return
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setLathato(true); obs.disconnect() }
-    }, { threshold: 0.12 })
-    obs.observe(el); return () => obs.disconnect()
+    const el = ref.current
+    if (!el) { setLathato(true); return }
+
+    let kesz = false
+    let obs: IntersectionObserver | null = null
+
+    const takarit = () => {
+      obs?.disconnect()
+      window.removeEventListener('scroll', ellenoriz)
+      window.removeEventListener('resize', ellenoriz)
+    }
+
+    function ellenoriz() {
+      if (kesz || !ref.current) return
+      const r = ref.current.getBoundingClientRect()
+      if (r.top < window.innerHeight * 0.94 && r.bottom > 0) {
+        kesz = true
+        setLathato(true)
+        takarit()
+      }
+    }
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      obs = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) { kesz = true; setLathato(true); takarit() }
+      }, { threshold: 0.1 })
+      obs.observe(el)
+    }
+
+    window.addEventListener('scroll', ellenoriz, { passive: true })
+    window.addEventListener('resize', ellenoriz)
+    ellenoriz() // ha már betöltéskor a képernyőn van
+
+    return takarit
   }, [])
+
   return { ref, lathato }
 }
 
