@@ -201,63 +201,41 @@ function Fejlec() {
   )
 }
 
-/* ═══════════════════════  élő licit kártya  ═══════════════════════ */
+/* ═══════════════════════  sorban álló tétel kártya  ═══════════════════════ */
 
-function LicitKartya({ cimke, szin, kezdoAr, keses }: {
-  cimke: string; szin: string; kezdoAr: number; keses: number
-}) {
-  const [ar, setAr] = useState(kezdoAr)
-  const [villan, setVillan] = useState(false)
-  const [ido, setIdo] = useState(180 + keses * 40)
-
-  useEffect(() => {
-    const t = setInterval(() => setIdo(s => (s > 0 ? s - 1 : 240)), 1000)
-    const l = setInterval(() => {
-      setAr(p => p + Math.floor(Math.random() * 120 + 40))
-      setVillan(true); setTimeout(() => setVillan(false), 550)
-    }, 3800 + keses * 1900)
-    return () => { clearInterval(t); clearInterval(l) }
-  }, [keses])
-
-  const p = Math.floor(ido / 60), m = ido % 60
-  const surgos = ido < 45
-
+/**
+ * A hero mellett a VALÓDI sor első tételeit mutatjuk.
+ * Korábban itt kitalált „élő" licitek ketyegtek, miközben egyetlen aukció
+ * sem futott — ugyanaz a hitelvesztés, mint egy kitalált vélemény.
+ */
+function SorbanKartya({ k, keses }: { k: KirakatElem; keses: number }) {
   return (
-    <div className="v-uveg rounded-2xl p-4 transition-all"
-      style={{
-        borderColor: villan ? szin : 'var(--v-vonal)',
-        boxShadow: villan ? `0 0 32px ${szin}44` : 'none',
-      }}>
-      <div className="flex items-center justify-between mb-3">
+    <div className="v-uveg rounded-2xl p-4 transition-all v-be"
+      style={{ animationDelay: `${380 + keses * 90}ms` }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = `${k.szin}88`; e.currentTarget.style.transform = 'translateY(-2px)' }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.transform = 'none' }}>
+      <div className="flex items-center justify-between mb-2.5 gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: szin, animation: 'v-lüktet 1.6s ease-in-out infinite' }} />
-          <span className="text-[10px] font-bold tracking-[0.14em] uppercase truncate" style={{ color: szin }}>{cimke}</span>
+          <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: k.szin }} />
+          <span className="text-[10px] font-bold tracking-[0.14em] uppercase truncate" style={{ color: k.szin }}>
+            {k.csoport}
+          </span>
         </div>
-        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0"
-          style={{ background: 'var(--v-rozsa)', color: '#fff' }}>ÉLŐ</span>
+        <span className="text-[10px] shrink-0" style={{ color: 'var(--v-szoveg-3)', fontVariantNumeric: 'tabular-nums' }}>
+          {String(k.sorszam).padStart(2, '0')}. a sorban
+        </span>
       </div>
 
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--v-szoveg-3)' }}>Ajánlat</p>
-          <p className="text-xl font-black" style={{
-            color: villan ? 'var(--v-arany)' : 'var(--v-szoveg)',
-            fontVariantNumeric: 'tabular-nums',
-            transform: villan ? 'scale(1.09)' : 'none',
-            transition: 'color .3s, transform .35s cubic-bezier(.34,1.56,.64,1)',
-          }}>
-            {ar.toLocaleString('hu-HU')} €
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--v-szoveg-3)' }}>Hátra</p>
-          <p className="text-xl font-black" style={{
-            color: surgos ? 'var(--v-rozsa)' : 'var(--v-szoveg-2)',
-            fontVariantNumeric: 'tabular-nums',
-          }}>
-            {String(p).padStart(2, '0')}:{String(m).padStart(2, '0')}
-          </p>
-        </div>
+      <p className="font-bold text-sm mb-1" style={{ color: 'var(--v-szoveg)' }}>{k.nev}</p>
+      <p className="text-xs leading-snug mb-3 line-clamp-2" style={{ color: 'var(--v-szoveg-2)' }}>{k.leiras}</p>
+
+      <div className="flex items-center justify-between gap-3 pt-2.5" style={{ borderTop: '1px solid var(--v-vonal)' }}>
+        <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: `${k.szin}18`, color: k.szin }}>
+          {k.erettseg}
+        </span>
+        <span className="text-sm font-bold" style={{ color: 'var(--v-szoveg)', fontVariantNumeric: 'tabular-nums' }}>
+          {k.arsav}
+        </span>
       </div>
     </div>
   )
