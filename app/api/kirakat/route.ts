@@ -32,7 +32,7 @@ export async function GET() {
       .limit(50),
     supabase
       .from('projektek')
-      .select('id, kategoria, badge, kikialtasi_ar')
+      .select('id, nev, rovid_leiras, kategoria, badge, kikialtasi_ar')
       .eq('statusz', 'varakozas')
       .order('priority_tokens', { ascending: false })
       .order('varakozas_kezd', { ascending: true })
