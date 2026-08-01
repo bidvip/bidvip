@@ -558,6 +558,8 @@ function Teruletek() {
           )}
         </div>
       </div>
+
+      <Tovabb szoveg="Nézzük mi van most a sorban" hova="#tetelek" />
     </section>
   )
 }
