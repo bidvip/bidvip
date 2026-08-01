@@ -495,7 +495,11 @@ function SubmitInner() {
       kategoria: form.kategoria, badge, kikialtasi_ar: parseInt(form.kikialtasi_ar),
       lejarat: new Date(Date.now() + parseInt(form.idotartam_nap) * 24 * 60 * 60 * 1000).toISOString(),
       van_domain: form.van_domain, van_kod: form.van_kod, van_feliratkozok: form.van_feliratkozok,
-      van_bevetel: form.van_bevetel, statusz: 'aktiv', fajlok: feltoltottFajlok,
+      // Minden beküldés a sorba kerül. Élesíteni kizárólag a cron élesít,
+      // és az indulás előtt nem élesít semmit — így egy helyen dől el,
+      // mikor kerülhet ötlet aukcióra.
+      van_bevetel: form.van_bevetel, statusz: 'varakozas',
+      varakozas_kezd: new Date().toISOString(), fajlok: feltoltottFajlok,
       sav: aiErtekeles ? (aiErtekeles.estimated_value >= 10000 ? 'premium' : aiErtekeles.estimated_value >= 1000 ? 'standard' : 'fast') : 'fast',
     }
     const anonRes = await fetch('/api/anon-name', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id, tipus: 'elado' }) })
