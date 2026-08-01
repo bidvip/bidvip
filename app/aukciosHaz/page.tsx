@@ -520,28 +520,38 @@ export default function Marketplace() {
               <div className="h-px flex-1" style={{ background: '#2E2028' }} />
             </div>
 
-            <p className="text-xs text-center mb-4" style={{ color: '#5A4F4A' }}>
-              A részletek csak az aukció indulásakor derülnek ki — az ötletek védve vannak a másolástól
+            <p className="text-xs text-center mb-4" style={{ color: 'var(--v-szoveg-3)' }}>
+              Látod miről szól — a részletes kifejtést és a fájlokat a nyertes vevő kapja meg
             </p>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               {sor.filter(k => {
                 const q = keresoszoveg.trim().toLowerCase()
-                return !q || k.cimke.toLowerCase().includes(q)
+                return !q || k.cimke.toLowerCase().includes(q) || k.nev.toLowerCase().includes(q) || k.leiras.toLowerCase().includes(q)
               }).map(k => (
-                <div key={k.id} className="rounded-lg px-4 py-3 flex items-center gap-4 transition"
-                  style={{ background: '#1A1217', border: '1px solid #2E2028' }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = `${k.szin}55`)}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#2E2028')}>
-                  <span className="text-xs font-mono w-5 shrink-0 tabular-nums" style={{ color: '#3E3040' }}>{k.sorszam}</span>
-                  <span className="w-1.5 h-8 rounded-full shrink-0" style={{ background: k.szin }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate" style={{ color: k.szin }}>{k.cimke}</p>
-                    <p className="text-xs" style={{ color: '#5A4F4A' }}>{k.erettseg} · a részletek indulásakor</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#3E3040' }}>Várható sáv</p>
-                    <p className="font-bold text-sm tabular-nums" style={{ color: '#9C8B7A' }}>{k.arsav}</p>
+                <div key={k.id} className="rounded-2xl overflow-hidden transition-all"
+                  style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = `${k.szin}88`; e.currentTarget.style.boxShadow = `0 10px 30px ${k.szin}26` }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.boxShadow = 'none' }}>
+                  <div style={{ height: 2, background: `linear-gradient(90deg, ${k.szin}, transparent)` }} />
+                  <div className="px-5 py-4 flex items-start gap-4">
+                    <span className="text-xs shrink-0 pt-0.5 w-6 tabular-nums" style={{ color: 'var(--v-szoveg-3)' }}>
+                      {String(k.sorszam).padStart(2, '0')}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5 truncate" style={{ color: k.szin }}>
+                        {k.csoport} · {k.tema}
+                      </p>
+                      <h3 className="text-base font-bold mb-1.5" style={{ color: 'var(--v-szoveg)' }}>{k.nev}</h3>
+                      <p className="text-sm leading-relaxed" style={{ color: 'var(--v-szoveg-2)' }}>{k.leiras}</p>
+                      <div className="flex items-center gap-3 mt-3.5 flex-wrap">
+                        <span className="text-[10px] font-bold px-2 py-1 rounded" style={{ background: `${k.szin}18`, color: k.szin }}>
+                          {k.erettseg}
+                        </span>
+                        <span className="text-xs tabular-nums" style={{ color: 'var(--v-szoveg-2)' }}>{k.arsav}</span>
+                        <span className="text-[11px] ml-auto" style={{ color: 'var(--v-szoveg-3)' }}>Részletek az aukción</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
