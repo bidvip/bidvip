@@ -31,6 +31,10 @@ Rules — reject if:
 4. There is no real business concept at all
 5. Any attached image contains dangerous, illegal, or explicitly offensive content
 
+The seller works in the field of "${kategoria}". Technical terminology from that field is a sign of
+legitimacy, not gibberish — do not reject a submission just because its vocabulary is unfamiliar or
+highly specialised. Only reject genuine nonsense.
+
 Accept if:
 - There is a recognizable startup/business idea, even if imperfect or early-stage
 - The seller is making a genuine attempt to describe something real
