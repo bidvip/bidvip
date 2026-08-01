@@ -295,18 +295,35 @@ function Hero({ varolista, elsoHarom }: { varolista: number; elsoHarom: KirakatE
           </div>
         </div>
 
-        <div className="lg:col-span-5 v-be" style={{ animationDelay: '340ms' }}>
-          <div className="flex items-center gap-2 mb-3 px-1">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--v-rozsa)', animation: 'v-lüktet 1.6s ease-in-out infinite' }} />
+        <div className="lg:col-span-5">
+          <div className="v-be flex items-center gap-2 mb-3 px-1" style={{ animationDelay: '340ms' }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--v-lila-2)', animation: 'v-lüktet 2s ease-in-out infinite' }} />
             <span className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: 'var(--v-szoveg-3)' }}>
-              Így néz ki egy élő aukció
+              Elsőként ezek kerülnek kalapács alá
             </span>
           </div>
-          <div className="flex flex-col gap-2.5">
-            <LicitKartya cimke="Energia · Napenergia" szin="#FBBF24" kezdoAr={6500} keses={0} />
-            <LicitKartya cimke="AI · Ügynökök" szin="#A78BFA" kezdoAr={28000} keses={1} />
-            <LicitKartya cimke="Víz · Szivárgás" szin="#38BDF8" kezdoAr={9500} keses={2} />
-          </div>
+
+          {elsoHarom.length > 0 ? (
+            <div className="flex flex-col gap-2.5">
+              {elsoHarom.map((k, i) => <SorbanKartya key={k.id} k={k} keses={i} />)}
+            </div>
+          ) : (
+            <div className="v-uveg rounded-2xl p-8 text-center v-be" style={{ animationDelay: '380ms' }}>
+              <p className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>
+                Még nincs beküldött tétel.<br />
+                <a href="/submit" className="font-bold" style={{ color: 'var(--v-lila-2)' }}>Legyél te az első →</a>
+              </p>
+            </div>
+          )}
+
+          {varolista > 3 && (
+            <a href="#tetelek" className="v-be block text-center text-xs mt-3 transition-colors"
+              style={{ animationDelay: '620ms', color: 'var(--v-szoveg-3)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>
+              és még {varolista - 3} tétel a sorban ↓
+            </a>
+          )}
         </div>
       </div>
     </section>
