@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
-import { kirakatba, KIRAKAT_MEZOK, type KirakatElem } from '@/lib/kirakat'
+import { type KirakatElem } from '@/lib/kirakat'
 
 const SAV_INFO = {
   fast:     { label: 'FAST',     slogan: '⚡ CHANNEL 01', tagline: 'Fast Deals · Live Now',        perc: 3,  color: '#22C55E', glow: '0 0 24px #22C55E44', bg: '#22C55E11' },
