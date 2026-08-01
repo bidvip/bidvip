@@ -28,6 +28,11 @@ export async function GET(req: NextRequest) {
   const now = new Date()
   const eredmeny: Record<string, string> = {}
 
+  // Indulás előtt egyetlen ötlet sem kerülhet aukcióra. A lejárt aukciók
+  // lezárása viszont ilyenkor is fut — ha valami mégis élő maradt, azt
+  // rendesen le kell zárni és kifizetni.
+  const elindultE = await elindult()
+
   for (const { sav, perc } of SAVOK) {
     // 1. Close expired active auction in this lane
     const { data: lejart } = await supabase
