@@ -365,7 +365,7 @@ function Hero({ varolista, elsoHarom }: { varolista: number; elsoHarom: KirakatE
   return (
     <section className="relative pt-[72px]">
       <Aurora />
-      <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-24 grid lg:grid-cols-12 gap-x-12 gap-y-16 items-center">
+      <div className="relative mx-auto max-w-6xl px-6 pt-16 pb-16 grid lg:grid-cols-12 gap-x-12 gap-y-16 items-center">
 
         <div className="lg:col-span-7">
           <div className="v-be inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full mb-7"
@@ -458,7 +458,7 @@ function Szamok({ varolista }: { varolista: number }) {
     [10, '%', 'jutalék, csak sikeres eladásnál'],
   ]
   return (
-    <section className="mx-auto max-w-6xl px-6 pb-24">
+    <section className="mx-auto max-w-6xl px-6 pb-16">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {adat.map(([szam, utotag, cimke], i) => (
           <Feltunik key={cimke} keses={i * 90}>
@@ -484,7 +484,7 @@ function Teruletek() {
   const valasztott = KATEGORIA_FA.find(c => c.nev === aktiv)
 
   return (
-    <section id="teruletek" className="mx-auto max-w-6xl px-6 py-24">
+    <section id="teruletek" className="mx-auto max-w-6xl px-6 py-16">
       <Feltunik>
         <p className="text-xs font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--v-lila-2)' }}>Szakterületek</p>
         <h2 className="font-black mb-4 tracking-tight" style={{ fontSize: 'clamp(1.9rem, 4vw, 3rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
@@ -642,7 +642,7 @@ function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) 
   const lathatoSor = mind ? szurtSor : szurtSor.slice(0, 10)
 
   return (
-    <section id="tetelek" className="mx-auto max-w-5xl px-6 py-24">
+    <section id="tetelek" className="mx-auto max-w-5xl px-6 py-16">
       <Feltunik>
         <div className="flex items-end justify-between gap-6 flex-wrap mb-8">
           <div>
@@ -702,7 +702,7 @@ function Menete() {
     ['Letétben zárul', 'A pénzt letétben tartjuk. Az eladó átad, csak utána fizetünk ki.', '#F43F5E'],
   ]
   return (
-    <section id="menete" className="mx-auto max-w-4xl px-6 py-24">
+    <section id="menete" className="mx-auto max-w-4xl px-6 py-16">
       <Feltunik>
         <p className="text-xs font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--v-lila-2)' }}>Az aukció menete</p>
         <h2 className="font-black mb-12 tracking-tight" style={{ fontSize: 'clamp(1.9rem, 4vw, 3rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
@@ -771,7 +771,7 @@ function Kerdesek() {
     ['Hogyan védett a személyazonosságom?', 'Az eladók és a vevők álnéven jelennek meg. A valódi személyazonosság kizárólag sikeres eladás után, az átadás részeként kerül megosztásra.'],
   ]
   return (
-    <section id="kerdesek" className="mx-auto max-w-3xl px-6 py-24">
+    <section id="kerdesek" className="mx-auto max-w-3xl px-6 py-16">
       <Feltunik>
         <p className="text-xs font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--v-lila-2)' }}>Kérdések</p>
         <h2 className="font-black mb-10 tracking-tight" style={{ fontSize: 'clamp(1.9rem, 4vw, 3rem)', letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
@@ -803,7 +803,7 @@ function Feliratkozas({ szam, novel }: { szam: number; novel: () => void }) {
   const szazalek = Math.min(100, (szam / INDULAS_KUSZOB) * 100)
 
   return (
-    <section className="mx-auto max-w-4xl px-6 pb-28">
+    <section className="mx-auto max-w-4xl px-6 pb-20">
       <Feltunik>
         <div className="relative rounded-3xl overflow-hidden px-6 sm:px-12 py-14 text-center"
           style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal-2)' }}>
@@ -915,9 +915,11 @@ export default function Fooldal() {
 
   return (
     <div style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)', minHeight: '100vh', overflowX: 'hidden' }}>
+      <HaladasSav />
       <Fejlec />
       <main>
-        <Hero varolista={sorban.length} />
+        <Hero varolista={sorban.length} elsoHarom={sorban.slice(0, 3)} />
+        <Utvonal />
         <Szamok varolista={sorban.length} />
         <Teruletek />
         <Tetelek elo={elo} sorban={sorban} />
