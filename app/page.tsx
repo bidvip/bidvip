@@ -324,6 +324,20 @@ function Teruletek() {
   const [aktiv, setAktiv] = useState<string | null>(null)
   const valasztott = KATEGORIA_FA.find(c => c.nev === aktiv)
 
+  // A panel magasságát megmérjük, nem tippeljük — mobilon a címkék
+  // többet tördelnek, egy fix érték levágná a lista végét.
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [panelMagassag, setPanelMagassag] = useState(0)
+
+  useEffect(() => {
+    if (!valasztott || !panelRef.current) { setPanelMagassag(0); return }
+    const mer = () => { if (panelRef.current) setPanelMagassag(panelRef.current.scrollHeight) }
+    mer()
+    const fig = new ResizeObserver(mer)
+    fig.observe(panelRef.current)
+    return () => fig.disconnect()
+  }, [valasztott])
+
   return (
     <section id="teruletek" className="mx-auto max-w-6xl px-6 py-24">
       <Feltunik>
