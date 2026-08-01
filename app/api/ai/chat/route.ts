@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { szakertoiKontextus } from '@/lib/kategoriak'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
