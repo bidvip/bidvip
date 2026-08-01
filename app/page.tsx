@@ -679,7 +679,7 @@ function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) 
       )}
 
       {szurtSor.length > 10 && (
-        <div className="pt-8 text-center">
+        <div className="pt-8 flex flex-wrap items-center justify-center gap-3">
           <button onClick={() => setMind(m => !m)}
             className="text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
             style={{ border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg-2)' }}
@@ -687,6 +687,16 @@ function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) 
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal-2)'; e.currentTarget.style.color = 'var(--v-szoveg-2)' }}>
             {mind ? 'Kevesebb' : `Mind a ${szurtSor.length} tétel`} →
           </button>
+
+          {/* Hosszú lista végén ne maradjon zsákutca */}
+          {mind && (
+            <a href="#tetelek" className="text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+              style={{ border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg-3)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--v-lila)'; e.currentTarget.style.color = 'var(--v-szoveg)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal-2)'; e.currentTarget.style.color = 'var(--v-szoveg-3)' }}>
+              ↑ Vissza a lista elejére
+            </a>
+          )}
         </div>
       )}
 
