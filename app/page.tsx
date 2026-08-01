@@ -161,6 +161,7 @@ function LiveCountdown({ lejarat }: { lejarat: string | null }) {
 
 function LiveListings() {
   const [projektek, setProjektek] = useState<LiveProjekt[]>([])
+  const [sorban, setSorban] = useState<KirakatElem[]>([])
   const [aktKat, setAktKat] = useState('Összes')
   const [kereses, setKereses] = useState('')
 
