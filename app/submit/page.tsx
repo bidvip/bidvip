@@ -3,11 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-const categories = [
-  'SaaS / Software', 'E-commerce', 'Mobile App', 'Content / Blog',
-  'Marketplace', 'Fintech', 'Edtech', 'Healthtech', 'Other',
-]
+import KategoriaValaszto from '@/app/components/KategoriaValaszto'
 
 const SUBMIT_COST = 25
 const FILE_COST = 2
