@@ -689,6 +689,8 @@ function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) 
           </button>
         </div>
       )}
+
+      <Tovabb szoveg="Hogyan zajlik egy aukció?" hova="#menete" />
     </section>
   )
 }
