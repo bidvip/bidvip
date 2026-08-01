@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { szakertoiKontextus } from '@/lib/kategoriak'
 
 export const dynamic = 'force-dynamic'
 
