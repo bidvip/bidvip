@@ -517,31 +517,32 @@ export default function Marketplace() {
               </div>
               <div className="h-px flex-1" style={{ background: '#2E2028' }} />
             </div>
+
+            <p className="text-xs text-center mb-4" style={{ color: '#5A4F4A' }}>
+              A részletek csak az aukció indulásakor derülnek ki — az ötletek védve vannak a másolástól
+            </p>
+
             <div className="flex flex-col gap-1.5">
-              {sor.filter(p => {
+              {sor.filter(k => {
                 const q = keresoszoveg.trim().toLowerCase()
-                return !q || p.nev.toLowerCase().includes(q) || p.rovid_leiras.toLowerCase().includes(q) || p.kategoria.toLowerCase().includes(q)
-              }).map((p, idx) => {
-                const si = SAV_INFO[p.sav as keyof typeof SAV_INFO]
-                return (
-                  <div key={p.id} className="group rounded-lg px-4 py-3 flex items-center gap-4 transition"
-                    style={{ background: '#1A1217', border: '1px solid #2E2028' }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#3E3040')}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#2E2028')}>
-                    <span className="text-xs font-mono w-5 shrink-0 tabular-nums" style={{ color: '#3E3040' }}>{idx + 1}</span>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded shrink-0"
-                      style={{ color: si?.color, background: `${si?.color}15` }}>{si?.label}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate transition" style={{ color: '#F5F0E8' }}>{p.nev}</p>
-                      <p className="text-xs truncate" style={{ color: '#9C8B7A' }}>{p.rovid_leiras}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-sm tabular-nums" style={{ color: si?.color }}>€{p.kikialtasi_ar.toLocaleString()}</p>
-                      {p.priority_tokens > 0 && <p className="text-[10px]" style={{ color: '#EAB308' }}>⚡ {p.priority_tokens} boost</p>}
-                    </div>
+                return !q || k.cimke.toLowerCase().includes(q)
+              }).map(k => (
+                <div key={k.id} className="rounded-lg px-4 py-3 flex items-center gap-4 transition"
+                  style={{ background: '#1A1217', border: '1px solid #2E2028' }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = `${k.szin}55`)}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#2E2028')}>
+                  <span className="text-xs font-mono w-5 shrink-0 tabular-nums" style={{ color: '#3E3040' }}>{k.sorszam}</span>
+                  <span className="w-1.5 h-8 rounded-full shrink-0" style={{ background: k.szin }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate" style={{ color: k.szin }}>{k.cimke}</p>
+                    <p className="text-xs" style={{ color: '#5A4F4A' }}>{k.erettseg} · a részletek indulásakor</p>
                   </div>
-                )
-              })}
+                  <div className="text-right shrink-0">
+                    <p className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#3E3040' }}>Várható sáv</p>
+                    <p className="font-bold text-sm tabular-nums" style={{ color: '#9C8B7A' }}>{k.arsav}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
