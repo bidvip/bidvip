@@ -18,7 +18,7 @@ export default function KategoriaValaszto({ ertek, onValt }: { ertek: string; on
   }, [])
 
   const talalatok = kereses ? keressTemat(kereses) : []
-  const kivalasztottSzin = KATEGORIA_FA.find(c => c.temak.includes(ertek))?.szin ?? '#DC2626'
+  const kivalasztottSzin = KATEGORIA_FA.find(c => c.temak.includes(ertek))?.szin ?? 'var(--v-rozsa)'
 
   function valaszt(tema: string) {
     onValt(tema)
@@ -32,33 +32,33 @@ export default function KategoriaValaszto({ ertek, onValt }: { ertek: string; on
       <button type="button" onClick={() => setNyitva(v => !v)}
         className="w-full px-4 py-3 flex items-center justify-between text-left transition rounded-lg"
         style={{
-          background: '#100C0F',
-          border: `1px solid ${nyitva ? kivalasztottSzin : '#2E2028'}`,
-          color: ertek ? '#F5F0E8' : '#5A4F4A',
+          background: 'var(--v-bg)',
+          border: `1px solid ${nyitva ? kivalasztottSzin : 'var(--v-vonal)'}`,
+          color: ertek ? 'var(--v-szoveg)' : 'var(--v-szoveg-3)',
         }}>
         <span className="flex items-center gap-2.5 min-w-0">
           {ertek && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: kivalasztottSzin }} />}
           <span className="truncate">{ertek || 'Válassz témát...'}</span>
         </span>
         <span className="flex-shrink-0 ml-2 transition-transform"
-          style={{ color: '#5A4F4A', transform: nyitva ? 'rotate(180deg)' : 'none' }}>▾</span>
+          style={{ color: 'var(--v-szoveg-3)', transform: nyitva ? 'rotate(180deg)' : 'none' }}>▾</span>
       </button>
 
       {nyitva && (
         <div className="absolute z-50 mt-2 w-full rounded-xl overflow-hidden"
-          style={{ background: '#160F14', border: '1px solid #2E2028', boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
+          style={{ background: '#160F14', border: '1px solid var(--v-vonal)', boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
 
-          <div className="p-3" style={{ borderBottom: '1px solid #2E2028' }}>
+          <div className="p-3" style={{ borderBottom: '1px solid var(--v-vonal)' }}>
             <input autoFocus value={kereses} onChange={e => setKereses(e.target.value)}
               placeholder="Keress témát... (pl. napenergia, AI, oktatás)"
               className="w-full px-3 py-2.5 text-sm rounded-lg focus:outline-none"
-              style={{ background: '#100C0F', border: '1px solid #2E2028', color: '#F5F0E8' }} />
+              style={{ background: 'var(--v-bg)', border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg)' }} />
           </div>
 
           <div className="overflow-y-auto" style={{ maxHeight: '340px' }}>
             {kereses ? (
               talalatok.length === 0 ? (
-                <p className="px-4 py-8 text-center text-sm" style={{ color: '#5A4F4A' }}>Nincs találat</p>
+                <p className="px-4 py-8 text-center text-sm" style={{ color: 'var(--v-szoveg-3)' }}>Nincs találat</p>
               ) : (
                 <div className="p-2 flex flex-col gap-1">
                   {talalatok.slice(0, 40).map(t => (
@@ -68,8 +68,8 @@ export default function KategoriaValaszto({ ertek, onValt }: { ertek: string; on
                       onMouseEnter={e => (e.currentTarget.style.background = `${t.szin}14`)}
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                       <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: t.szin }} />
-                      <span className="text-sm truncate" style={{ color: '#F5F0E8' }}>{t.nev}</span>
-                      <span className="ml-auto text-[10px] flex-shrink-0" style={{ color: '#5A4F4A' }}>{t.csoport}</span>
+                      <span className="text-sm truncate" style={{ color: 'var(--v-szoveg)' }}>{t.nev}</span>
+                      <span className="ml-auto text-[10px] flex-shrink-0" style={{ color: 'var(--v-szoveg-3)' }}>{t.csoport}</span>
                     </button>
                   ))}
                 </div>
@@ -86,9 +86,9 @@ export default function KategoriaValaszto({ ertek, onValt }: { ertek: string; on
                         onMouseEnter={e => (e.currentTarget.style.background = `${cs.szin}14`)}
                         onMouseLeave={e => (e.currentTarget.style.background = nyitottE ? `${cs.szin}14` : 'transparent')}>
                         <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cs.szin }} />
-                        <span className="text-sm font-semibold" style={{ color: nyitottE ? cs.szin : '#F5F0E8' }}>{cs.nev}</span>
+                        <span className="text-sm font-semibold" style={{ color: nyitottE ? cs.szin : 'var(--v-szoveg)' }}>{cs.nev}</span>
                         <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded"
-                          style={{ color: '#5A4F4A', border: '1px solid #2E2028' }}>{cs.temak.length}</span>
+                          style={{ color: 'var(--v-szoveg-3)', border: '1px solid var(--v-vonal)' }}>{cs.temak.length}</span>
                       </button>
 
                       {nyitottE && (

@@ -72,24 +72,26 @@
   .v-aurora-elem   { animation: none !important; }
 }
 
-/* ── Régi sötét paletta — a még át nem tervezett oldalak használják ── */
+/* ── Örökölt nevek, az új palettára mutatva ──
+   Régebbi kód még ezekre hivatkozik; egy helyen vezetjük át őket,
+   hogy ne kelljen minden hivatkozást megkeresni. */
 :root {
-  --bv-bg:          #100C0F;
-  --bv-bg-card:     #1A1217;
-  --bv-bg-elevated: #221820;
-  --bv-border:      #2E2028;
-  --bv-border-hi:   #3E3040;
-  --bv-text:        #F5F0E8;
-  --bv-muted:       #9C8B7A;
-  --bv-faint:       #5A4F4A;
-  --bv-accent:      #DC2626;
-  --bv-accent-hi:   #EF4444;
-  --bv-gold:        #EAB308;
-  --bv-gold-hi:     #FBBF24;
-  --bv-green:       #16A34A;
-  --bv-live:        #22C55E;
-  --background: var(--bv-bg);
-  --foreground: var(--bv-text);
+  --bv-bg:          var(--v-bg);
+  --bv-bg-card:     var(--v-bg-2);
+  --bv-bg-elevated: var(--v-bg-3);
+  --bv-border:      var(--v-vonal);
+  --bv-border-hi:   var(--v-vonal-2);
+  --bv-text:        var(--v-szoveg);
+  --bv-muted:       var(--v-szoveg-2);
+  --bv-faint:       var(--v-szoveg-3);
+  --bv-accent:      var(--v-rozsa);
+  --bv-accent-hi:   var(--v-rozsa-2);
+  --bv-gold:        var(--v-arany);
+  --bv-gold-hi:     #FCD34D;
+  --bv-green:       var(--v-zold);
+  --bv-live:        var(--v-zold);
+  --background:     var(--v-bg);
+  --foreground:     var(--v-szoveg);
 }
 
 @theme inline {

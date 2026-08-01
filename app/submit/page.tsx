@@ -512,29 +512,29 @@ function SubmitInner() {
   }
 
   const inputStyle: React.CSSProperties = {
-    background: '#1A1217', border: '1px solid #2E2028', color: '#F5F0E8', borderRadius: '8px',
+    background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg)', borderRadius: '8px',
   }
   const cardStyle: React.CSSProperties = {
-    background: '#1A1217', border: '1px solid #2E2028', borderRadius: '8px',
+    background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)', borderRadius: '8px',
   }
 
   // — Suspended —
   if (felfuggesztve) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: '#100C0F', color: '#F5F0E8' }}>
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)' }}>
         <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase mb-6"
-          style={{ color: '#DC2626', background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', padding: '6px 14px', borderRadius: '4px' }}>
+          style={{ color: 'var(--v-rozsa)', background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)', padding: '6px 14px', borderRadius: '4px' }}>
           Fiók felfüggesztve
         </span>
         <h2 className="text-2xl font-black mb-2">A fiókod felfüggesztésre került</h2>
-        <p className="text-sm mb-4 max-w-sm" style={{ color: '#9C8B7A' }}>Az admin felülvizsgálja a beküldésedet és e-mailben értesítünk az eredményről.</p>
-        <div className="px-5 py-3 mb-8 text-sm max-w-md rounded-lg" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)', color: '#F87171' }}>
+        <p className="text-sm mb-4 max-w-sm" style={{ color: 'var(--v-szoveg-2)' }}>Az admin felülvizsgálja a beküldésedet és e-mailben értesítünk az eredményről.</p>
+        <div className="px-5 py-3 mb-8 text-sm max-w-md rounded-lg" style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', color: '#F87171' }}>
           <strong>Ok:</strong> {felfuggesztve}
         </div>
         <button onClick={() => router.push('/dashboard')} className="font-semibold text-sm px-6 py-3 rounded-lg transition"
-          style={{ border: '1px solid #2E2028', color: '#9C8B7A', background: 'transparent' }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = '#3E3040'; e.currentTarget.style.color = '#F5F0E8' }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
+          style={{ border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg-2)', background: 'transparent' }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--v-vonal-2)'; e.currentTarget.style.color = 'var(--v-szoveg)' }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.color = 'var(--v-szoveg-2)' }}>
           ← Dashboard
         </button>
       </main>
@@ -544,13 +544,13 @@ function SubmitInner() {
   // — Success —
   if (allapot === 'siker') {
     return (
-      <main className="min-h-screen flex flex-col overflow-hidden" style={{ background: '#100C0F', color: '#F5F0E8' }}>
+      <main className="min-h-screen flex flex-col overflow-hidden" style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)' }}>
         <div className="fixed inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full"
             style={{ background: 'radial-gradient(circle, rgba(22,163,74,0.08) 0%, transparent 70%)' }} />
         </div>
-        <nav className="relative z-10 flex items-center px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
-          <span className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Bid<span style={{ color: '#DC2626' }}>Vip</span></span>
+        <nav className="relative z-10 flex items-center px-8 py-5" style={{ borderBottom: '1px solid var(--v-vonal)' }}>
+          <span className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Bid<span style={{ color: 'var(--v-rozsa)' }}>Vip</span></span>
         </nav>
         <div className="relative z-10 flex flex-1 items-center justify-center px-6 py-12">
           <div className="max-w-md w-full text-center">
@@ -560,25 +560,25 @@ function SubmitInner() {
               Sikeresen beküldve
             </span>
             <h2 className="text-3xl font-black mb-3" style={{ letterSpacing: '-0.03em' }}>Projekt beküldve!</h2>
-            <p className="mb-6 leading-relaxed" style={{ color: '#9C8B7A' }}>
+            <p className="mb-6 leading-relaxed" style={{ color: 'var(--v-szoveg-2)' }}>
               Az admin csapatunk felülvizsgálja a projektedet, majd amikor jóváhagyják, élőbe kerül az Aukciós Házban.
             </p>
             <div className="flex items-start gap-3 px-4 py-3 mb-8 text-sm text-left rounded-lg"
-              style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.2)' }}>
-              <span className="shrink-0 mt-0.5" style={{ color: '#EAB308' }}>&#x1F512;</span>
-              <span style={{ color: '#9C8B7A' }}>A projekt beküldés után <strong style={{ color: '#F5F0E8' }}>nem szerkeszthető</strong>. Ha változtatni szeretnél, vedd fel a kapcsolatot az adminnal.</span>
+              style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)' }}>
+              <span className="shrink-0 mt-0.5" style={{ color: 'var(--v-arany)' }}>&#x1F512;</span>
+              <span style={{ color: 'var(--v-szoveg-2)' }}>A projekt beküldés után <strong style={{ color: 'var(--v-szoveg)' }}>nem szerkeszthető</strong>. Ha változtatni szeretnél, vedd fel a kapcsolatot az adminnal.</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button onClick={() => router.push('/dashboard')} className="px-6 py-3 rounded-lg font-semibold text-sm transition"
-                style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.2)' }}
+                style={{ background: 'var(--v-rozsa)', color: '#fff', boxShadow: '0 0 20px rgba(244,63,94,0.2)' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--v-rozsa)')}>
                 Dashboard →
               </button>
               <button onClick={() => router.push('/aukciosHaz')} className="px-6 py-3 rounded-lg font-semibold text-sm transition"
-                style={{ border: '1px solid #2E2028', color: '#9C8B7A', background: 'transparent' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#3E3040'; e.currentTarget.style.color = '#F5F0E8' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
+                style={{ border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg-2)', background: 'transparent' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--v-vonal-2)'; e.currentTarget.style.color = 'var(--v-szoveg)' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.color = 'var(--v-szoveg-2)' }}>
                 Aukciós Ház
               </button>
             </div>
@@ -589,26 +589,26 @@ function SubmitInner() {
   }
 
   return (
-    <main className="min-h-screen" style={{ background: '#100C0F', color: '#F5F0E8' }}>
-      <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
-        <a href="/" className="text-2xl font-black no-underline" style={{ letterSpacing: '-0.03em', color: '#F5F0E8' }}>
-          Bid<span style={{ color: '#DC2626' }}>Vip</span>
+    <main className="min-h-screen" style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)' }}>
+      <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid var(--v-vonal)' }}>
+        <a href="/" className="text-2xl font-black no-underline" style={{ letterSpacing: '-0.03em', color: 'var(--v-szoveg)' }}>
+          Bid<span style={{ color: 'var(--v-rozsa)' }}>Vip</span>
         </a>
-        <a href="/dashboard" className="text-sm no-underline transition" style={{ color: '#9C8B7A' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>
+        <a href="/dashboard" className="text-sm no-underline transition" style={{ color: 'var(--v-szoveg-2)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-2)')}>
           ← Back
         </a>
       </nav>
 
       {/* Step indicator */}
       <div className="max-w-2xl mx-auto px-6 pt-10 pb-4">
-        <div className="relative h-0.5 rounded-full mb-6 mx-4" style={{ background: '#2E2028' }}>
+        <div className="relative h-0.5 rounded-full mb-6 mx-4" style={{ background: 'var(--v-vonal)' }}>
           <div className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
             style={{
               width: lepes === 1 ? '0%' : lepes === 2 ? '50%' : '100%',
-              background: 'linear-gradient(90deg, #DC2626, #EF4444)',
-              boxShadow: '0 0 8px rgba(220,38,38,0.4)',
+              background: 'linear-gradient(90deg, var(--v-rozsa), #EF4444)',
+              boxShadow: '0 0 8px rgba(244,63,94,0.4)',
             }} />
         </div>
         <div className="flex items-start justify-between">
@@ -623,15 +623,15 @@ function SubmitInner() {
               <div key={s.n} className="flex flex-col items-center gap-1.5 flex-1">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
                   style={{
-                    border: `2px solid ${done || active ? '#DC2626' : '#2E2028'}`,
-                    background: done ? '#DC2626' : active ? 'rgba(220,38,38,0.12)' : '#1A1217',
-                    color: done ? '#fff' : active ? '#DC2626' : '#5A4F4A',
-                    boxShadow: active ? '0 0 12px rgba(220,38,38,0.3)' : 'none',
+                    border: `2px solid ${done || active ? 'var(--v-rozsa)' : 'var(--v-vonal)'}`,
+                    background: done ? 'var(--v-rozsa)' : active ? 'rgba(244,63,94,0.12)' : 'var(--v-bg-2)',
+                    color: done ? '#fff' : active ? 'var(--v-rozsa)' : 'var(--v-szoveg-3)',
+                    boxShadow: active ? '0 0 12px rgba(244,63,94,0.3)' : 'none',
                   }}>
                   {done ? '✓' : s.n}
                 </div>
-                <span className="text-xs font-semibold" style={{ color: active ? '#DC2626' : done ? '#9C8B7A' : '#5A4F4A' }}>{s.label}</span>
-                <span className="text-[10px] hidden sm:block" style={{ color: '#5A4F4A' }}>{s.sub}</span>
+                <span className="text-xs font-semibold" style={{ color: active ? 'var(--v-rozsa)' : done ? 'var(--v-szoveg-2)' : 'var(--v-szoveg-3)' }}>{s.label}</span>
+                <span className="text-[10px] hidden sm:block" style={{ color: 'var(--v-szoveg-3)' }}>{s.sub}</span>
               </div>
             )
           })}
@@ -645,7 +645,7 @@ function SubmitInner() {
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl font-black mb-1" style={{ letterSpacing: '-0.03em' }}>Describe your project</h1>
-              <p style={{ color: '#9C8B7A' }}>Get AI feedback — the AI also reviews your uploaded images.</p>
+              <p style={{ color: 'var(--v-szoveg-2)' }}>Get AI feedback — the AI also reviews your uploaded images.</p>
             </div>
 
             <div className="p-6 flex flex-col gap-4" style={cardStyle}>
@@ -654,29 +654,29 @@ function SubmitInner() {
                 { mezo: 'rovid_leiras', label: 'Short description * (max 150 chars)', placeholder: 'What does it do in one sentence?', type: 'input', maxLength: 150 },
               ].map(f => (
                 <div key={f.mezo}>
-                  <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>{f.label}</label>
+                  <label className="text-sm mb-1 block" style={{ color: 'var(--v-szoveg-2)' }}>{f.label}</label>
                   <input value={form[f.mezo as keyof typeof form] as string}
                     onChange={e => frissit(f.mezo, e.target.value)}
                     placeholder={f.placeholder}
                     maxLength={f.maxLength}
                     className="w-full px-4 py-3 focus:outline-none transition"
                     style={inputStyle}
-                    onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
-                    onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+                    onFocus={e => (e.currentTarget.style.borderColor = 'var(--v-rozsa)')}
+                    onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')} />
                 </div>
               ))}
               <div>
-                <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>Detailed description *</label>
+                <label className="text-sm mb-1 block" style={{ color: 'var(--v-szoveg-2)' }}>Detailed description *</label>
                 <textarea rows={6} value={form.reszletes_leiras} onChange={e => frissit('reszletes_leiras', e.target.value)}
                   placeholder="What problem does it solve? Who is the target customer? What's the competitive advantage? What's included in the sale?"
                   className="w-full px-4 py-3 focus:outline-none resize-none transition"
                   style={inputStyle}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+                  onFocus={e => (e.currentTarget.style.borderColor = 'var(--v-rozsa)')}
+                  onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')} />
               </div>
               <div>
-                <label className="text-sm mb-1 block" style={{ color: '#9C8B7A' }}>
-                  Category * <span style={{ color: '#5A4F4A' }}>— ez alapján elemzi az AI az ötleted</span>
+                <label className="text-sm mb-1 block" style={{ color: 'var(--v-szoveg-2)' }}>
+                  Category * <span style={{ color: 'var(--v-szoveg-3)' }}>— ez alapján elemzi az AI az ötleted</span>
                 </label>
                 <KategoriaValaszto ertek={form.kategoria} onValt={t => frissit('kategoria', t)} />
               </div>
@@ -693,36 +693,36 @@ function SubmitInner() {
                 <label key={item.mezo} className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" checked={form[item.mezo as keyof typeof form] as boolean}
                     onChange={e => frissit(item.mezo, e.target.checked)}
-                    className="w-5 h-5" style={{ accentColor: '#DC2626' }} />
-                  <span style={{ color: '#F5F0E8' }}>{item.label}</span>
+                    className="w-5 h-5" style={{ accentColor: 'var(--v-rozsa)' }} />
+                  <span style={{ color: 'var(--v-szoveg)' }}>{item.label}</span>
                 </label>
               ))}
             </div>
 
             <div className="p-6 flex flex-col gap-4" style={cardStyle}>
-              <h2 className="font-semibold">Files & Media <span className="font-normal text-sm" style={{ color: '#5A4F4A' }}>(optional)</span></h2>
+              <h2 className="font-semibold">Files & Media <span className="font-normal text-sm" style={{ color: 'var(--v-szoveg-3)' }}>(optional)</span></h2>
               <label className="flex flex-col items-center justify-center py-6 cursor-pointer rounded-lg transition"
-                style={{ border: '2px dashed #2E2028' }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = '#DC2626')}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = '#2E2028')}>
+                style={{ border: '2px dashed var(--v-vonal)' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--v-rozsa)')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')}>
                 <span className="text-2xl mb-2">&#128206;</span>
-                <span className="text-sm" style={{ color: '#9C8B7A' }}>Click to select files</span>
-                <span className="text-xs mt-1" style={{ color: '#5A4F4A' }}>Images, PDF, Word, Excel — max 5 files, 10MB each</span>
+                <span className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>Click to select files</span>
+                <span className="text-xs mt-1" style={{ color: 'var(--v-szoveg-3)' }}>Images, PDF, Word, Excel — max 5 files, 10MB each</span>
                 <input type="file" multiple accept="image/*,.pdf,.docx,.xlsx" onChange={fajlValasztas} className="hidden" />
               </label>
               {kivalasztottFajlok.length > 0 && (
                 <div className="flex flex-col gap-2">
                   {kivalasztottFajlok.map((f, i) => (
                     <div key={i} className="flex items-center justify-between px-4 py-2 rounded-lg text-sm"
-                      style={{ background: '#221820', border: '1px solid #2E2028' }}>
-                      <span className="truncate" style={{ color: '#9C8B7A' }}>
+                      style={{ background: 'var(--v-bg-3)', border: '1px solid var(--v-vonal)' }}>
+                      <span className="truncate" style={{ color: 'var(--v-szoveg-2)' }}>
                         {f.type.startsWith('image/') ? '🖼️' : f.type === 'application/pdf' ? '📄' : '📊'} {f.name}
                       </span>
                       <div className="flex items-center gap-2 ml-2 shrink-0">
-                        {feltoltottFajlok[i] ? <span className="text-xs" style={{ color: '#16A34A' }}>✓</span> : <span className="text-xs" style={{ color: '#5A4F4A' }}>pending</span>}
-                        <button type="button" onClick={() => fajlTorles(i)} className="transition" style={{ color: '#5A4F4A', background: 'none', border: 'none', cursor: 'pointer' }}
-                          onMouseEnter={e => (e.currentTarget.style.color = '#DC2626')}
-                          onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>✕</button>
+                        {feltoltottFajlok[i] ? <span className="text-xs" style={{ color: '#16A34A' }}>✓</span> : <span className="text-xs" style={{ color: 'var(--v-szoveg-3)' }}>pending</span>}
+                        <button type="button" onClick={() => fajlTorles(i)} className="transition" style={{ color: 'var(--v-szoveg-3)', background: 'none', border: 'none', cursor: 'pointer' }}
+                          onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-rozsa)')}
+                          onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>✕</button>
                       </div>
                     </div>
                   ))}
@@ -734,37 +734,37 @@ function SubmitInner() {
 
             {feedback && (
               <div className="rounded-lg p-6 flex flex-col gap-4" style={{
-                border: `1px solid ${feedback.score === -1 ? 'rgba(220,38,38,0.3)' : feedback.ready ? 'rgba(22,163,74,0.3)' : 'rgba(234,179,8,0.3)'}`,
-                background: feedback.score === -1 ? 'rgba(220,38,38,0.05)' : feedback.ready ? 'rgba(22,163,74,0.05)' : 'rgba(234,179,8,0.05)',
+                border: `1px solid ${feedback.score === -1 ? 'rgba(244,63,94,0.3)' : feedback.ready ? 'rgba(22,163,74,0.3)' : 'rgba(251,191,36,0.3)'}`,
+                background: feedback.score === -1 ? 'rgba(244,63,94,0.05)' : feedback.ready ? 'rgba(22,163,74,0.05)' : 'rgba(251,191,36,0.05)',
               }}>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">AI Feedback</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold" style={{ color: feedback.score === -1 ? '#DC2626' : feedback.score >= 7 ? '#16A34A' : feedback.score >= 5 ? '#EAB308' : '#DC2626' }}>
+                    <span className="text-2xl font-bold" style={{ color: feedback.score === -1 ? 'var(--v-rozsa)' : feedback.score >= 7 ? '#16A34A' : feedback.score >= 5 ? 'var(--v-arany)' : 'var(--v-rozsa)' }}>
                       {feedback.score === -1 ? '-1' : feedback.score}/10
                     </span>
                     {feedback.score === -1
-                      ? <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(220,38,38,0.1)', color: '#DC2626', border: '1px solid rgba(220,38,38,0.2)' }}>Blocked</span>
+                      ? <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(244,63,94,0.1)', color: 'var(--v-rozsa)', border: '1px solid rgba(244,63,94,0.2)' }}>Blocked</span>
                       : feedback.ready
                         ? <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(22,163,74,0.1)', color: '#16A34A', border: '1px solid rgba(22,163,74,0.2)' }}>Ready</span>
-                        : <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(234,179,8,0.1)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.2)' }}>Needs improvement</span>}
+                        : <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(251,191,36,0.1)', color: 'var(--v-arany)', border: '1px solid rgba(251,191,36,0.2)' }}>Needs improvement</span>}
                   </div>
                 </div>
                 {feedback.score === -1 ? (
                   <p className="text-sm" style={{ color: '#F87171' }}>Your content violates marketplace policies. Your account has been suspended pending admin review.</p>
                 ) : (
                   <>
-                    <p className="text-sm italic" style={{ color: '#9C8B7A' }}>&quot;{feedback.verdict}&quot;</p>
+                    <p className="text-sm italic" style={{ color: 'var(--v-szoveg-2)' }}>&quot;{feedback.verdict}&quot;</p>
                     {feedback.strengths.length > 0 && (
                       <div>
                         <p className="text-xs font-bold mb-1 uppercase tracking-wide" style={{ color: '#16A34A' }}>Strengths</p>
-                        {feedback.strengths.map((s, i) => <p key={i} className="text-sm" style={{ color: '#9C8B7A' }}>✓ {s}</p>)}
+                        {feedback.strengths.map((s, i) => <p key={i} className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>✓ {s}</p>)}
                       </div>
                     )}
                     {feedback.improvements.length > 0 && (
                       <div>
-                        <p className="text-xs font-bold mb-1 uppercase tracking-wide" style={{ color: '#EAB308' }}>Improve</p>
-                        {feedback.improvements.map((s, i) => <p key={i} className="text-sm" style={{ color: '#9C8B7A' }}>→ {s}</p>)}
+                        <p className="text-xs font-bold mb-1 uppercase tracking-wide" style={{ color: 'var(--v-arany)' }}>Improve</p>
+                        {feedback.improvements.map((s, i) => <p key={i} className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>→ {s}</p>)}
                       </div>
                     )}
                   </>
@@ -775,21 +775,21 @@ function SubmitInner() {
             <button type="button" onClick={aiFeedback}
               disabled={feedbackAllapot === 'loading' || feltoltesAllapot === 'loading' || !form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria}
               className="w-full py-3 rounded-lg font-semibold transition"
-              style={{ border: '1px solid rgba(220,38,38,0.4)', color: '#DC2626', background: 'transparent',
+              style={{ border: '1px solid rgba(244,63,94,0.4)', color: 'var(--v-rozsa)', background: 'transparent',
                 opacity: (feedbackAllapot === 'loading' || !form.nev || !form.rovid_leiras || !form.reszletes_leiras || !form.kategoria) ? 0.5 : 1 }}>
               {feltoltesAllapot === 'loading' ? 'Uploading...' : feedbackAllapot === 'loading' ? 'Analyzing...' : feedback ? 'Re-analyze' : 'Get AI Feedback (free)'}
             </button>
 
             {feedback && !feedback.ready && (
-              <p className="text-sm text-center" style={{ color: '#EAB308' }}>Improve your listing based on the feedback, then re-analyze.</p>
+              <p className="text-sm text-center" style={{ color: 'var(--v-arany)' }}>Improve your listing based on the feedback, then re-analyze.</p>
             )}
 
             {feedback?.ready && (
               <button type="button" onClick={lepés1Tovabb}
                 className="w-full py-3 rounded-lg font-semibold transition"
-                style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.2)' }}
+                style={{ background: 'var(--v-rozsa)', color: '#fff', boxShadow: '0 0 20px rgba(244,63,94,0.2)' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--v-rozsa)')}>
                 ✓ Continue to AI Mentor →
               </button>
             )}
@@ -801,26 +801,26 @@ function SubmitInner() {
           <div className="flex flex-col gap-4">
             <div>
               <button type="button" onClick={() => setLepes(1)} className="text-sm mb-3 transition"
-                style={{ color: '#5A4F4A', background: 'none', border: 'none', cursor: 'pointer' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#9C8B7A')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>← Back</button>
+                style={{ color: 'var(--v-szoveg-3)', background: 'none', border: 'none', cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg-2)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>← Back</button>
               <h1 className="text-3xl font-black mb-1" style={{ letterSpacing: '-0.03em' }}>Refine with AI Mentor</h1>
-              <p style={{ color: '#9C8B7A' }}>
+              <p style={{ color: 'var(--v-szoveg-2)' }}>
                 Chat with Sonnet 5 to make your idea market-ready.{' '}
-                <span style={{ color: '#DC2626' }}>{CHAT_COST} tokens/message</span>
+                <span style={{ color: 'var(--v-rozsa)' }}>{CHAT_COST} tokens/message</span>
                 {' · '}Balance:{' '}
-                <span className="font-semibold" style={{ color: (tokenEgyenleg ?? 0) < CHAT_COST ? '#DC2626' : '#F5F0E8' }}>{tokenEgyenleg ?? '...'}</span>
+                <span className="font-semibold" style={{ color: (tokenEgyenleg ?? 0) < CHAT_COST ? 'var(--v-rozsa)' : 'var(--v-szoveg)' }}>{tokenEgyenleg ?? '...'}</span>
               </p>
               {chatScore !== null && (
                 <div className="flex items-center gap-3 mt-2">
-                  <div className="flex-1 rounded-full h-2" style={{ background: '#2E2028' }}>
+                  <div className="flex-1 rounded-full h-2" style={{ background: 'var(--v-vonal)' }}>
                     <div className="h-2 rounded-full transition-all" style={{
                       width: `${chatScore * 10}%`,
-                      background: chatScore >= 8.5 ? '#16A34A' : chatScore >= 7 ? '#EAB308' : '#DC2626',
+                      background: chatScore >= 8.5 ? '#16A34A' : chatScore >= 7 ? 'var(--v-arany)' : 'var(--v-rozsa)',
                     }} />
                   </div>
-                  <span className="text-sm font-bold" style={{ color: chatScore >= 8.5 ? '#16A34A' : chatScore >= 7 ? '#EAB308' : '#DC2626' }}>{chatScore}/10</span>
-                  <span className="text-xs" style={{ color: '#5A4F4A' }}>need 8.5</span>
+                  <span className="text-sm font-bold" style={{ color: chatScore >= 8.5 ? '#16A34A' : chatScore >= 7 ? 'var(--v-arany)' : 'var(--v-rozsa)' }}>{chatScore}/10</span>
+                  <span className="text-xs" style={{ color: 'var(--v-szoveg-3)' }}>need 8.5</span>
                 </div>
               )}
             </div>
@@ -830,9 +830,9 @@ function SubmitInner() {
                 <div key={i} className={`flex ${u.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[85%] px-4 py-3 rounded-lg text-sm leading-relaxed"
                     style={{
-                      background: u.role === 'user' ? '#DC2626' : '#221820',
-                      color: u.role === 'user' ? '#fff' : '#9C8B7A',
-                      border: u.role === 'user' ? 'none' : '1px solid #2E2028',
+                      background: u.role === 'user' ? 'var(--v-rozsa)' : 'var(--v-bg-3)',
+                      color: u.role === 'user' ? '#fff' : 'var(--v-szoveg-2)',
+                      border: u.role === 'user' ? 'none' : '1px solid var(--v-vonal)',
                     }}>
                     {u.content.split('\n').map((sor, j) => <p key={j} className={j > 0 ? 'mt-2' : ''}>{sor}</p>)}
                   </div>
@@ -841,7 +841,7 @@ function SubmitInner() {
               {chatAllapot === 'loading' && (
                 <div className="flex justify-start">
                   <div className="px-4 py-3 rounded-lg text-sm animate-pulse"
-                    style={{ background: '#221820', color: '#5A4F4A', border: '1px solid #2E2028' }}>Thinking...</div>
+                    style={{ background: 'var(--v-bg-3)', color: 'var(--v-szoveg-3)', border: '1px solid var(--v-vonal)' }}>Thinking...</div>
                 </div>
               )}
               <div ref={chatVegRef} />
@@ -853,7 +853,7 @@ function SubmitInner() {
               <div className="flex flex-wrap gap-2">
                 {feltoltottFajlok.map((f, i) => (
                   <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                    style={{ background: '#221820', border: '1px solid #2E2028', color: '#9C8B7A' }}>
+                    style={{ background: 'var(--v-bg-3)', border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg-2)' }}>
                     <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>
                     <span className="max-w-[120px] truncate">{f.nev}</span>
                     <span style={{ color: '#16A34A' }}>✓</span>
@@ -869,21 +869,21 @@ function SubmitInner() {
                 disabled={chatAllapot === 'loading' || chatFajlAllapot === 'loading'}
                 className="flex-1 px-4 py-3 focus:outline-none transition"
                 style={{ ...inputStyle, opacity: (chatAllapot === 'loading') ? 0.6 : 1 }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+                onFocus={e => (e.currentTarget.style.borderColor = 'var(--v-rozsa)')}
+                onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')} />
               <button type="button" onClick={() => chatFajlInputRef.current?.click()}
                 disabled={chatAllapot === 'loading' || chatFajlAllapot === 'loading' || feltoltottFajlok.length >= 5}
                 className="shrink-0 px-3 py-3 rounded-lg font-bold text-base transition"
-                style={{ background: '#221820', border: '1px solid #3E3040', color: '#F5F0E8' }}>
+                style={{ background: 'var(--v-bg-3)', border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg)' }}>
                 {chatFajlAllapot === 'loading' ? '...' : '+ File'}
               </button>
               <input ref={chatFajlInputRef} type="file" className="hidden" accept="image/*,.pdf,.docx,.xlsx" onChange={chatFajlFeltoltes} />
               <button onClick={chatKuldes}
                 disabled={!chatInput.trim() || chatAllapot === 'loading' || chatFajlAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST}
                 className="px-4 py-3 rounded-lg font-semibold text-sm shrink-0 transition"
-                style={{ background: '#DC2626', color: '#fff', opacity: (!chatInput.trim() || chatAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST) ? 0.4 : 1 }}
+                style={{ background: 'var(--v-rozsa)', color: '#fff', opacity: (!chatInput.trim() || chatAllapot === 'loading' || (tokenEgyenleg ?? 0) < CHAT_COST) ? 0.4 : 1 }}
                 onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#EF4444' }}
-                onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--v-rozsa)')}>
                 Send
               </button>
             </div>
@@ -891,21 +891,21 @@ function SubmitInner() {
             {(tokenEgyenleg ?? 0) < CHAT_COST && (
               <p className="text-sm text-center" style={{ color: '#F87171' }}>
                 Not enough tokens.{' '}
-                <a href="/tokens?redirect=/submit" style={{ color: '#DC2626' }}>Buy tokens →</a>
+                <a href="/tokens?redirect=/submit" style={{ color: 'var(--v-rozsa)' }}>Buy tokens →</a>
               </p>
             )}
 
-            <div className="pt-4" style={{ borderTop: '1px solid #2E2028' }}>
+            <div className="pt-4" style={{ borderTop: '1px solid var(--v-vonal)' }}>
               {chatKeszen ? (
                 <button type="button" onClick={lepés2Tovabb}
                   className="w-full py-3 rounded-lg font-semibold transition"
-                  style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 20px rgba(220,38,38,0.2)' }}
+                  style={{ background: 'var(--v-rozsa)', color: '#fff', boxShadow: '0 0 20px rgba(244,63,94,0.2)' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+                  onMouseLeave={e => (e.currentTarget.style.background = 'var(--v-rozsa)')}>
                   ✓ Market-ready — Set price & submit →
                 </button>
               ) : (
-                <p className="text-center text-sm py-2" style={{ color: '#5A4F4A' }}>
+                <p className="text-center text-sm py-2" style={{ color: 'var(--v-szoveg-3)' }}>
                   The AI will unlock this button when your idea is market-ready.
                 </p>
               )}
@@ -918,22 +918,22 @@ function SubmitInner() {
           <form onSubmit={beküldes} className="flex flex-col gap-6">
             <div>
               <button type="button" onClick={() => setLepes(2)} className="text-sm mb-3 transition"
-                style={{ color: '#5A4F4A', background: 'none', border: 'none', cursor: 'pointer' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#9C8B7A')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>← Back</button>
+                style={{ color: 'var(--v-szoveg-3)', background: 'none', border: 'none', cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg-2)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>← Back</button>
               <h1 className="text-3xl font-black mb-1" style={{ letterSpacing: '-0.03em' }}>Set price & submit</h1>
-              <p style={{ color: '#9C8B7A' }}>Almost there — set your starting price and auction duration.</p>
+              <p style={{ color: 'var(--v-szoveg-2)' }}>Almost there — set your starting price and auction duration.</p>
             </div>
 
             <div className="p-4 flex items-center justify-between rounded-lg"
-              style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)' }}>
+              style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)' }}>
               <div>
-                <p className="font-semibold" style={{ color: '#F5F0E8' }}>Submission cost</p>
-                <p className="text-sm" style={{ color: '#9C8B7A' }}>{SUBMIT_COST} base + {feltoltottFajlok.length} × {FILE_COST} files + {DURATION_COST[form.idotartam_nap] ?? 0} duration</p>
+                <p className="font-semibold" style={{ color: 'var(--v-szoveg)' }}>Submission cost</p>
+                <p className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>{SUBMIT_COST} base + {feltoltottFajlok.length} × {FILE_COST} files + {DURATION_COST[form.idotartam_nap] ?? 0} duration</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold" style={{ color: '#EAB308' }}>{totalCost} tokens</p>
-                <p className="text-xs" style={{ color: (tokenEgyenleg ?? 0) < totalCost ? '#DC2626' : '#5A4F4A' }}>You have: {tokenEgyenleg ?? '...'}</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--v-arany)' }}>{totalCost} tokens</p>
+                <p className="text-xs" style={{ color: (tokenEgyenleg ?? 0) < totalCost ? 'var(--v-rozsa)' : 'var(--v-szoveg-3)' }}>You have: {tokenEgyenleg ?? '...'}</p>
               </div>
             </div>
 
@@ -941,50 +941,50 @@ function SubmitInner() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-semibold">Final Documents</h2>
-                  <p className="text-sm mt-0.5" style={{ color: '#9C8B7A' }}>Upload deliverables buyers will receive. Each file costs {FILE_COST} tokens.</p>
+                  <p className="text-sm mt-0.5" style={{ color: 'var(--v-szoveg-2)' }}>Upload deliverables buyers will receive. Each file costs {FILE_COST} tokens.</p>
                 </div>
                 <button type="button" onClick={() => step3FajlInputRef.current?.click()}
                   disabled={step3FajlAllapot === 'loading' || feltoltottFajlok.length >= 10}
                   className="shrink-0 px-4 py-2 rounded-lg font-semibold text-sm transition"
-                  style={{ background: '#221820', border: '1px solid #3E3040', color: '#F5F0E8' }}>
+                  style={{ background: 'var(--v-bg-3)', border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg)' }}>
                   {step3FajlAllapot === 'loading' ? 'Uploading...' : '+ Add File'}
                 </button>
                 <input ref={step3FajlInputRef} type="file" className="hidden" accept="image/*,.pdf,.docx,.xlsx,.zip,.pptx" onChange={step3FajlFeltoltes} />
               </div>
               {feltoltottFajlok.length > 0 ? (
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between text-xs pb-1" style={{ color: '#5A4F4A', borderBottom: '1px solid #2E2028' }}>
+                  <div className="flex items-center justify-between text-xs pb-1" style={{ color: 'var(--v-szoveg-3)', borderBottom: '1px solid var(--v-vonal)' }}>
                     <span>{feltoltottFajlok.length} file(s) attached</span>
-                    <span style={{ color: '#EAB308' }}>Locked after submit</span>
+                    <span style={{ color: 'var(--v-arany)' }}>Locked after submit</span>
                   </div>
                   {feltoltottFajlok.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm" style={{ color: '#9C8B7A' }}>
+                    <div key={i} className="flex items-center gap-2 text-sm" style={{ color: 'var(--v-szoveg-2)' }}>
                       <span>{f.tipus.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : f.tipus.includes('zip') ? '🗜️' : '📄'}</span>
                       <span className="truncate flex-1">{f.nev}</span>
-                      <span className="text-xs shrink-0" style={{ color: '#EAB308' }}>+{FILE_COST} tokens</span>
+                      <span className="text-xs shrink-0" style={{ color: 'var(--v-arany)' }}>+{FILE_COST} tokens</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-center py-2" style={{ color: '#5A4F4A' }}>No files yet — add your pitch deck, business plan, or other documents.</p>
+                <p className="text-sm text-center py-2" style={{ color: 'var(--v-szoveg-3)' }}>No files yet — add your pitch deck, business plan, or other documents.</p>
               )}
             </div>
 
             {ertekelesAllapot === 'loading' && (
               <div className="px-5 py-4 flex items-center gap-3 rounded-lg" style={cardStyle}>
                 <div className="w-4 h-4 rounded-full animate-spin shrink-0"
-                  style={{ border: '2px solid #DC2626', borderTopColor: 'transparent' }} />
-                <p className="text-sm" style={{ color: '#9C8B7A' }}>AI is estimating your project&apos;s value...</p>
+                  style={{ border: '2px solid var(--v-rozsa)', borderTopColor: 'transparent' }} />
+                <p className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>AI is estimating your project&apos;s value...</p>
               </div>
             )}
             {aiErtekeles && (
-              <div className="px-5 py-4 rounded-lg" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.2)' }}>
+              <div className="px-5 py-4 rounded-lg" style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)' }}>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="font-semibold text-sm" style={{ color: '#EAB308' }}>AI Valuation</p>
-                  <p className="font-bold text-xl" style={{ color: '#EAB308' }}>€{aiErtekeles.estimated_value.toLocaleString()}</p>
+                  <p className="font-semibold text-sm" style={{ color: 'var(--v-arany)' }}>AI Valuation</p>
+                  <p className="font-bold text-xl" style={{ color: 'var(--v-arany)' }}>€{aiErtekeles.estimated_value.toLocaleString()}</p>
                 </div>
-                <p className="text-xs" style={{ color: '#9C8B7A' }}>{aiErtekeles.reasoning}</p>
-                <p className="text-xs mt-2" style={{ color: '#5A4F4A' }}>
+                <p className="text-xs" style={{ color: 'var(--v-szoveg-2)' }}>{aiErtekeles.reasoning}</p>
+                <p className="text-xs mt-2" style={{ color: 'var(--v-szoveg-3)' }}>
                   Starting price: €{aiErtekeles.estimated_value.toLocaleString()} – €{Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} (max 1.5×)
                 </p>
               </div>
@@ -992,13 +992,13 @@ function SubmitInner() {
 
             <div className="p-6 flex flex-col gap-3" style={cardStyle}>
               <h2 className="font-semibold">Starting Price</h2>
-              <p className="text-sm" style={{ color: '#9C8B7A' }}>
+              <p className="text-sm" style={{ color: 'var(--v-szoveg-2)' }}>
                 {aiErtekeles
                   ? `Set between €${aiErtekeles.estimated_value.toLocaleString()} and €${Math.round(aiErtekeles.estimated_value * 1.5).toLocaleString()} — buyers can bid higher.`
                   : 'The minimum bid the auction starts from (EUR).'}
               </p>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#9C8B7A' }}>€</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--v-szoveg-2)' }}>€</span>
                 <input required type="number"
                   min={aiErtekeles ? aiErtekeles.estimated_value : 1}
                   max={aiErtekeles ? Math.round(aiErtekeles.estimated_value * 1.5) : undefined}
@@ -1017,8 +1017,8 @@ function SubmitInner() {
                   placeholder={aiErtekeles ? `e.g. ${aiErtekeles.estimated_value}` : 'e.g. 500'}
                   className="w-full pl-8 pr-4 py-3 focus:outline-none transition"
                   style={inputStyle}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+                  onFocus={e => (e.currentTarget.style.borderColor = 'var(--v-rozsa)')}
+                  onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')} />
               </div>
             </div>
 
@@ -1034,12 +1034,12 @@ function SubmitInner() {
                   return (
                     <button key={d.nap} type="button" onClick={() => frissit('idotartam_nap', d.nap)}
                       className="flex flex-col items-center p-4 rounded-lg transition"
-                      style={{ border: `1px solid ${sel ? '#DC2626' : '#2E2028'}`, background: sel ? 'rgba(220,38,38,0.08)' : '#1A1217' }}
-                      onMouseEnter={e => { if (!sel) e.currentTarget.style.borderColor = '#3E3040' }}
-                      onMouseLeave={e => { if (!sel) e.currentTarget.style.borderColor = '#2E2028' }}>
-                      <span className="font-bold" style={{ color: '#F5F0E8' }}>{d.label}</span>
-                      <span className="text-xs mt-1" style={{ color: '#9C8B7A' }}>{d.sub}</span>
-                      <span className="text-xs mt-1" style={{ color: sel ? '#DC2626' : '#EAB308' }}>
+                      style={{ border: `1px solid ${sel ? 'var(--v-rozsa)' : 'var(--v-vonal)'}`, background: sel ? 'rgba(244,63,94,0.08)' : 'var(--v-bg-2)' }}
+                      onMouseEnter={e => { if (!sel) e.currentTarget.style.borderColor = 'var(--v-vonal-2)' }}
+                      onMouseLeave={e => { if (!sel) e.currentTarget.style.borderColor = 'var(--v-vonal)' }}>
+                      <span className="font-bold" style={{ color: 'var(--v-szoveg)' }}>{d.label}</span>
+                      <span className="text-xs mt-1" style={{ color: 'var(--v-szoveg-2)' }}>{d.sub}</span>
+                      <span className="text-xs mt-1" style={{ color: sel ? 'var(--v-rozsa)' : 'var(--v-arany)' }}>
                         {d.token === 0 ? 'included' : `+${d.token} tokens`}
                       </span>
                     </button>
@@ -1051,22 +1051,22 @@ function SubmitInner() {
             {hiba && <p className="text-sm text-center" style={{ color: '#F87171' }}>{hiba}</p>}
 
             {allapot === 'szures' && (
-              <div className="px-5 py-4 text-center rounded-lg" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.2)' }}>
-                <p className="font-semibold text-sm" style={{ color: '#EAB308' }}>AI is reviewing your submission...</p>
-                <p className="text-xs mt-1" style={{ color: '#9C8B7A' }}>Checking content quality. No tokens deducted yet.</p>
+              <div className="px-5 py-4 text-center rounded-lg" style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)' }}>
+                <p className="font-semibold text-sm" style={{ color: 'var(--v-arany)' }}>AI is reviewing your submission...</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--v-szoveg-2)' }}>Checking content quality. No tokens deducted yet.</p>
               </div>
             )}
 
             <button type="submit" disabled={allapot !== 'idle' && allapot !== 'hiba'}
               className="py-4 rounded-lg font-semibold text-lg transition"
-              style={{ background: '#DC2626', color: '#fff', boxShadow: '0 0 24px rgba(220,38,38,0.2)', opacity: (allapot !== 'idle' && allapot !== 'hiba') ? 0.6 : 1 }}
+              style={{ background: 'var(--v-rozsa)', color: '#fff', boxShadow: '0 0 24px rgba(244,63,94,0.2)', opacity: (allapot !== 'idle' && allapot !== 'hiba') ? 0.6 : 1 }}
               onMouseEnter={e => { if (allapot === 'idle') e.currentTarget.style.background = '#EF4444' }}
-              onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--v-rozsa)')}>
               {allapot === 'szures' ? 'Reviewing...' : allapot === 'loading' ? 'Submitting...' : `Submit Project — ${totalCost} tokens →`}
             </button>
 
             {allapot === 'idle' && (
-              <p className="text-xs text-center" style={{ color: '#5A4F4A' }}>
+              <p className="text-xs text-center" style={{ color: 'var(--v-szoveg-3)' }}>
                 An AI will review your project before it goes live. If rejected, you are sent back to the mentor — no tokens lost.
               </p>
             )}
@@ -1080,8 +1080,8 @@ function SubmitInner() {
 export default function Submit() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen flex items-center justify-center" style={{ background: '#100C0F' }}>
-        <div style={{ color: '#9C8B7A' }}>Loading...</div>
+      <main className="min-h-screen flex items-center justify-center" style={{ background: 'var(--v-bg)' }}>
+        <div style={{ color: 'var(--v-szoveg-2)' }}>Loading...</div>
       </main>
     }>
       <SubmitInner />

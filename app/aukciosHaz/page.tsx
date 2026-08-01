@@ -8,14 +8,14 @@ import { type KirakatElem } from '@/lib/kirakat'
 
 const SAV_INFO = {
   fast:     { label: 'FAST',     slogan: '⚡ CHANNEL 01', tagline: 'Fast Deals · Live Now',        perc: 3,  color: '#22C55E', glow: '0 0 24px #22C55E44', bg: '#22C55E11' },
-  standard: { label: 'STANDARD', slogan: '📡 CHANNEL 02', tagline: 'Prime Time · Bid To Win',      perc: 5,  color: '#EAB308', glow: '0 0 24px #EAB30844', bg: '#EAB30811' },
-  premium:  { label: 'PREMIUM',  slogan: '🏆 CHANNEL 03', tagline: 'High Value · Serious Buyers',  perc: 20, color: '#DC2626', glow: '0 0 24px #DC262644', bg: '#DC262611' },
+  standard: { label: 'STANDARD', slogan: '📡 CHANNEL 02', tagline: 'Prime Time · Bid To Win',      perc: 5,  color: '#FBBF24', glow: '0 0 24px #FBBF2444', bg: '#FBBF2411' },
+  premium:  { label: 'PREMIUM',  slogan: '🏆 CHANNEL 03', tagline: 'High Value · Serious Buyers',  perc: 20, color: '#F43F5E', glow: '0 0 24px #F43F5E44', bg: '#F43F5E11' },
 }
 
 const badge_info: Record<string, { label: string; color: string }> = {
   idea:      { label: 'Concept',   color: '#22C55E' },
-  prototype: { label: 'Prototype', color: '#EAB308' },
-  proven:    { label: 'Proven',    color: '#DC2626' },
+  prototype: { label: 'Prototype', color: '#FBBF24' },
+  proven:    { label: 'Proven',    color: '#F43F5E' },
 }
 
 type Projekt = {
@@ -72,9 +72,9 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
   return (
     <div onClick={() => projekt && onKattint(projekt)}
       style={{
-        background: '#1A1217',
-        border: `1px solid ${isUrgent ? '#DC262699' : isLive ? `${info.color}55` : '#2E2028'}`,
-        boxShadow: isUrgent ? '0 0 28px rgba(220,38,38,0.18)' : isLive ? info.glow : 'none',
+        background: 'var(--v-bg-2)',
+        border: `1px solid ${isUrgent ? '#F43F5E99' : isLive ? `${info.color}55` : 'var(--v-vonal)'}`,
+        boxShadow: isUrgent ? '0 0 28px rgba(244,63,94,0.18)' : isLive ? info.glow : 'none',
         animation: isUrgent ? 'urgentPulse 1s ease-in-out infinite' : 'none',
         cursor: projekt ? 'pointer' : 'default',
         borderRadius: '8px', overflow: 'hidden',
@@ -82,25 +82,25 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
       }}
       className="relative flex flex-col group hover:scale-[1.015] transition-transform">
       {isLive && <div className="pointer-events-none absolute inset-0 z-10 opacity-[0.025]"
-        style={{ background: 'repeating-linear-gradient(0deg, #F5F0E8 0px, #F5F0E8 1px, transparent 1px, transparent 3px)' }} />}
+        style={{ background: 'repeating-linear-gradient(0deg, var(--v-szoveg) 0px, var(--v-szoveg) 1px, transparent 1px, transparent 3px)' }} />}
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-3 py-2"
-        style={{ background: isLive ? info.bg : '#100C0F', borderBottom: '1px solid #2E2028' }}>
+        style={{ background: isLive ? info.bg : 'var(--v-bg)', borderBottom: '1px solid var(--v-vonal)' }}>
         <div className="flex items-center gap-1.5">
           {isLive && <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: info.color }} />}
           <span className="text-[10px] font-black tracking-widest" style={{ color: info.color }}>{info.label}</span>
-          {isLive && <span className="text-[10px] font-black px-1 rounded" style={{ background: '#DC2626', color: '#fff' }}>LIVE</span>}
+          {isLive && <span className="text-[10px] font-black px-1 rounded" style={{ background: 'var(--v-rozsa)', color: '#fff' }}>LIVE</span>}
         </div>
         <div className="flex items-center gap-2">
           {projekt && (
             <button onClick={handleShare} title="Copy link"
               className="text-[10px] font-bold transition"
-              style={{ color: copied ? '#22C55E' : '#5A4F4A' }}>
+              style={{ color: copied ? '#22C55E' : 'var(--v-szoveg-3)' }}>
               {copied ? '✓' : '🔗'}
             </button>
           )}
-          <span className="text-[10px] font-mono" style={{ color: '#3E3040' }}>#{slot}</span>
+          <span className="text-[10px] font-mono" style={{ color: 'var(--v-vonal-2)' }}>#{slot}</span>
         </div>
       </div>
 
@@ -113,42 +113,42 @@ function TvPanel({ projekt, sav, slot, onKattint, topLicit, bidderCount }: {
                 style={{ color: badge_info[projekt.badge]?.color, background: `${badge_info[projekt.badge]?.color}1a` }}>
                 {badge_info[projekt.badge]?.label ?? projekt.badge}
               </span>
-              <span className="text-[10px]" style={{ color: '#5A4F4A' }}>{projekt.kategoria}</span>
+              <span className="text-[10px]" style={{ color: 'var(--v-szoveg-3)' }}>{projekt.kategoria}</span>
             </div>
 
-            <h3 className="font-bold text-sm mb-1 leading-snug line-clamp-2" style={{ color: '#F5F0E8' }}>{projekt.nev}</h3>
-            <p className="text-xs line-clamp-2 flex-1" style={{ color: '#9C8B7A' }}>{projekt.rovid_leiras}</p>
+            <h3 className="font-bold text-sm mb-1 leading-snug line-clamp-2" style={{ color: 'var(--v-szoveg)' }}>{projekt.nev}</h3>
+            <p className="text-xs line-clamp-2 flex-1" style={{ color: 'var(--v-szoveg-2)' }}>{projekt.rovid_leiras}</p>
 
-            <div className="mt-3 pt-3 flex items-end justify-between" style={{ borderTop: '1px solid #2E2028' }}>
+            <div className="mt-3 pt-3 flex items-end justify-between" style={{ borderTop: '1px solid var(--v-vonal)' }}>
               <div>
-                <p className="text-[10px] mb-0.5" style={{ color: '#5A4F4A' }}>{topLicit ? 'Current bid' : 'Starting price'}</p>
+                <p className="text-[10px] mb-0.5" style={{ color: 'var(--v-szoveg-3)' }}>{topLicit ? 'Current bid' : 'Starting price'}</p>
                 <p className="text-lg font-black tabular-nums" style={{ color: info.color }}>
                   €{(topLicit ?? projekt.kikialtasi_ar).toLocaleString()}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] mb-0.5" style={{ color: '#5A4F4A' }}>Time left</p>
+                <p className="text-[10px] mb-0.5" style={{ color: 'var(--v-szoveg-3)' }}>Time left</p>
                 <p className={`text-lg font-mono font-black ${isUrgent ? 'animate-pulse' : ''}`}
-                  style={{ color: countdown.done ? '#EF4444' : isUrgent ? '#DC2626' : '#F5F0E8' }}>
+                  style={{ color: countdown.done ? '#EF4444' : isUrgent ? 'var(--v-rozsa)' : 'var(--v-szoveg)' }}>
                   {countdown.label}
                 </p>
               </div>
             </div>
 
             {bidderCount != null && bidderCount > 0 && (
-              <p className="mt-2 text-[10px] text-center" style={{ color: '#5A4F4A' }}>
+              <p className="mt-2 text-[10px] text-center" style={{ color: 'var(--v-szoveg-3)' }}>
                 {bidderCount} {bidderCount === 1 ? 'bidder' : 'bidders'}
               </p>
             )}
             <div className="mt-2 text-center text-[11px] font-black py-1.5 rounded opacity-0 group-hover:opacity-100 transition"
-              style={{ background: info.color, color: info.color === '#EAB308' ? '#100C0F' : '#fff' }}>
+              style={{ background: info.color, color: info.color === 'var(--v-arany)' ? 'var(--v-bg)' : '#fff' }}>
               Click to Bid →
             </div>
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
             <p className="text-2xl mb-2" style={{ opacity: 0.15 }}>◻</p>
-            <p className="text-xs" style={{ color: '#3E3040' }}>Empty slot</p>
+            <p className="text-xs" style={{ color: 'var(--v-vonal-2)' }}>Empty slot</p>
           </div>
         )}
       </div>
@@ -202,54 +202,54 @@ function BidModal({ projekt, user, onZar }: { projekt: Projekt; user: User | nul
     }
   }
 
-  const bdgColor = badge_info[projekt.badge]?.color ?? '#9C8B7A'
-  const isDark = info?.color === '#EAB308'
+  const bdgColor = badge_info[projekt.badge]?.color ?? 'var(--v-szoveg-2)'
+  const isDark = info?.color === 'var(--v-arany)'
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
       onClick={e => { if (e.target === e.currentTarget) onZar() }}>
       <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onZar} />
       <div className="relative w-full max-w-md rounded-lg overflow-hidden"
-        style={{ background: '#1A1217', border: `1px solid ${info?.color}44`, boxShadow: `0 0 50px ${info?.color}22` }}>
+        style={{ background: 'var(--v-bg-2)', border: `1px solid ${info?.color}44`, boxShadow: `0 0 50px ${info?.color}22` }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3"
-          style={{ background: `linear-gradient(to right, ${info?.color}18, transparent)`, borderBottom: '1px solid #2E2028' }}>
+          style={{ background: `linear-gradient(to right, ${info?.color}18, transparent)`, borderBottom: '1px solid var(--v-vonal)' }}>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: info?.color }} />
             <span className="text-xs font-black tracking-widest" style={{ color: info?.color }}>LIVE AUCTION</span>
           </div>
-          <button onClick={onZar} className="text-lg leading-none transition" style={{ color: '#5A4F4A' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>✕</button>
+          <button onClick={onZar} className="text-lg leading-none transition" style={{ color: 'var(--v-szoveg-3)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>✕</button>
         </div>
 
         {/* Project info */}
-        <div className="px-5 pt-4 pb-3" style={{ borderBottom: '1px solid #2E2028' }}>
+        <div className="px-5 pt-4 pb-3" style={{ borderBottom: '1px solid var(--v-vonal)' }}>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[10px] font-bold px-2 py-0.5 rounded"
               style={{ color: bdgColor, background: `${bdgColor}1a` }}>
               {badge_info[projekt.badge]?.label ?? projekt.badge}
             </span>
-            <span className="text-[10px]" style={{ color: '#5A4F4A' }}>{projekt.kategoria}</span>
+            <span className="text-[10px]" style={{ color: 'var(--v-szoveg-3)' }}>{projekt.kategoria}</span>
           </div>
           <h2 className="font-black text-xl leading-tight" style={{ letterSpacing: '-0.02em' }}>{projekt.nev}</h2>
-          <p className="text-xs mt-1 line-clamp-2" style={{ color: '#9C8B7A' }}>{projekt.rovid_leiras}</p>
+          <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--v-szoveg-2)' }}>{projekt.rovid_leiras}</p>
         </div>
 
         {/* Bid + timer */}
         <div className="px-5 py-4 flex items-center justify-between"
           style={{ background: `${info?.color}08` }}>
           <div>
-            <p className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5A4F4A' }}>Current Bid</p>
+            <p className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: 'var(--v-szoveg-3)' }}>Current Bid</p>
             <p className="text-4xl font-black tabular-nums" style={{ color: info?.color, letterSpacing: '-0.03em' }}>
               €{legmagasabb.toLocaleString()}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5A4F4A' }}>Time Left</p>
+            <p className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: 'var(--v-szoveg-3)' }}>Time Left</p>
             <p className={`text-2xl font-mono font-black tabular-nums ${modalUrgent ? 'animate-pulse' : ''}`}
-              style={{ color: countdown.done ? '#EF4444' : modalUrgent ? '#DC2626' : '#F5F0E8' }}>
+              style={{ color: countdown.done ? '#EF4444' : modalUrgent ? 'var(--v-rozsa)' : 'var(--v-szoveg)' }}>
               {countdown.label}
             </p>
           </div>
@@ -257,15 +257,15 @@ function BidModal({ projekt, user, onZar }: { projekt: Projekt; user: User | nul
 
         <div className="px-5 pb-5">
           {auctionEnded ? (
-            <div className="text-center text-sm py-3 rounded-lg" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)', color: '#EF4444' }}>
+            <div className="text-center text-sm py-3 rounded-lg" style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', color: '#EF4444' }}>
               Auction ended — no more bids
             </div>
           ) : isSeller ? (
-            <div className="text-center text-xs py-3" style={{ color: '#5A4F4A' }}>This is your project</div>
+            <div className="text-center text-xs py-3" style={{ color: 'var(--v-szoveg-3)' }}>This is your project</div>
           ) : !user ? (
             <button onClick={() => router.push('/auth')}
               className="w-full py-3.5 rounded-lg font-black text-sm transition"
-              style={{ background: info?.color, color: isDark ? '#100C0F' : '#fff' }}
+              style={{ background: info?.color, color: isDark ? 'var(--v-bg)' : '#fff' }}
               onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
               Sign in to bid →
@@ -278,26 +278,26 @@ function BidModal({ projekt, user, onZar }: { projekt: Projekt; user: User | nul
                   className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl font-bold shrink-0 transition active:scale-95"
                   style={{ background: `${info?.color}15`, border: `1px solid ${info?.color}33`, color: info?.color }}>−</button>
                 <div className="relative flex-1">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold" style={{ color: '#5A4F4A' }}>€</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold" style={{ color: 'var(--v-szoveg-3)' }}>€</span>
                   <input type="number" required min={minimumLicit} value={licitOsszeg}
                     onChange={e => setLicitOsszeg(e.target.value)}
                     placeholder={`${minimumLicit.toLocaleString()}`}
                     className="w-full pl-8 pr-4 py-3.5 rounded-lg text-lg font-black text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:outline-none transition"
-                    style={{ background: '#221820', border: `1px solid ${info?.color}33`, color: '#F5F0E8' }}
-                    onFocus={e => (e.currentTarget.style.borderColor = info?.color ?? '#DC2626')}
-                    onBlur={e => (e.currentTarget.style.borderColor = `${info?.color ?? '#DC2626'}33`)} />
+                    style={{ background: 'var(--v-bg-3)', border: `1px solid ${info?.color}33`, color: 'var(--v-szoveg)' }}
+                    onFocus={e => (e.currentTarget.style.borderColor = info?.color ?? 'var(--v-rozsa)')}
+                    onBlur={e => (e.currentTarget.style.borderColor = `${info?.color ?? 'var(--v-rozsa)'}33`)} />
                 </div>
                 <button type="button"
                   onClick={() => setLicitOsszeg(v => String((parseInt(v) || minimumLicit) + increment))}
                   className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl font-bold shrink-0 transition active:scale-95"
                   style={{ background: `${info?.color}15`, border: `1px solid ${info?.color}33`, color: info?.color }}>+</button>
               </div>
-              <p className="text-center text-[10px]" style={{ color: '#5A4F4A' }}>min. €{minimumLicit.toLocaleString()} · increment +€{increment}</p>
+              <p className="text-center text-[10px]" style={{ color: 'var(--v-szoveg-3)' }}>min. €{minimumLicit.toLocaleString()} · increment +€{increment}</p>
               {allapot === 'hiba' && <p className="text-xs text-center" style={{ color: '#EF4444' }}>{hiba}</p>}
               {allapot === 'siker' && <p className="text-xs font-bold text-center" style={{ color: '#22C55E' }}>Bid placed!</p>}
               <button type="submit" disabled={allapot === 'loading'}
                 className="py-4 rounded-lg font-black text-base transition active:scale-[0.98]"
-                style={{ background: info?.color, color: isDark ? '#100C0F' : '#fff', boxShadow: allapot !== 'loading' ? info?.glow : 'none', opacity: allapot === 'loading' ? 0.7 : 1 }}
+                style={{ background: info?.color, color: isDark ? 'var(--v-bg)' : '#fff', boxShadow: allapot !== 'loading' ? info?.glow : 'none', opacity: allapot === 'loading' ? 0.7 : 1 }}
                 onMouseEnter={e => { if (allapot !== 'loading') e.currentTarget.style.opacity = '0.9' }}
                 onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
                 {allapot === 'loading' ? 'Submitting...' : 'Place Bid →'}
@@ -306,16 +306,16 @@ function BidModal({ projekt, user, onZar }: { projekt: Projekt; user: User | nul
           )}
 
           {!loading && licitek.length > 0 && (
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid #2E2028' }}>
-              <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: '#5A4F4A' }}>Bid History ({licitek.length})</p>
+            <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--v-vonal)' }}>
+              <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--v-szoveg-3)' }}>Bid History ({licitek.length})</p>
               <div className="flex flex-col gap-1">
                 {licitek.slice(0, 5).map((l, i) => (
                   <div key={l.id} className="flex justify-between items-center py-1.5 px-3 rounded text-xs"
-                    style={{ background: i === 0 ? '#221820' : 'transparent' }}>
-                    <span className="font-mono" style={{ color: i === 0 ? '#F5F0E8' : '#9C8B7A' }}>
+                    style={{ background: i === 0 ? 'var(--v-bg-3)' : 'transparent' }}>
+                    <span className="font-mono" style={{ color: i === 0 ? 'var(--v-szoveg)' : 'var(--v-szoveg-2)' }}>
                       {i === 0 ? '— ' : `${i + 1}. `}{l.anon_nev || `Buyer#${i + 1}`}
                     </span>
-                    <span className="font-bold tabular-nums" style={{ color: i === 0 ? info?.color : '#5A4F4A' }}>
+                    <span className="font-bold tabular-nums" style={{ color: i === 0 ? info?.color : 'var(--v-szoveg-3)' }}>
                       €{l.osszeg.toLocaleString()}
                     </span>
                   </div>
@@ -325,9 +325,9 @@ function BidModal({ projekt, user, onZar }: { projekt: Projekt; user: User | nul
           )}
           <a href={`/project/${projekt.id}`}
             className="block mt-4 text-center text-xs transition"
-            style={{ color: '#5A4F4A' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#9C8B7A')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#5A4F4A')}>
+            style={{ color: 'var(--v-szoveg-3)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg-2)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>
             View full details →
           </a>
         </div>
@@ -388,20 +388,20 @@ export default function Marketplace() {
   }, [])
 
   const skeletonCard = (
-    <div className="rounded-lg h-52 animate-pulse" style={{ background: '#1A1217', border: '1px solid #2E2028' }} />
+    <div className="rounded-lg h-52 animate-pulse" style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }} />
   )
 
   if (loading) return (
-    <main className="min-h-screen" style={{ background: '#100C0F', color: '#F5F0E8' }}>
-      <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #2E2028' }}>
-        <span className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Bid<span style={{ color: '#DC2626' }}>Vip</span></span>
+    <main className="min-h-screen" style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)' }}>
+      <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid var(--v-vonal)' }}>
+        <span className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>Bid<span style={{ color: 'var(--v-rozsa)' }}>Vip</span></span>
       </nav>
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="h-10 w-48 rounded mb-2 animate-pulse" style={{ background: '#1A1217' }} />
-        <div className="h-4 w-64 rounded mb-10 animate-pulse" style={{ background: '#1A1217' }} />
+        <div className="h-10 w-48 rounded mb-2 animate-pulse" style={{ background: 'var(--v-bg-2)' }} />
+        <div className="h-4 w-64 rounded mb-10 animate-pulse" style={{ background: 'var(--v-bg-2)' }} />
         {['fast','standard','premium'].map(s => (
           <div key={s} className="mb-10">
-            <div className="h-3 w-40 rounded mb-4 animate-pulse" style={{ background: '#1A1217' }} />
+            <div className="h-3 w-40 rounded mb-4 animate-pulse" style={{ background: 'var(--v-bg-2)' }} />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">{skeletonCard}{skeletonCard}{skeletonCard}</div>
           </div>
         ))}
@@ -412,26 +412,26 @@ export default function Marketplace() {
   const savok = ['fast', 'standard', 'premium'] as const
 
   return (
-    <main className="min-h-screen" style={{ background: '#100C0F', color: '#F5F0E8' }}>
+    <main className="min-h-screen" style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)' }}>
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-32 left-1/4 w-[600px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.05) 0%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.05) 0%, transparent 70%)' }} />
         <div className="absolute top-1/2 right-0 w-[400px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(234,179,8,0.04) 0%, transparent 70%)' }} />
-        <div className="absolute inset-0" style={{ opacity: 0.012, backgroundImage: 'radial-gradient(circle, #F5F0E8 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+          style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.04) 0%, transparent 70%)' }} />
+        <div className="absolute inset-0" style={{ opacity: 0.012, backgroundImage: 'radial-gradient(circle, var(--v-szoveg) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
       </div>
-      <nav className="relative z-10 flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #2E2028', backdropFilter: 'blur(8px)' }}>
+      <nav className="relative z-10 flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid var(--v-vonal)', backdropFilter: 'blur(8px)' }}>
         <a href="/" className="text-2xl font-black" style={{ letterSpacing: '-0.03em' }}>
-          Bid<span style={{ color: '#DC2626' }}>Vip</span>
+          Bid<span style={{ color: 'var(--v-rozsa)' }}>Vip</span>
         </a>
         <div className="flex items-center gap-4">
-          <a href="/dashboard" className="text-sm transition" style={{ color: '#9C8B7A' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#F5F0E8')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#9C8B7A')}>Dashboard</a>
+          <a href="/dashboard" className="text-sm transition" style={{ color: 'var(--v-szoveg-2)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-2)')}>Dashboard</a>
           <a href="/submit" className="text-sm font-black px-4 py-2 rounded-lg transition"
-            style={{ background: '#DC2626', color: '#fff' }}
+            style={{ background: 'var(--v-rozsa)', color: '#fff' }}
             onMouseEnter={e => (e.currentTarget.style.background = '#EF4444')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#DC2626')}>
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--v-rozsa)')}>
             + List Project
           </a>
         </div>
@@ -441,7 +441,7 @@ export default function Marketplace() {
         {/* Hero */}
         <div className="mb-10">
           <h1 className="text-4xl font-black mb-1" style={{ letterSpacing: '-0.04em' }}>Aukciós Ház</h1>
-          <p className="text-sm uppercase tracking-widest font-mono" style={{ color: '#5A4F4A' }}>
+          <p className="text-sm uppercase tracking-widest font-mono" style={{ color: 'var(--v-szoveg-3)' }}>
             <span className="animate-pulse" style={{ color: '#22C55E' }}>●</span> 9 live channels · tune in · place your bid
           </p>
         </div>
@@ -449,17 +449,17 @@ export default function Marketplace() {
         {/* Search */}
         <div className="mb-8 flex items-center gap-4 flex-wrap">
           <div className="relative max-w-md flex-1">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#5A4F4A' }}>◎</span>
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--v-szoveg-3)' }}>◎</span>
             <input type="text" placeholder="Search projects, categories..."
               value={keresoszoveg} onChange={e => setKeresoszoveg(e.target.value)}
               className="w-full pl-9 pr-9 py-2.5 rounded-lg text-sm focus:outline-none transition"
-              style={{ background: '#1A1217', border: '1px solid #2E2028', color: '#F5F0E8' }}
-              onFocus={e => (e.currentTarget.style.borderColor = '#DC2626')}
-              onBlur={e => (e.currentTarget.style.borderColor = '#2E2028')} />
+              style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg)' }}
+              onFocus={e => (e.currentTarget.style.borderColor = 'var(--v-rozsa)')}
+              onBlur={e => (e.currentTarget.style.borderColor = 'var(--v-vonal)')} />
             {keresoszoveg && (
               <button onClick={() => setKeresoszoveg('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xs transition"
-                style={{ color: '#5A4F4A' }}>✕</button>
+                style={{ color: 'var(--v-szoveg-3)' }}>✕</button>
             )}
           </div>
           {keresoszoveg.trim() && (() => {
@@ -467,7 +467,7 @@ export default function Marketplace() {
             const n = savok.reduce((acc, s) => acc + aktivak[s].filter(p =>
               p.nev.toLowerCase().includes(q) || p.rovid_leiras.toLowerCase().includes(q) || p.kategoria.toLowerCase().includes(q)
             ).length, 0)
-            return <span className="text-sm" style={{ color: '#5A4F4A' }}>{n === 0 ? 'No results' : `${n} result${n !== 1 ? 's' : ''}`}</span>
+            return <span className="text-sm" style={{ color: 'var(--v-szoveg-3)' }}>{n === 0 ? 'No results' : `${n} result${n !== 1 ? 's' : ''}`}</span>
           })()}
         </div>
 
@@ -486,7 +486,7 @@ export default function Marketplace() {
                   <div className="h-px flex-1" style={{ background: `linear-gradient(to right, ${info.color}55, transparent)` }} />
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-black tracking-widest font-mono" style={{ color: info.color }}>{info.slogan}</span>
-                    <span className="text-[10px] uppercase tracking-widest hidden sm:block" style={{ color: '#5A4F4A' }}>{info.tagline}</span>
+                    <span className="text-[10px] uppercase tracking-widest hidden sm:block" style={{ color: 'var(--v-szoveg-3)' }}>{info.tagline}</span>
                     <span className="inline-flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: info.color }} />
                       <span className="text-[10px] font-black tracking-widest" style={{ color: info.color }}>ON AIR</span>
@@ -512,12 +512,12 @@ export default function Marketplace() {
         {sor.length > 0 && (
           <div>
             <div className="flex items-center gap-4 mb-5">
-              <div className="h-px flex-1" style={{ background: '#2E2028' }} />
+              <div className="h-px flex-1" style={{ background: 'var(--v-vonal)' }} />
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black tracking-widest uppercase" style={{ color: '#5A4F4A' }}>Sorban Következő</span>
-                <span className="text-xs px-2 py-0.5 rounded" style={{ background: '#221820', color: '#9C8B7A' }}>{sor.length}</span>
+                <span className="text-xs font-black tracking-widest uppercase" style={{ color: 'var(--v-szoveg-3)' }}>Sorban Következő</span>
+                <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'var(--v-bg-3)', color: 'var(--v-szoveg-2)' }}>{sor.length}</span>
               </div>
-              <div className="h-px flex-1" style={{ background: '#2E2028' }} />
+              <div className="h-px flex-1" style={{ background: 'var(--v-vonal)' }} />
             </div>
 
             <p className="text-xs text-center mb-4" style={{ color: 'var(--v-szoveg-3)' }}>
@@ -573,7 +573,7 @@ function RegisterModal({ projekt, onZar }: { projekt: Projekt; onZar: () => void
       onClick={e => { if (e.target === e.currentTarget) onZar() }}>
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onZar} />
       <div className="relative w-full max-w-sm rounded-2xl overflow-hidden"
-        style={{ background: '#1A1217', border: `1px solid ${info?.color}44`, boxShadow: `0 0 60px ${info?.color}22, 0 25px 50px rgba(0,0,0,0.5)` }}>
+        style={{ background: 'var(--v-bg-2)', border: `1px solid ${info?.color}44`, boxShadow: `0 0 60px ${info?.color}22, 0 25px 50px rgba(0,0,0,0.5)` }}>
 
         {/* Top accent bar */}
         <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${info?.color}, transparent)` }} />
@@ -589,10 +589,10 @@ function RegisterModal({ projekt, onZar }: { projekt: Projekt; onZar: () => void
           <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: info?.color }}>
             {info?.label} · LIVE
           </p>
-          <h3 className="font-black text-xl mb-1" style={{ color: '#F5F0E8', letterSpacing: '-0.02em' }}>
+          <h3 className="font-black text-xl mb-1" style={{ color: 'var(--v-szoveg)', letterSpacing: '-0.02em' }}>
             {projekt.nev}
           </h3>
-          <p className="text-xs mb-6" style={{ color: '#5A4F4A' }}>
+          <p className="text-xs mb-6" style={{ color: 'var(--v-szoveg-3)' }}>
             Licitáláshoz regisztráció szükséges
           </p>
 
@@ -600,25 +600,25 @@ function RegisterModal({ projekt, onZar }: { projekt: Projekt; onZar: () => void
           <div className="flex flex-col gap-3">
             <a href="/auth?tab=register"
               className="block w-full py-3.5 rounded-xl font-black text-sm text-center transition-all"
-              style={{ background: `linear-gradient(135deg, ${info?.color}, ${info?.color}cc)`, color: info?.color === '#EAB308' ? '#100C0F' : '#fff', boxShadow: `0 4px 20px ${info?.color}44` }}
+              style={{ background: `linear-gradient(135deg, ${info?.color}, ${info?.color}cc)`, color: info?.color === 'var(--v-arany)' ? 'var(--v-bg)' : '#fff', boxShadow: `0 4px 20px ${info?.color}44` }}
               onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
               Regisztrálok →
             </a>
             <a href="/auth"
               className="block w-full py-3 rounded-xl font-bold text-sm text-center transition-all"
-              style={{ border: '1px solid #2E2028', color: '#9C8B7A' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#5A4F4A'; e.currentTarget.style.color = '#F5F0E8' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#2E2028'; e.currentTarget.style.color = '#9C8B7A' }}>
+              style={{ border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg-2)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--v-szoveg-3)'; e.currentTarget.style.color = 'var(--v-szoveg)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.color = 'var(--v-szoveg-2)' }}>
               Van már fiókom
             </a>
           </div>
 
           <button onClick={onZar}
             className="mt-5 text-xs transition-colors"
-            style={{ color: '#3D3035' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#9C8B7A')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#3D3035')}>
+            style={{ color: 'var(--v-szoveg-3)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg-2)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>
             Folytatom böngészésként
           </button>
         </div>
