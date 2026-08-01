@@ -19,21 +19,10 @@
   --kat-arany:     #A67C00;  /* prémium jelölés */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --kat-papir:   #14110E;
-    --kat-papir-2: #1C1815;
-    --kat-papir-3: #241F1A;
-    --kat-tinta:   #F2EDE3;
-    --kat-tinta-2: #A89C8B;
-    --kat-tinta-3: #6B6055;
-    --kat-vonal:   #2E2822;
-    --kat-vonal-2: #443C33;
-    --kat-bibor:   #C4444A;
-    --kat-bibor-2: #D65A60;
-    --kat-arany:   #C9A227;
-  }
-}
+/* A katalógus szándékosan egyetlen világban él: papír és tinta.
+   Nincs sötét változata — ahogy egy árverési katalógusnak sincs.
+   Ez a döntés hordozza a márka karakterét, ezért nem követi a
+   rendszertémát. */
 
 /* ── Régi sötét paletta — a még át nem tervezett oldalak használják ── */
 :root {
