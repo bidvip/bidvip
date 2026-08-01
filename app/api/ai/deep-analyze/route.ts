@@ -25,6 +25,7 @@ Project:
 - Short description: ${rovid_leiras}
 - Detailed description: ${reszletes_leiras}
 ${kepUrlok.length > 0 ? `\nThe seller uploaded ${kepUrlok.length} image(s) — factor them into your analysis.` : ''}
+${szakertoiKontextus(kategoria)}
 
 Write a thorough, honest, professional analysis with these sections (use ## markdown headers):
 
