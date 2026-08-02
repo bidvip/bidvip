@@ -164,7 +164,9 @@ function HaladasSav() {
     return () => { window.removeEventListener('scroll', f); window.removeEventListener('resize', f) }
   }, [])
   return (
-    <div className="fixed top-0 inset-x-0 z-[60] h-0.5" style={{ background: 'transparent' }} aria-hidden="true">
+    <div className="fixed top-0 inset-x-0 z-[60] h-0.5" style={{ background: 'transparent' }}
+      role="progressbar" aria-label="Olvasási haladás"
+      aria-valuenow={Math.round(arany)} aria-valuemin={0} aria-valuemax={100}>
       <div style={{
         height: '100%', width: `${arany}%`,
         background: 'linear-gradient(90deg, var(--v-lila), var(--v-rozsa))',
