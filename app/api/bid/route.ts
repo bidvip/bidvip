@@ -130,13 +130,10 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Sniping elleni hosszabbítás ──
-  let ujLejarat: string | null = null
-  if (projekt.lejarat) {
-    const hatra = (new Date(projekt.lejarat).getTime() - Date.now()) / 1000
-    if (hatra > 0 && hatra < HOSSZABBITAS_ABLAK_MP) {
-      ujLejarat = new Date(Date.now() + HOSSZABBITAS_MP * 1000).toISOString()
-      await supabase.from('projektek').update({ lejarat: ujLejarat }).eq('id', projekt_id)
-    }
+  const hosszabbitva = hosszabbitasSzukseges(projekt.lejarat ? new Date(projekt.lejarat) : null)
+  const ujLejarat = hosszabbitva ? hosszabbitva.toISOString() : null
+  if (ujLejarat) {
+    await supabase.from('projektek').update({ lejarat: ujLejarat }).eq('id', projekt_id)
   }
 
   // ── Túllicitált értesítése, vagy az ő automata ellenlicitje ──
