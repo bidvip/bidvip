@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { megkovetelBejelentkezes } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -7,13 +7,12 @@ const WELCOME_TOKENS = 50
 const MAX_BONUS_USERS = 2000
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const { user, supabase } = v
 
-  const { user_id } = await req.json()
-  if (!user_id) return NextResponse.json({ error: 'Missing user_id' }, { status: 400 })
+  // A bónusz mindig a bejelentkezett felhasználóé
+  const user_id = user.id
 
   // Check if user already got the bonus
   const { data: profil } = await supabase
