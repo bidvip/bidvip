@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import { EMAIL_FELADO, EMAIL_HOMOKOZO, ALAP_URL } from './beallitasok'
+import { EMAIL_FELADO, EMAIL_HOMOKOZO, ALAP_URL, DOMAIN } from './beallitasok'
 import { naploFigyelem } from './naplo'
 
 let homokozoJelezve = false
