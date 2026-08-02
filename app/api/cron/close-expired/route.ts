@@ -15,6 +15,53 @@ const SAVOK = [
   { sav: 'premium',  perc: 20, label: 'Premium'  },
 ]
 
+/** Ennyi ideje van a nyertesnek fizetni, mielőtt a tétel visszakerül a sorba. */
+const FIZETESI_HATARIDO_ORA = 48
+
+/**
+ * Visszateszi a sorba azokat a lezárt tételeket, amiknél a nyertes nem
+ * fizetett határidőre.
+ *
+ * A `fizetesi_hatarido` oszlop csak a migráció után létezik. Amíg nincs,
+ * a függvény csendben kihagyja magát, hogy a cron többi része fusson —
+ * enélkül egyetlen hiányzó oszlop az egész aukciózárást megállítaná.
+ */
+async function fizetetlenekKezelese(
+  supabase: ReturnType<typeof createClient>,
+  most: Date
+): Promise<string> {
+  const { data, error } = await supabase
+    .from('projektek')
+    .select('id, nev, fizetesi_hatarido, fizetve_ekkor')
+    .eq('statusz', 'lezart')
+    .lt('fizetesi_hatarido', most.toISOString())
+    .is('fizetve_ekkor', null)
+    .limit(50)
+
+  if (error) return 'kihagyva (migráció még nem futott)'
+  if (!data?.length) return 'nincs lejárt fizetés'
+
+  for (const p of data) {
+    // Vissza a sorba: kaphat új esélyt egy másik aukción
+    await supabase
+      .from('projektek')
+      .update({
+        statusz: 'varakozas',
+        varakozas_kezd: most.toISOString(),
+        lejarat: null,
+        vevo_email: null,
+        fizetesi_hatarido: null,
+      })
+      .eq('id', p.id)
+
+    naploFigyelem('cron/fizetetlen', 'A nyertes nem fizetett, a tétel visszakerült a sorba', {
+      projekt_id: p.id, projekt: p.nev,
+    })
+  }
+
+  return `visszasorolva:${data.length}`
+}
+
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
