@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
+import { ALAP_URL } from '@/lib/beallitasok'
 
-const ALAP = 'https://bidvip.vercel.app'
+const ALAP = ALAP_URL
 
 /**
  * Csak a nyilvánosan értelmes oldalak kerülnek bele. A bejelentkezés mögötti

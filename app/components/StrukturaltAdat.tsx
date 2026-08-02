@@ -1,4 +1,5 @@
-const ALAP = 'https://bidvip.vercel.app'
+import { ALAP_URL } from '@/lib/beallitasok'
+const ALAP = ALAP_URL
 
 /**
  * Strukturált adat a keresőknek.

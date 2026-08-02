@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ALAP_URL } from '@/lib/beallitasok'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 
@@ -21,7 +22,7 @@ export default function AuthPage() {
 
     if (mod === 'elfelejtett') {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://bidvip.vercel.app/auth/reset',
+        redirectTo: '${ALAP_URL}/auth/reset',
       })
       if (error) { setHibaUzenet(error.message); setAllapot('hiba') }
       else { setAllapot('siker') }

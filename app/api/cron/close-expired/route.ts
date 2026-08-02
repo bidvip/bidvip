@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { ALAP_URL } from '@/lib/beallitasok'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { sendEmail, auctionWinnerEmail, auctionSellerEmail } from '@/lib/email'
@@ -7,7 +8,7 @@ import { biztonsagosan, naploFigyelem } from '@/lib/naplo'
 
 export const dynamic = 'force-dynamic'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'
+const BASE_URL = ALAP_URL
 
 const SAVOK = [
   { sav: 'fast',     perc: 3,  label: 'Fast'     },

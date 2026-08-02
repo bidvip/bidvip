@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { ALAP_URL } from '@/lib/beallitasok'
 import Stripe from 'stripe'
 import { megkovetelBejelentkezes } from '@/lib/auth'
 
@@ -41,8 +42,8 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       metadata: { user_id, tokens: selected.tokens.toString(), pkg },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/tokens?status=success&session_id={CHECKOUT_SESSION_ID}${redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bidvip.vercel.app'}/tokens?status=cancelled${redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''}`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || ALAP_URL}/tokens?status=success&session_id={CHECKOUT_SESSION_ID}${redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || ALAP_URL}/tokens?status=cancelled${redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''}`,
     })
 
     return NextResponse.json({ url: session.url })
