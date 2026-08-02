@@ -77,7 +77,11 @@ export async function POST(req: NextRequest) {
       eladoKap,
       vevo_email
     )
-    await sendEmail(elado_email, sellerSubj, sellerHtml).catch(() => {})
+    await biztonsagosan(
+      'stripe-webhook/elado-ertesites',
+      () => sendEmail(elado_email, sellerSubj, sellerHtml),
+      { projekt_id, cimzett: elado_email }
+    )
   }
 
   return NextResponse.json({ ok: true })
