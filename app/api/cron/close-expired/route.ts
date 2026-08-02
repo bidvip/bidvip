@@ -82,13 +82,34 @@ const { data: { user: winner } } = await supabase.auth.admin.getUserById(topLici
       })
 
       const eladoKap = Math.round(topLicit.osszeg * 0.9)
+
+      // A nyertes levele tartalmazza az EGYETLEN fizetési linket. Ha ez
+      // nem megy ki, az ügylet meghiúsul — ezért nem nyelhetjük el csendben.
       if (session.url) {
         const { subject, html } = auctionWinnerEmail(projekt.nev, topLicit.osszeg, session.url)
-        await sendEmail(winnerEmail, subject, html).catch(() => {})
+        const kimentE = await biztonsagosan(
+          'cron/nyertes-ertesites',
+          () => sendEmail(winnerEmail, subject, html),
+          { projekt_id: projekt.id, projekt: projekt.nev, cimzett: winnerEmail }
+        )
+        if (kimentE === null) {
+          naploFigyelem('cron/nyertes-ertesites', 'A nyertes NEM kapta meg a fizetési linket', {
+            projekt_id: projekt.id, fizetesi_link: session.url,
+          })
+        }
+      } else {
+        naploFigyelem('cron/fizetesi-link', 'A Stripe nem adott vissza fizetési URL-t', {
+          projekt_id: projekt.id,
+        })
       }
+
       if (sellerEmail) {
         const { subject, html } = auctionSellerEmail(projekt.nev, topLicit.osszeg, eladoKap)
-        await sendEmail(sellerEmail, subject, html).catch(() => {})
+        await biztonsagosan(
+          'cron/elado-ertesites',
+          () => sendEmail(sellerEmail, subject, html),
+          { projekt_id: projekt.id, cimzett: sellerEmail }
+        )
       }
     }
 
