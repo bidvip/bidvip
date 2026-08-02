@@ -122,10 +122,14 @@ async function felfuggeszt(supabase: any, user_id: string, user_email: string, f
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  // Feltöltés csak bejelentkezve. Enélkül bárki tölthetne a tárhelyre,
+  // és a fájlt elemző AI-hívás is ingyen fogyasztható lenne.
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const { user, supabase } = v
+
+  const feltoltesKorlat = korlatEllenoriz(`feltoltes:${user.id}`, { hivas: 20, ablakMp: 600 })
+  if (feltoltesKorlat) return feltoltesKorlat
 
   const formData = await req.formData()
   const fajl = formData.get('fajl') as File
