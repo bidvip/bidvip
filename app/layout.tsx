@@ -20,23 +20,35 @@ const instrumentSerif = Instrument_Serif({
   style: ["normal", "italic"],
 });
 
+const LEIRAS =
+  'Ötletek aukciós háza. Nem kell kész terméked — hozd az ötletet, az AI segít ' +
+  'kidolgozni, felbecsüljük mennyit ér, és élő aukción értékesítjük komoly vevők előtt.'
+
 export const metadata: Metadata = {
-  title: "BidVip — Aukciós Ház",
-  description: "Buy and sell validated startup projects through secure, AI-assisted, transparent auctions. Develop your idea with AI, then auction it to the highest bidder.",
+  // A címsablon miatt az aloldalak automatikusan „Beküldés — BidVip" alakot kapnak
+  title: {
+    default: 'BidVip — Ötletek aukciós háza',
+    template: '%s — BidVip',
+  },
+  description: LEIRAS,
+  applicationName: 'BidVip',
+  keywords: ['startup ötlet', 'ötlet eladása', 'aukció', 'piactér', 'üzleti ötlet', 'BidVip'],
   openGraph: {
-    title: "BidVip — Aukciós Ház",
-    description: "Buy and sell validated startup projects through secure, AI-assisted, transparent auctions.",
-    url: "https://bidvip.vercel.app",
-    siteName: "BidVip",
-    locale: "en_US",
-    type: "website",
+    title: 'BidVip — Ötletek aukciós háza',
+    description: LEIRAS,
+    url: 'https://bidvip.vercel.app',
+    siteName: 'BidVip',
+    locale: 'hu_HU',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "BidVip — Aukciós Ház",
-    description: "Buy and sell validated startup projects through secure, AI-assisted, transparent auctions.",
+    card: 'summary_large_image',
+    title: 'BidVip — Ötletek aukciós háza',
+    description: LEIRAS,
   },
-  metadataBase: new URL("https://bidvip.vercel.app"),
+  alternates: { canonical: '/' },
+  robots: { index: true, follow: true },
+  metadataBase: new URL('https://bidvip.vercel.app'),
 };
 
 export default function RootLayout({
