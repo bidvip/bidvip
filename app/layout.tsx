@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'BidVip — Ötletek aukciós háza',
     description: LEIRAS,
-    url: 'https://bidvip.vercel.app',
+    url: ALAP_URL,
     siteName: 'BidVip',
     locale: 'hu_HU',
     type: 'website',
