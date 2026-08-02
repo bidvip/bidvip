@@ -129,12 +129,32 @@ function Aurora() {
   // Az elmosott foltok animálása drága: három nagy felület, folyamatos
   // újrarajzolással. Ha a hero kigörgött a képből, semmi értelme tovább
   // járatni — ez gyenge eszközön és akkumulátoron is meglátszik.
+  //
+  // A figyelő mellé görgetés-ellenőrzés is kerül: ha az előbbi valamiért
+  // nem sül el, a kikapcsolás akkor is megtörténik.
   useEffect(() => {
     const el = ref.current
-    if (!el || typeof IntersectionObserver === 'undefined') return
-    const obs = new IntersectionObserver(([e]) => setFut(e.isIntersecting), { threshold: 0 })
-    obs.observe(el)
-    return () => obs.disconnect()
+    if (!el) return
+
+    const ellenoriz = () => {
+      const r = el.getBoundingClientRect()
+      setFut(r.bottom > 0 && r.top < window.innerHeight)
+    }
+
+    let obs: IntersectionObserver | null = null
+    if (typeof IntersectionObserver !== 'undefined') {
+      obs = new IntersectionObserver(([e]) => setFut(e.isIntersecting), { threshold: 0 })
+      obs.observe(el)
+    }
+    window.addEventListener('scroll', ellenoriz, { passive: true })
+    window.addEventListener('resize', ellenoriz)
+    ellenoriz()
+
+    return () => {
+      obs?.disconnect()
+      window.removeEventListener('scroll', ellenoriz)
+      window.removeEventListener('resize', ellenoriz)
+    }
   }, [])
 
   const mozgas = (nev: string, ido: string, irany = '') =>
