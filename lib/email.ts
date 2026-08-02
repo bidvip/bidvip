@@ -1,11 +1,33 @@
 import { Resend } from 'resend'
+import { EMAIL_FELADO, EMAIL_HOMOKOZO, ALAP_URL } from './beallitasok'
+import { naploFigyelem } from './naplo'
 
-const FROM = 'BidVip <onboarding@resend.dev>'
+let homokozoJelezve = false
 
 export async function sendEmail(to: string, subject: string, html: string) {
+  // Egyszeri figyelmeztetés indulás után: amíg a homokozó-feladó van
+  // érvényben, a levelek nagy eséllyel levélszemétbe kerülnek — köztük a
+  // nyertesnek küldött fizetési link.
+  if (EMAIL_HOMOKOZO && !homokozoJelezve) {
+    homokozoJelezve = true
+    naploFigyelem(
+      'email/feladó',
+      'A feladó még a Resend homokozó-doménje. A levelek spambe eshetnek. Állítsd be az EMAIL_FELADO változót saját, hitelesített domainnel.',
+      { jelenlegi: EMAIL_FELADO }
+    )
+  }
+
   const resend = new Resend(process.env.RESEND_API_KEY!)
-  await resend.emails.send({ from: FROM, to, subject, html })
+  const { error } = await resend.emails.send({ from: EMAIL_FELADO, to, subject, html })
+
+  // A Resend hibát objektumban ad vissza, nem kivételként — enélkül a
+  // sikertelen küldés sikeresnek látszana.
+  if (error) {
+    throw new Error(`Resend: ${error.message ?? JSON.stringify(error)}`)
+  }
 }
+
+export { ALAP_URL }
 
 export function outbidEmail(projektNev: string, ujOsszeg: number, linkUrl: string) {
   return {
