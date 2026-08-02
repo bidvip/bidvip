@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
-  metadataBase: new URL('https://bidvip.vercel.app'),
+  metadataBase: new URL(ALAP_URL),
 };
 
 export default function RootLayout({
