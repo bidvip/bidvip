@@ -199,7 +199,7 @@ function Utvonal() {
       szin: 'var(--v-rozsa-2)',
       hatter: 'rgba(244,63,94,.09)',
       keret: 'rgba(244,63,94,.32)',
-      lepesek: ['Böngészed a tételeket ingyen', 'Regisztrálsz és licitálsz', 'Letéti védelemmel veszed át'],
+      lepesek: ['Böngészed a tételeket ingyen', 'Regisztrálsz és licitálsz', 'Fizetés után megkapod a teljes anyagot'],
       gomb: 'Megnézem a tételeket',
       hova: '#tetelek',
     },
