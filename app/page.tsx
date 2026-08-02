@@ -658,6 +658,7 @@ function Tetelek({ elo, sorban }: { elo: EloProjekt[]; sorban: KirakatElem[] }) 
             </h2>
           </div>
           <input value={kereses} onChange={e => setKereses(e.target.value)}
+            type="search" aria-label="Keresés a tételek között"
             placeholder="Keresés szakterületre…"
             className="text-sm px-4 py-2.5 rounded-xl w-full sm:w-64 focus:outline-none transition-colors"
             style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)', color: 'var(--v-szoveg)' }}
