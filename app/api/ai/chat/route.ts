@@ -3,7 +3,8 @@ import { megkovetelBejelentkezes } from '@/lib/auth'
 import { aiKorlat } from '@/lib/sebessegkorlat'
 import { szakertoiKontextus } from '@/lib/kategoriak'
 
-export const runtime = 'edge'
+// A jogosultság-ellenőrzés a next/headers cookies() függvényét is használja,
+// ami a Node futtatókörnyezetet igényli — ezért az edge mód itt megszűnt.
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
