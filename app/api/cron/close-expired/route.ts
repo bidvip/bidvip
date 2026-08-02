@@ -115,7 +115,19 @@ const { data: { user: winner } } = await supabase.auth.admin.getUserById(topLici
       const { data: { user: seller } } = await supabase.auth.admin.getUserById(projekt.user_id)
       const sellerEmail = seller?.email
 
-      await supabase.from('projektek').update({ vevo_email: winnerEmail }).eq('id', projekt.id)
+      // A határidőt megpróbáljuk beállítani; ha az oszlop még nincs meg,
+      // legalább a vevő e-mailje rögzüljön.
+      const hataridovel = await supabase
+        .from('projektek')
+        .update({
+          vevo_email: winnerEmail,
+          fizetesi_hatarido: new Date(now.getTime() + FIZETESI_HATARIDO_ORA * 3600_000).toISOString(),
+        })
+        .eq('id', projekt.id)
+
+      if (hataridovel.error) {
+        await supabase.from('projektek').update({ vevo_email: winnerEmail }).eq('id', projekt.id)
+      }
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
