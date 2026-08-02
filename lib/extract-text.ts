@@ -2,6 +2,7 @@
 const pdfParse = require('pdf-parse')
 import mammoth from 'mammoth'
 import * as XLSX from 'xlsx'
+import { naploHiba } from './naplo'
 
 export async function extractText(buffer: Buffer, mimeType: string): Promise<string> {
   try {
