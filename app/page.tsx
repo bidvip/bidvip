@@ -504,6 +504,8 @@ function Teruletek() {
           return (
             <Feltunik key={cs.nev} keses={Math.min(i, 12) * 45}>
               <button onClick={() => setAktiv(nyitva ? null : cs.nev)}
+                aria-expanded={nyitva}
+                aria-label={`${cs.nev} — ${cs.temak.length} kategória${nyitva ? ', nyitva' : ''}`}
                 className="w-full text-left rounded-xl overflow-hidden transition-all h-full"
                 style={{
                   background: nyitva ? `${cs.szin}18` : 'var(--v-bg-2)',
