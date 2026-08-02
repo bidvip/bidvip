@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
+import { apiHivas } from '@/lib/api-hivas'
 
 const ROLES = [
   { id: 'vevo' as const,     cim: 'Vevő vagyok',  leiras: 'Projekteket keresek — böngészek, licitálok, vásárolok.', color: 'var(--v-arany)' },
@@ -24,7 +25,7 @@ export default function Onboarding() {
     if (!user) { router.push('/auth'); return }
     const { error } = await supabase.from('profiles').upsert({ id: user.id, szerepkor: valasztott })
     if (error) { setLoading(false); return }
-    const bonuszRes = await fetch('/api/tokens/welcome-bonus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id }) })
+    const bonuszRes = await apiHivas('/api/tokens/welcome-bonus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id }) })
     const bonuszAdat = await bonuszRes.json()
     if (bonuszAdat.ok) { setBonuszKapott(true); setTimeout(() => router.push('/dashboard'), 2500) }
     else { router.push('/dashboard') }

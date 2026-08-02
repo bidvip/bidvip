@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
+import { apiHivas } from '@/lib/api-hivas'
 import type { User } from '@supabase/supabase-js'
 import { type KirakatElem } from '@/lib/kirakat'
 
@@ -191,7 +192,7 @@ function BidModal({ projekt, user, onZar }: { projekt: Projekt; user: User | nul
     const osszeg = parseInt(licitOsszeg)
     if (!osszeg || osszeg < minimumLicit) { setHiba(`Minimum: €${minimumLicit.toLocaleString()} (+€${increment})`); setAllapot('hiba'); return }
     setAllapot('loading'); setHiba('')
-    const res  = await fetch('/api/bid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id: projekt.id, user_id: user.id, osszeg, proxy_max: null }) })
+    const res  = await apiHivas('/api/bid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id: projekt.id, user_id: user.id, osszeg, proxy_max: null }) })
     const data = await res.json()
     if (!res.ok) { setHiba((data.error || 'Something went wrong.') + (data.debug ? ` [${data.debug}]` : '')); setAllapot('hiba') }
     else {

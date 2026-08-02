@@ -713,7 +713,7 @@ function Menete() {
     ['Kidolgozzuk', 'Az adott terület szakértőjeként gondolkodó AI kérdez vissza és piacképessé formálja.', '#38BDF8'],
     ['Felbecsüljük', 'Megbecsüljük a valós piaci értéket a szakterület tényleges alkuméretei alapján.', '#34D399'],
     ['Kalapács alá kerül', 'Időkorlátos, anonim élő aukció. A legmagasabb ajánlat nyer.', '#FBBF24'],
-    ['Letétben zárul', 'A pénzt letétben tartjuk. Az eladó átad, csak utána fizetünk ki.', '#F43F5E'],
+    ['Átadás', 'A vevő a nyertes licitet Stripe-on fizeti. A fizetés beérkezése után kapja meg a részletes anyagot és a fájlokat, az eladónak pedig kifizetjük a 90%-ot.', '#F43F5E'],
   ]
   return (
     <section id="menete" className="mx-auto max-w-4xl px-6 py-16">

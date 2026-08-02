@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { apiHivas } from '@/lib/api-hivas'
 import KategoriaValaszto from '@/app/components/KategoriaValaszto'
 
 const SUBMIT_COST = 25
@@ -186,7 +187,7 @@ function SubmitInner() {
       for (const fajl of ujak) {
         const fd = new FormData()
         fd.append('fajl', fajl)
-        const res = await fetch('/api/upload', { method: 'POST', body: fd })
+        const res = await apiHivas('/api/upload', { method: 'POST', body: fd })
         if (res.ok) { const data = await res.json(); ujFajlok.push(data) }
       }
       setFeltoltottFajlok(ujFajlok)
@@ -194,7 +195,7 @@ function SubmitInner() {
       kepUrlok = ujFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     }
     const fajlSzovegek = ujFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
-    const res = await fetch('/api/ai/feedback', {
+    const res = await apiHivas('/api/ai/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, kepUrlok, fajlSzovegek }),
@@ -203,7 +204,7 @@ function SubmitInner() {
     if (data.score === -1) {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        await fetch('/api/report', {
+        await apiHivas('/api/report', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: user.id, user_email: user.email, nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, block_reason: data.block_reason || 'Content violates marketplace rules.', fajlok: feltoltottFajlok }),
@@ -221,7 +222,7 @@ function SubmitInner() {
     const fajlok = fajlokParam ?? feltoltottFajlok
     const kepUrlok = fajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
     const fajlSzovegek = fajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
-    const res = await fetch('/api/ai/chat', {
+    const res = await apiHivas('/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ uzenet, elozmenyek, projekt: projektAdat, kepUrlok, fajlSzovegek }),
@@ -264,7 +265,7 @@ function SubmitInner() {
       if (userId) fd.append('user_id', userId)
       const { data: { user: u } } = await supabase.auth.getUser()
       if (u?.email) fd.append('user_email', u.email)
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const res = await apiHivas('/api/upload', { method: 'POST', body: fd })
       const resData = await res.json()
       if (!res.ok) {
         if (resData.suspended) { setFelfuggesztve(resData.error); return }
@@ -282,7 +283,7 @@ function SubmitInner() {
     setFeltoltottFajlok(ujFajlok)
     setChatFajlAllapot('idle')
     if (draftId) await supabase.from('projektek').update({ fajlok: ujFajlok }).eq('id', draftId)
-    const spendRes = await fetch('/api/tokens/spend', {
+    const spendRes = await apiHivas('/api/tokens/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId, amount: CHAT_COST }),
@@ -359,7 +360,7 @@ function SubmitInner() {
   async function chatKuldes() {
     if (!chatInput.trim() || chatAllapot === 'loading') return
     if ((tokenEgyenleg ?? 0) < CHAT_COST) { setHiba(`Not enough tokens. You need ${CHAT_COST} but have ${tokenEgyenleg}.`); return }
-    const spendRes = await fetch('/api/tokens/spend', {
+    const spendRes = await apiHivas('/api/tokens/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId, amount: CHAT_COST }),
@@ -384,7 +385,7 @@ function SubmitInner() {
         await supabase.from('projektek').update({ chat_elozmenyek: [...ujUzenetek, { role: 'assistant', content: vegsoValasz }] }).eq('id', draftId)
       }
     } catch {
-      await fetch('/api/tokens/spend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId, amount: -CHAT_COST }) })
+      await apiHivas('/api/tokens/spend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId, amount: -CHAT_COST }) })
       setTokenEgyenleg((prev) => (prev ?? 0) + CHAT_COST)
       setChatUzenetek([...ujUzenetek, { role: 'assistant', content: 'Connection error. Your token was refunded. Please try again.' }])
     } finally {
@@ -402,7 +403,7 @@ function SubmitInner() {
     try {
       const badge = form.van_bevetel ? 'proven' : (form.van_kod || form.van_feliratkozok) ? 'prototype' : 'idea'
       const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
-      const res = await fetch('/api/ai/valuation', {
+      const res = await apiHivas('/api/ai/valuation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, badge, fajlSzovegek, chat_score: chatScore }),
@@ -433,7 +434,7 @@ function SubmitInner() {
       if (userId) fd.append('user_id', userId)
       const { data: { user: u } } = await supabase.auth.getUser()
       if (u?.email) fd.append('user_email', u.email)
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const res = await apiHivas('/api/upload', { method: 'POST', body: fd })
       const resData = await res.json()
       if (!res.ok) {
         if (resData.suspended) { setFelfuggesztve(resData.error); return }
@@ -462,7 +463,7 @@ function SubmitInner() {
     setAllapot('szures')
     const fajlSzovegek = feltoltottFajlok.filter(f => !f.tipus.startsWith('image/') && f.szoveg).map(f => f.szoveg as string)
     const kepUrlok = feltoltottFajlok.filter(f => f.tipus.startsWith('image/')).map(f => f.url)
-    const validateRes = await fetch('/api/ai/validate', {
+    const validateRes = await apiHivas('/api/ai/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nev: form.nev, rovid_leiras: form.rovid_leiras, reszletes_leiras: form.reszletes_leiras, kategoria: form.kategoria, fajlSzovegek, kepUrlok }),
@@ -478,7 +479,7 @@ function SubmitInner() {
       return
     }
     setAllapot('loading')
-    const spendRes = await fetch('/api/tokens/spend', {
+    const spendRes = await apiHivas('/api/tokens/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: user.id, amount: totalCost }),
@@ -502,7 +503,7 @@ function SubmitInner() {
       varakozas_kezd: new Date().toISOString(), fajlok: feltoltottFajlok,
       sav: aiErtekeles ? (aiErtekeles.estimated_value >= 10000 ? 'premium' : aiErtekeles.estimated_value >= 1000 ? 'standard' : 'fast') : 'fast',
     }
-    const anonRes = await fetch('/api/anon-name', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id, tipus: 'elado' }) })
+    const anonRes = await apiHivas('/api/anon-name', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id, tipus: 'elado' }) })
     const { nev: anonEladoNev } = await anonRes.json()
     const { error } = draftId
       ? await supabase.from('projektek').update({ ...projektAdat, anon_elado_nev: anonEladoNev }).eq('id', draftId)

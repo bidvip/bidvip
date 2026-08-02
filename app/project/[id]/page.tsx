@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useParams, useRouter } from 'next/navigation'
+import { apiHivas } from '@/lib/api-hivas'
 import type { User } from '@supabase/supabase-js'
 
 const badge_info: Record<string, { label: string; color: string; bg: string }> = {
@@ -105,7 +106,7 @@ export default function ProjectDetail() {
       ])
       setProjekt(proj); setUser(u); setLicitek(lics || []); setLoading(false)
       if (u) supabase.from('tokenek').select('egyenleg').eq('user_id', u.id).single().then(({ data }) => setTokenEgyenleg(data?.egyenleg ?? 0))
-      if (proj) fetch('/api/ai/intro', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nev: proj.nev, rovid_leiras: proj.rovid_leiras, kategoria: proj.kategoria, badge: proj.badge, kikialtasi_ar: proj.kikialtasi_ar }) }).then(r => r.json()).then(d => { if (d.intro) setAiIntro(d.intro) }).catch(() => {})
+      if (proj) apiHivas('/api/ai/intro', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nev: proj.nev, rovid_leiras: proj.rovid_leiras, kategoria: proj.kategoria, badge: proj.badge, kikialtasi_ar: proj.kikialtasi_ar }) }).then(r => r.json()).then(d => { if (d.intro) setAiIntro(d.intro) }).catch(() => {})
     }
     betolt()
 
@@ -130,11 +131,11 @@ export default function ProjectDetail() {
     if (!projekt) return
     if (!user) { router.push('/auth'); return }
     setAiAllapot('loading')
-    const spendRes = await fetch('/api/tokens/spend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id, amount: 1 }) })
+    const spendRes = await apiHivas('/api/tokens/spend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id, amount: 1 }) })
     const spendData = await spendRes.json()
     if (!spendRes.ok) { setTokenEgyenleg(spendData.egyenleg ?? 0); setAiAllapot('nincs_token'); return }
     setTokenEgyenleg(spendData.uj_egyenleg)
-    const res = await fetch('/api/ai/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nev: projekt.nev, rovid_leiras: projekt.rovid_leiras, kategoria: projekt.kategoria, badge: projekt.badge, kikialtasi_ar: projekt.kikialtasi_ar }) })
+    const res = await apiHivas('/api/ai/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nev: projekt.nev, rovid_leiras: projekt.rovid_leiras, kategoria: projekt.kategoria, badge: projekt.badge, kikialtasi_ar: projekt.kikialtasi_ar }) })
     const data = await res.json()
     setAiElemzes(data.analysis || ''); setAiAllapot('kesz')
   }
@@ -145,7 +146,7 @@ export default function ProjectDetail() {
     const osszeg = parseInt(proxyMode ? proxyMax : licitOsszeg)
     if (!osszeg || osszeg < minimumLicit) { setHiba(`Minimum bid is €${minimumLicit.toLocaleString()} (increment: €${increment})`); setAllapot('hiba'); return }
     setAllapot('loading'); setHiba('')
-    const res = await fetch('/api/bid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id: id, user_id: user.id, osszeg: proxyMode ? minimumLicit : osszeg, proxy_max: proxyMode ? osszeg : null }) })
+    const res = await apiHivas('/api/bid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id: id, user_id: user.id, osszeg: proxyMode ? minimumLicit : osszeg, proxy_max: proxyMode ? osszeg : null }) })
     const data = await res.json()
     if (!res.ok) { setHiba(data.error || 'Something went wrong.'); setAllapot('hiba') }
     else { setAllapot('siker'); setLicitOsszeg(''); setProxyMax(''); setTimeout(() => setAllapot('idle'), 3000) }

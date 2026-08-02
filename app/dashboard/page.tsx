@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
+import { apiHivas } from '@/lib/api-hivas'
 import type { User } from '@supabase/supabase-js'
 
 function UserMenu({ email, onSignOut }: { email: string; onSignOut: () => void }) {
@@ -166,7 +167,7 @@ export default function Dashboard() {
   async function ujraBekuldes(projekt_id: string) {
     if (!user) return
     setUjrakuldes(projekt_id)
-    const res = await fetch('/api/project/resubmit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id, user_id: user.id }) })
+    const res = await apiHivas('/api/project/resubmit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id, user_id: user.id }) })
     if (res.ok) setSajatProjektek(prev => prev.map(p => p.id === projekt_id ? { ...p, statusz: 'felulvizsgalat' } : p))
     setUjrakuldes(null)
   }
@@ -176,7 +177,7 @@ export default function Dashboard() {
     const amount = parseInt(boostTokenek)
     if (!amount || amount < 1) return
     setBoostLoading(true); setBoostUzenet('')
-    const res  = await fetch('/api/queue/boost', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id, user_id: user.id, token_amount: amount }) })
+    const res  = await apiHivas('/api/queue/boost', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projekt_id, user_id: user.id, token_amount: amount }) })
     const data = await res.json()
     if (res.ok) {
       setBoostUzenet(`#${data.position} in queue`)

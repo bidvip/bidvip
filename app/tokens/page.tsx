@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
+import { apiHivas } from '@/lib/api-hivas'
 import type { User } from '@supabase/supabase-js'
 
 function TokenCalculator({ onSelect }: { onSelect: (pkg: string) => void }) {
@@ -138,7 +139,7 @@ export default function TokensPage() {
     if (!user) return
     setLoading(pkg)
     const redirect = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('redirect') || ''
-    const res = await fetch('/api/tokens/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ package: pkg, user_id: user.id, user_email: user.email, redirect }) })
+    const res = await apiHivas('/api/tokens/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ package: pkg, user_id: user.id, user_email: user.email, redirect }) })
     const { url, error } = await res.json()
     if (url) { window.location.href = url }
     else { console.error(error); setLoading(null) }
