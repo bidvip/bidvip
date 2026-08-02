@@ -5,13 +5,13 @@ import { createClient } from '@supabase/supabase-js'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const { user, supabase } = v
 
-  const userId = req.nextUrl.searchParams.get('user_id')
-  if (!userId) return NextResponse.json({ suspended: false })
+  // Mindenki csak a saját felfüggesztését kérdezheti le — a felfüggesztés
+  // oka személyes adat, más felhasználóé nem szivároghat ki.
+  const userId = user.id
 
   const { data } = await supabase
     .from('felfuggesztesek')
