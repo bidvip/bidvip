@@ -123,8 +123,25 @@ function Szamlalo({ ig, utotag = '', ido = 1400 }: { ig: number; utotag?: string
 /* ═══════════════════════  aurora háttér  ═══════════════════════ */
 
 function Aurora() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [fut, setFut] = useState(true)
+
+  // Az elmosott foltok animálása drága: három nagy felület, folyamatos
+  // újrarajzolással. Ha a hero kigörgött a képből, semmi értelme tovább
+  // járatni — ez gyenge eszközön és akkumulátoron is meglátszik.
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const obs = new IntersectionObserver(([e]) => setFut(e.isIntersecting), { threshold: 0 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  const mozgas = (nev: string, ido: string, irany = '') =>
+    fut ? `${nev} ${ido} ease-in-out infinite ${irany}`.trim() : 'none'
+
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div ref={ref} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       <div className="v-aurora-elem absolute rounded-full"
         style={{
           width: '58vw', height: '58vw', maxWidth: 900, maxHeight: 900,
