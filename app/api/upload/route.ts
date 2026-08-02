@@ -10,7 +10,12 @@ const ENGEDELYEZETT_TIPUSOK = [
   'image/jpeg', 'image/png', 'image/webp', 'image/gif',
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  // Az Excel (.xlsx) feltöltés átmenetileg letiltva. Az `xlsx` csomagban
+  // magas súlyosságú, javítatlan sebezhetőség van (GHSA-4r6h-8v6p-xvw6 —
+  // prototípus-szennyezés és ReDoS), a SheetJS pedig elhagyta az npm-et,
+  // így nincs frissítés. Az olvasó kód megmaradt: ha a hivatalos forrásra
+  // váltunk, elég ezt a sort visszatenni.
+  // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ]
 
 const MAX_MERET = 10 * 1024 * 1024 // 10MB
