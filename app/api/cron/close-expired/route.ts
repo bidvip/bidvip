@@ -27,7 +27,7 @@ const FIZETESI_HATARIDO_ORA = 48
  * enélkül egyetlen hiányzó oszlop az egész aukciózárást megállítaná.
  */
 async function fizetetlenekKezelese(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   most: Date
 ): Promise<string> {
   const { data, error } = await supabase
