@@ -77,18 +77,24 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   const legmagasabb = topLicit?.osszeg || projekt.kikialtasi_ar
-  const minEmel = minIncrement(legmagasabb)
-  const minimum = legmagasabb + minEmel
 
-  if (osszeg < minimum) {
-    return NextResponse.json(
-      { error: `A legkisebb leadható licit ${minimum} € (lépésköz: ${minEmel} €)`, minimum },
-      { status: 400 }
-    )
+  // A szabályokat a tesztelt tiszta logika dönti el
+  const ertekeles = licitErtekeles({ osszeg, legmagasabb, proxyMax: proxy_max })
+  if (!ertekeles.ok) {
+    if (ertekeles.hiba === 'tul_alacsony') {
+      return NextResponse.json(
+        {
+          error: `A legkisebb leadható licit ${ertekeles.minimum} € (lépésköz: ${licitLepcso(legmagasabb)} €)`,
+          minimum: ertekeles.minimum,
+        },
+        { status: 400 }
+      )
+    }
+    return NextResponse.json({ error: 'Érvénytelen licit' }, { status: 400 })
   }
 
   const anonNev = await getNapiAnonNev(supabase, user_id, 'vevo')
-  const valodiBid = proxy_max ? Math.min(proxy_max, osszeg) : osszeg
+  const valodiBid = ertekeles.osszeg
 
   const { data: ujLicit, error: insertHiba } = await supabase.from('licitek').insert([{
     projekt_id,
