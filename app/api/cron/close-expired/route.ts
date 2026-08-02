@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { sendEmail, auctionWinnerEmail, auctionSellerEmail } from '@/lib/email'
 import { elindult } from '@/lib/indulas'
+import { biztonsagosan, naploFigyelem } from '@/lib/naplo'
 
 export const dynamic = 'force-dynamic'
 
