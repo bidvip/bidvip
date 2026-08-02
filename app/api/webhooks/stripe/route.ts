@@ -57,7 +57,18 @@ export async function POST(req: NextRequest) {
     projekt.reszletes_leiras || '',
     fajlok
   )
-  await sendEmail(vevo_email, buyerSubj, buyerHtml).catch(() => {})
+  // Ez a levél tartalmazza a megvásárolt anyagot. Ha nem megy ki, a vevő
+  // fizetett és nem kapott semmit — ezt azonnal tudni kell.
+  const vevoKapta = await biztonsagosan(
+    'stripe-webhook/vevo-atadas',
+    () => sendEmail(vevo_email, buyerSubj, buyerHtml),
+    { projekt_id, cimzett: vevo_email }
+  )
+  if (vevoKapta === null) {
+    naploFigyelem('stripe-webhook/vevo-atadas', 'FIZETETT VEVŐ NEM KAPTA MEG AZ ANYAGOT', {
+      projekt_id, vevo_email,
+    })
+  }
 
   // Email seller: buyer contact + payout amount
   if (elado_email) {
