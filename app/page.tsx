@@ -867,6 +867,7 @@ function Feliratkozas({ szam, novel }: { szam: number; novel: () => void }) {
             ) : (
               <form onSubmit={bekuld} className="flex flex-col sm:flex-row gap-2.5 mx-auto" style={{ maxWidth: 420 }}>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                  aria-label="E-mail cím az értesítéshez" autoComplete="email"
                   placeholder="nev@pelda.hu"
                   className="flex-1 text-sm px-4 py-3 rounded-xl focus:outline-none transition-colors"
                   style={{ background: 'var(--v-bg)', border: '1px solid var(--v-vonal-2)', color: 'var(--v-szoveg)' }}
