@@ -166,7 +166,8 @@ function Aurora() {
           top: '2%', right: '10%',
           background: 'radial-gradient(circle, rgba(56,189,248,.24) 0%, transparent 66%)',
           filter: 'blur(80px)',
-          animation: 'v-aurora 27s ease-in-out infinite reverse',
+          animation: mozgas('v-aurora', '27s', 'reverse'),
+          willChange: fut ? 'transform' : 'auto',
         }} />
       {/* finom rács a mélységért */}
       <div className="absolute inset-0" style={{
