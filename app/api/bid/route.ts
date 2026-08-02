@@ -157,7 +157,11 @@ export async function POST(req: NextRequest) {
           projekt.nev, valodiBid,
           `${process.env.NEXT_PUBLIC_BASE_URL}/project/${projekt_id}`
         )
-        await sendEmail(prevUser.email, subject, html).catch(() => {})
+        await biztonsagosan(
+          'licit/tullicitalas-ertesites',
+          () => sendEmail(prevUser.email!, subject, html),
+          { projekt_id, cimzett: prevUser.email }
+        )
       }
     }
   }
