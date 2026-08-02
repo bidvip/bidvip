@@ -27,7 +27,11 @@ export async function extractText(buffer: Buffer, mimeType: string): Promise<str
     }
 
     return ''
-  } catch {
+  } catch (hiba) {
+    // A szövegkinyerés elmaradása nem állítja meg a feltöltést — a fájl
+    // attól még elmenthető. De tudni akarunk róla, mert az AI így
+    // kevesebb információból dolgozik.
+    naploHiba('szovegkinyeres', hiba, { mimeType, meret: buffer.length })
     return ''
   }
 }
