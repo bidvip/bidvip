@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { megkovetelBejelentkezes } from '@/lib/auth'
+import { korlatEllenoriz } from '@/lib/sebessegkorlat'
 import { extractText } from '@/lib/extract-text'
 import Anthropic from '@anthropic-ai/sdk'
 
