@@ -11,16 +11,24 @@ const PACKAGES: Record<string, { tokens: number; amount: number; name: string }>
 }
 
 export async function POST(req: NextRequest) {
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const { user } = v
+
   try {
-    const { package: pkg, user_id, user_email, redirect = '' } = await req.json()
+    const { package: pkg, redirect = '' } = await req.json()
 
     const selected = PACKAGES[pkg]
-    if (!selected) return NextResponse.json({ error: 'Invalid package' }, { status: 400 })
+    if (!selected) return NextResponse.json({ error: 'Ismeretlen csomag' }, { status: 400 })
+
+    // A jóváírás célja és az e-mail a munkamenetből jön — így nem lehet
+    // más számlájára vásárolni, sem idegen címre szóló számlát kiállítani.
+    const user_id = user.id
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
-      customer_email: user_email,
+      customer_email: user.email,
       line_items: [{
         price_data: {
           currency: 'eur',
