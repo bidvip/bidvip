@@ -34,6 +34,11 @@ export async function GET(req: NextRequest) {
   // rendesen le kell zárni és kifizetni.
   const elindultE = await elindult()
 
+  // ── Nem fizetett nyertesek kezelése ──
+  // Enélkül a lezárt tétel örökre ott ragad: a nyertes nem fizetett, a
+  // tétel mégsem kerül vissza forgalomba, és az eladó sem tud mit kezdeni vele.
+  eredmeny.fizetetlen = await fizetetlenekKezelese(supabase, now)
+
   for (const { sav, perc } of SAVOK) {
     // 1. Close expired active auction in this lane
     const { data: lejart } = await supabase
