@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { megkovetelAdmin } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { sendEmail, rejectionEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  
+  const v = await megkovetelAdmin(req)
+  if (v instanceof NextResponse) return v
+  const { supabase } = v
+
 
   const { projekt_id } = await req.json()
 

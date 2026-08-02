@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { getNapiAnonNev } from '@/lib/anon-nev'
+import { megkovetelBejelentkezes } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const { user_id, tipus } = await req.json()
-  if (!user_id || !tipus) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const { user, supabase } = v
 
-  const supabase: any = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const { tipus } = await req.json()
+  if (tipus !== 'elado' && tipus !== 'vevo') {
+    return NextResponse.json({ error: 'Érvénytelen típus' }, { status: 400 })
+  }
 
-  const nev = await getNapiAnonNev(supabase, user_id, tipus)
+  // Az álnév mindig a bejelentkezett felhasználóé — más nevében nem kérhető
+  const nev = await getNapiAnonNev(supabase, user.id, tipus)
   return NextResponse.json({ nev })
 }
