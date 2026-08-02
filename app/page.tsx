@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { type KirakatElem } from '@/lib/kirakat'
 import { KATEGORIA_FA } from '@/lib/kategoriak'
+import StrukturaltAdat from '@/app/components/StrukturaltAdat'
 
 const INDULAS_KUSZOB = 2000
 
