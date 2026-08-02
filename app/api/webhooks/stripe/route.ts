@@ -38,13 +38,23 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // Mark project as sold
-  const { data: projekt } = await supabase
+  // Eladottra állítjuk, és rögzítjük a fizetés idejét — utóbbi alapján
+  // tudja a cron, hogy ezt a tételt már nem kell visszasorolni.
+  const eladott = await supabase
     .from('projektek')
-    .update({ statusz: 'sold', vevo_email })
+    .update({ statusz: 'sold', vevo_email, fizetve_ekkor: new Date().toISOString() })
     .eq('id', projekt_id)
     .select('nev, reszletes_leiras, fajlok, kikialtasi_ar')
-    .single()
+    .maybeSingle()
+
+  const projekt = eladott.error
+    ? (await supabase
+        .from('projektek')
+        .update({ statusz: 'sold', vevo_email })
+        .eq('id', projekt_id)
+        .select('nev, reszletes_leiras, fajlok, kikialtasi_ar')
+        .maybeSingle()).data
+    : eladott.data
 
   if (!projekt) return NextResponse.json({ error: 'Project not found' }, { status: 404 })
 
