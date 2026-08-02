@@ -7,6 +7,7 @@ import {
   licitLepcso, licitErtekeles, automataEllenlicit,
   elertReserve, hosszabbitasSzukseges,
 } from '@/lib/licit-logika'
+import { biztonsagosan, naploHiba } from '@/lib/naplo'
 
 export const dynamic = 'force-dynamic'
 
