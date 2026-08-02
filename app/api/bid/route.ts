@@ -3,26 +3,15 @@ import { sendEmail, outbidEmail } from '@/lib/email'
 import { getNapiAnonNev } from '@/lib/anon-nev'
 import { megkovetelBejelentkezes } from '@/lib/auth'
 import { korlatEllenoriz } from '@/lib/sebessegkorlat'
+import {
+  licitLepcso, licitErtekeles, automataEllenlicit,
+  elertReserve, hosszabbitasSzukseges,
+} from '@/lib/licit-logika'
 
 export const dynamic = 'force-dynamic'
 
-export function minIncrement(ar: number): number {
-  if (ar < 500) return 25
-  if (ar < 2000) return 50
-  if (ar < 10000) return 100
-  return 250
-}
-
-/**
- * Sniping elleni hosszabbítás.
- *
- * Ha a licit az aukció legvégén érkezik, a többieknek nem marad idejük
- * reagálni. A bevett megoldás — az eBay is ezt vezette be — hogy az
- * utolsó percekben leadott licit meghosszabbítja a lejáratot.
- * A ti sávjaitok 3–20 percesek, ezért itt rövidebb ablak indokolt.
- */
-const HOSSZABBITAS_ABLAK_MP = 60
-const HOSSZABBITAS_MP = 60
+/** Megtartva a visszafelé kompatibilitás miatt — a logika a lib-ben él. */
+export const minIncrement = licitLepcso
 
 export async function POST(req: NextRequest) {
   const v = await megkovetelBejelentkezes(req)
