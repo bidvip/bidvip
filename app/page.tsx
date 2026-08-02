@@ -606,12 +606,12 @@ function SorbanSor({ k }: { k: KirakatElem }) {
       style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }}
       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = `${k.szin}88`; e.currentTarget.style.boxShadow = `0 10px 30px ${k.szin}26` }}
       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = 'var(--v-vonal)'; e.currentTarget.style.boxShadow = 'none' }}>
-      <div style={{ height: 2, background: `linear-gradient(90deg, ${k.szin}, transparent)` }} />
+      <div style={{ height: 2, background: `linear-gradient(90deg, ${k.szin}, transparent)` }} aria-hidden="true" />
 
       <div className="px-5 py-4">
         <div className="flex items-start gap-4">
           <span className="text-xs shrink-0 pt-0.5 w-6" style={{ color: 'var(--v-szoveg-3)', fontVariantNumeric: 'tabular-nums' }}>
-            {String(k.sorszam).padStart(2, '0')}
+            <span className="csak-olvasonak">Sorszám: </span>{String(k.sorszam).padStart(2, '0')}
           </span>
 
           <div className="flex-1 min-w-0">
