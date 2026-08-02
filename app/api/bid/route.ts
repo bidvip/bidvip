@@ -168,7 +168,10 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({ projekt_id, osszeg: valodiBid }),
   }).catch(() => {})
 
-  const elertReserve = projekt.reserve_ar == null || valodiBid >= projekt.reserve_ar
-
-  return NextResponse.json({ ok: true, osszeg: valodiBid, ujLejarat, elertReserve })
+  return NextResponse.json({
+    ok: true,
+    osszeg: valodiBid,
+    ujLejarat,
+    elertReserve: elertReserve(valodiBid, projekt.reserve_ar),
+  })
 }
