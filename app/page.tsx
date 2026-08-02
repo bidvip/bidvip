@@ -929,7 +929,7 @@ function Lablec() {
           <span className="font-bold" style={{ color: 'var(--v-szoveg)' }}>BidVip</span>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
-          {[['Tételek', '#tetelek'], ['Menete', '#menete'], ['Aukciósház', '/aukciosHaz'], ['ÁSZF', '/aszf'], ['Adatvédelem', '/adatvedelem']].map(([c, h]) => (
+          {[['Tételek', '#tetelek'], ['Aukciósház', '/aukciosHaz'], ['ÁSZF', '/aszf'], ['Adatvédelem', '/adatvedelem'], ['Impresszum', '/impresszum']].map(([c, h]) => (
             <a key={h} href={h} className="text-sm transition-colors" style={{ color: 'var(--v-szoveg-3)' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--v-szoveg)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--v-szoveg-3)')}>{c}</a>
