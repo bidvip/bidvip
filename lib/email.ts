@@ -127,9 +127,9 @@ export function launchEmail() {
       <p>BidVip is the marketplace where you develop your startup idea with AI, then auction it to the highest bidder — transparently and securely.</p>
       <p>As one of our early supporters, <strong>you'll receive 50 free tokens</strong> when you create your account (first 2,000 users only).</p>
       <p style="margin:24px 0;">
-        <a href="https://bidvip.vercel.app/auth" style="background:#7c3aed;color:white;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:bold;">Create Your Account →</a>
+        <a href="${ALAP_URL}/auth" style="background:#7c3aed;color:white;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:bold;">Create Your Account →</a>
       </p>
-      <p style="color:#888;font-size:12px;">You're receiving this because you signed up for early access at bidvip.vercel.app. <a href="https://bidvip.vercel.app">Unsubscribe</a></p>
+      <p style="color:#888;font-size:12px;">You're receiving this because you signed up for early access at ${DOMAIN}. <a href="${ALAP_URL}">Unsubscribe</a></p>
       <p>— BidVip Team</p>
     `,
   }
