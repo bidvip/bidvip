@@ -5,6 +5,13 @@ import { sendEmail, bidEmail } from '@/lib/email'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
+  // Belső végpont: csak a licit-feldolgozó hívhatja. Enélkül bárki
+  // küldhetne hamis „új licit érkezett" leveleket az eladóknak.
+  const belso = req.headers.get('x-belso-kulcs')
+  if (!process.env.CRON_SECRET || belso !== process.env.CRON_SECRET) {
+    return NextResponse.json({ error: 'Nincs jogosultság' }, { status: 403 })
+  }
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
