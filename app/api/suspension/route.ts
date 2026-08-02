@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createBrowserClient } from '@/lib/supabase-browser'
-import { createClient } from '@supabase/supabase-js'
+import { megkovetelBejelentkezes } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
