@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { sendEmail, purchaseSellerEmail, purchaseBuyerDetailedEmail } from '@/lib/email'
+import { biztonsagosan, naploFigyelem } from '@/lib/naplo'
 
 export const dynamic = 'force-dynamic'
 
