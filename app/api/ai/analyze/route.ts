@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { megkovetelBejelentkezes } from '@/lib/auth'
+import { aiKorlat } from '@/lib/sebessegkorlat'
 import Anthropic from '@anthropic-ai/sdk'
 import { szakertoiKontextus } from '@/lib/kategoriak'
 
@@ -11,6 +13,11 @@ const BADGE_LABELS: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const korlat = aiKorlat(v.user.id)
+  if (korlat) return korlat
+
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
   const { nev, rovid_leiras, kategoria, badge, kikialtasi_ar } = await req.json()

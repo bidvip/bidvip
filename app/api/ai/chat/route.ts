@@ -1,10 +1,17 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { megkovetelBejelentkezes } from '@/lib/auth'
+import { aiKorlat } from '@/lib/sebessegkorlat'
 import { szakertoiKontextus } from '@/lib/kategoriak'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const korlat = aiKorlat(v.user.id)
+  if (korlat) return korlat
+
   const { uzenet, elozmenyek, projekt, kepUrlok = [], fajlSzovegek = [] } = await req.json()
 
   const rendszerPrompt = `You are a senior startup advisor and investor on BidVip, a marketplace where startup ideas are auctioned. You have reviewed hundreds of startups. Your job is to help the seller turn their rough idea into a compelling, market-ready listing that buyers will actually bid on.
