@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { ALAP_URL } from "@/lib/beallitasok";
 import "./globals.css";
 
 const geistSans = Geist({
