@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-belso-kulcs': process.env.CRON_SECRET ?? '' },
     body: JSON.stringify({ projekt_id, osszeg: valodiBid }),
-  }).catch(() => {})
+  }).catch(hiba => naploHiba('licit/elado-ertesites', hiba, { projekt_id }))
 
   return NextResponse.json({
     ok: true,
