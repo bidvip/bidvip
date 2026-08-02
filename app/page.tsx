@@ -940,6 +940,7 @@ export default function Fooldal() {
 
   return (
     <div style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)', minHeight: '100vh', overflowX: 'hidden' }}>
+      <StrukturaltAdat gyik={GYIK} />
       <HaladasSav />
       <Fejlec />
       <main id="tartalom" tabIndex={-1}>
