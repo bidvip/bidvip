@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { megkovetelBejelentkezes } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 const PROTECTED_POSITIONS = 5
 
 export async function POST(req: NextRequest) {
-  const { projekt_id, user_id, token_amount } = await req.json()
-  if (!projekt_id || !user_id || !token_amount || token_amount < 1) {
-    return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
-  }
+  const v = await megkovetelBejelentkezes(req)
+  if (v instanceof NextResponse) return v
+  const { user, supabase } = v
+  const user_id = user.id
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const { projekt_id, token_amount } = await req.json()
+  if (!projekt_id || typeof token_amount !== 'number' || token_amount < 1) {
+    return NextResponse.json({ error: 'Hiányzó vagy érvénytelen mezők' }, { status: 400 })
+  }
 
   // Verify project belongs to user and is waiting
   const { data: projekt } = await supabase
