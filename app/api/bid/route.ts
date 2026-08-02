@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
   if (topLicit && topLicit.user_id !== user_id) {
     const prevProxy = topLicit.proxy_max
     if (prevProxy && prevProxy > valodiBid) {
-      const ellen = Math.min(prevProxy, valodiBid + minIncrement(valodiBid))
+      const ellen = automataEllenlicit(valodiBid, prevProxy)
       const prevAnonNev = await getNapiAnonNev(supabase, topLicit.user_id, 'vevo')
       await supabase.from('licitek').insert([{
         projekt_id,
