@@ -783,14 +783,7 @@ function Kerdes({ k, v }: { k: string; v: string }) {
 }
 
 function Kerdesek() {
-  const lista: [string, string][] = [
-    ['Nincs kész termékem, csak egy ötletem. Beküldhetem?', 'Igen — a katalógus túlnyomó része ilyen. Három érettségi szintet jelölünk: Ötlet, Prototípus és Bizonyított. A kész termék magasabb árat ér el, de a puszta ötletnek is van piaca.'],
-    ['Honnan tudom, hogy nem lopják el az ötletemet?', 'Az aukció indulásáig sem a tétel neve, sem a leírása nem jelenik meg — csak a szakterület, az érettség és egy ársáv. A részletes anyagot kizárólag a nyertes vevő kapja meg, az átadás részeként.'],
-    ['Mibe kerül?', 'A beküldés és a böngészés ingyenes. Sikeres eladás után a végösszeg 10%-át számítjuk fel, amit az eladó fizet. Ha nem kel el a tétel, nem fizetsz semmit.'],
-    ['Milyen témában küldhetek be ötletet?', 'Huszonöt szakterületen, a napenergiától a vízgazdálkodáson át a csillagászatig — közel háromszáz kategóriában. Ha valós problémát old meg és van aki megvenné, itt a helye.'],
-    ['Mikor indul az első aukció?', 'Amint összegyűlik a kellő számú érdeklődő. Addig a beküldött tételek sorban állnak, és senki nem tud licitálni — így az első árverésen már valódi vevők lesznek jelen.'],
-    ['Hogyan védett a személyazonosságom?', 'Az eladók és a vevők álnéven jelennek meg. A valódi személyazonosság kizárólag sikeres eladás után, az átadás részeként kerül megosztásra.'],
-  ]
+  const lista = GYIK
   return (
     <section id="kerdesek" className="mx-auto max-w-3xl px-6 py-16">
       <Feltunik>
