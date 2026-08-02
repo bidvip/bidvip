@@ -61,7 +61,12 @@ export default function RootLayout({
       lang="hu"
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Billentyűzettel érkezőnek ne kelljen minden oldalon átlépkednie
+            a teljes fejlécen. Csak fókuszra jelenik meg. */}
+        <a href="#tartalom" className="ugrolink">Ugrás a tartalomra</a>
+        {children}
+      </body>
     </html>
   );
 }
