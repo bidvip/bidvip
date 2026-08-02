@@ -268,7 +268,8 @@ export default function ProjectDetail() {
                         {projekt.fajlok.filter(f => f.tipus.startsWith('image/')).map((f, i) => (
                           <a key={i} href={f.url} target="_blank" rel="noopener noreferrer">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={f.url} alt={f.nev} className="w-full h-40 object-cover rounded-lg transition"
+                            <img src={f.url} alt={f.nev} loading="lazy" decoding="async"
+                              className="w-full h-40 object-cover rounded-lg transition"
                               style={{ border: '1px solid var(--v-vonal)' }} />
                           </a>
                         ))}
