@@ -146,4 +146,52 @@ body {
 /* ── Global resets ── */
 * { box-sizing: border-box; }
 ::selection { background: #7C3AED4D; color: var(--v-szoveg); }
-:focus-visible { outline: 2px solid var(--v-lila-2); outline-offset: 2px; }
+
+/* ── Akadálymentesség ──────────────────────────────────────────────
+   A fókuszjelzés két rétegű: a sötét gyűrű attól függetlenül látszik,
+   milyen színű felületen áll az elem. Egyetlen világos gyűrű a világos
+   kártyákon eltűnne. */
+:focus-visible {
+  outline: 2px solid var(--v-lila-2);
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(7, 5, 13, .85);
+}
+
+/* Csak képernyőolvasónak szánt szöveg */
+.csak-olvasonak {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Ugrólink: billentyűzettel érkezőnek ne kelljen a teljes fejlécen
+   átlépkednie minden oldalbetöltéskor. Fókuszra előbukkan. */
+.ugrolink {
+  position: absolute;
+  left: 12px; top: -100px;
+  z-index: 100;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: var(--v-lila);
+  color: #fff;
+  font-size: 14px; font-weight: 700;
+  transition: top .2s ease;
+}
+.ugrolink:focus { top: 12px; }
+
+/* A tartalomra ugrás után is legyen látható a cél */
+main:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
