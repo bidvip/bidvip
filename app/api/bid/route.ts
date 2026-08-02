@@ -46,11 +46,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'A maximum nem lehet kisebb a licitnél' }, { status: 400 })
   }
 
-  const { data: projekt } = await supabase
+  // A reserve_ar oszlop csak a migráció lefuttatása után létezik. Amíg nincs,
+  // a lekérdezés hibára futna és a licitálás megállna — ezért visszaesünk a
+  // szűkebb változatra. A migráció után magától a bővebb ág fut.
+  type ProjektSor = {
+    kikialtasi_ar: number; lejarat: string | null; statusz: string
+    user_id: string; nev: string; reserve_ar?: number | null
+  }
+  let projekt: ProjektSor | null = null
+
+  const bovebb = await supabase
     .from('projektek')
     .select('kikialtasi_ar, reserve_ar, lejarat, statusz, user_id, nev')
     .eq('id', projekt_id)
-    .single()
+    .maybeSingle()
+
+  if (bovebb.error) {
+    const szukebb = await supabase
+      .from('projektek')
+      .select('kikialtasi_ar, lejarat, statusz, user_id, nev')
+      .eq('id', projekt_id)
+      .maybeSingle()
+    projekt = (szukebb.data as ProjektSor | null) ?? null
+  } else {
+    projekt = (bovebb.data as ProjektSor | null) ?? null
+  }
 
   if (!projekt) return NextResponse.json({ error: 'A tétel nem található' }, { status: 404 })
   if (projekt.statusz !== 'aktiv') return NextResponse.json({ error: 'Az aukció nem aktív' }, { status: 400 })
