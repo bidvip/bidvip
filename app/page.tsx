@@ -157,7 +157,8 @@ function Aurora() {
           top: '-8%', left: '18%',
           background: 'radial-gradient(circle, rgba(244,63,94,.34) 0%, rgba(244,63,94,.1) 42%, transparent 70%)',
           filter: 'blur(70px)',
-          animation: 'v-aurora-2 24s ease-in-out infinite',
+          animation: mozgas('v-aurora-2', '24s'),
+          willChange: fut ? 'transform' : 'auto',
         }} />
       <div className="v-aurora-elem absolute rounded-full"
         style={{
