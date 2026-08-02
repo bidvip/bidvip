@@ -26,9 +26,10 @@
     "stripe": "^22.3.2",
     "xlsx": "^0.18.5"
   },
-  "//": "A Next.js régebbi sharp-ot húz be, amiben magas súlyosságú libvips sebezhetőségek vannak (GHSA-f88m-g3jw-g9cj). Az override kikényszeríti a javított verziót.",
+  "//": "A Next.js régebbi sharp-ot és postcss-t húz be, mindkettőben ismert sebezhetőséggel. Az override kikényszeríti a javított verziót anélkül, hogy a Next.js-t kellene visszaléptetni.",
   "overrides": {
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "postcss": "^8.5.25"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
