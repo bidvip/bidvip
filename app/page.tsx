@@ -933,7 +933,7 @@ export default function Fooldal() {
     <div style={{ background: 'var(--v-bg)', color: 'var(--v-szoveg)', minHeight: '100vh', overflowX: 'hidden' }}>
       <HaladasSav />
       <Fejlec />
-      <main>
+      <main id="tartalom" tabIndex={-1}>
         <Hero varolista={sorban.length} elsoHarom={sorban.slice(0, 3)} />
         <Utvonal />
         <Szamok varolista={sorban.length} />
