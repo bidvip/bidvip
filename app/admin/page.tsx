@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
+import { apiHivas } from '@/lib/api-hivas'
 
 const ADMIN_EMAIL = 'info.webbloki@gmail.com'
 
@@ -61,6 +62,7 @@ export default function AdminPage() {
   const [launchAllapot, setLaunchAllapot] = useState<'idle' | 'loading' | 'siker' | 'hiba'>('idle')
   const [launchEredmeny, setLaunchEredmeny] = useState<{ sent: number; failed: number } | null>(null)
   const [userEmailek, setUserEmailek] = useState<Record<string, string>>({})
+  const [allapot, setAllapot] = useState<AllapotValasz | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -75,7 +77,7 @@ export default function AdminPage() {
 
       const [{ data: proj }, rep, { count: felCount }] = await Promise.all([
         supabase.from('projektek').select('*').order('letrehozva', { ascending: false }),
-        fetch('/api/admin/reports').then(r => r.json()),
+        apiHivas('/api/admin/reports').then(r => r.json()),
         supabase.from('feliratkozok').select('id', { count: 'exact', head: true }),
       ])
 
@@ -88,7 +90,7 @@ export default function AdminPage() {
       const uniqueUserIds = [...new Set(ujProjektek.map((p: Projekt) => p.user_id).filter(Boolean))]
       if (uniqueUserIds.length > 0) {
         const { data: { session } } = await supabase.auth.getSession()
-        fetch('/api/admin/user-emails', {
+        apiHivas('/api/admin/user-emails', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
           body: JSON.stringify({ user_ids: uniqueUserIds }),
@@ -102,7 +104,7 @@ export default function AdminPage() {
 
   async function jovahagyas(id: string) {
     setAktiv(id)
-    const res = await fetch('/api/admin/approve', {
+    const res = await apiHivas('/api/admin/approve', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ projekt_id: id }),
@@ -115,7 +117,7 @@ export default function AdminPage() {
 
   async function elutasitas(id: string) {
     setAktiv(id)
-    const res = await fetch('/api/admin/reject', {
+    const res = await apiHivas('/api/admin/reject', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ projekt_id: id }),
@@ -136,7 +138,7 @@ export default function AdminPage() {
 
   async function feloldasReport(report: Report) {
     setAktiv(report.id)
-    await fetch('/api/admin/lift-suspension', {
+    await apiHivas('/api/admin/lift-suspension', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ report_id: report.id, user_id: report.user_id }),
@@ -149,7 +151,7 @@ export default function AdminPage() {
     if (!confirm(`Send launch notification to ${feliratkozokSzam} subscribers?`)) return
     setLaunchAllapot('loading')
     const { data: { session } } = await supabase.auth.getSession()
-    const res = await fetch('/api/admin/launch-notify', {
+    const res = await apiHivas('/api/admin/launch-notify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -168,7 +170,7 @@ export default function AdminPage() {
   async function vegelegesTiltas(report: Report) {
     if (!confirm(`Permanently ban ${report.user_email}?`)) return
     setAktiv(report.id)
-    await fetch('/api/admin/permanent-ban', {
+    await apiHivas('/api/admin/permanent-ban', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ report_id: report.id, user_id: report.user_id }),
