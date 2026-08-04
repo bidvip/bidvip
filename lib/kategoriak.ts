@@ -143,6 +143,36 @@ export function csoportjaTemanak(tema: string): KategoriaCsoport | null {
 }
 
 /**
+ * URL-barát azonosító magyar szövegből.
+ *
+ * Az ékezeteket lecseréljük, mert a százalékkódolt URL olvashatatlan és
+ * a keresők sem szeretik. A leképezés kézi: a `normalize('NFD')` a magyar
+ * ő és ű betűket kettős ékezetes alakra bontaná, ami rossz eredményt ad.
+ */
+const EKEZET: Record<string, string> = {
+  á: 'a', é: 'e', í: 'i', ó: 'o', ö: 'o', ő: 'o',
+  ú: 'u', ü: 'u', ű: 'u',
+}
+
+export function azonosito(szoveg: string): string {
+  return szoveg
+    .toLowerCase()
+    .replace(/[áéíóöőúüű]/g, k => EKEZET[k] ?? k)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+/** Csoport keresése URL-azonosító alapján. */
+export function csoportAzonositobol(az: string): KategoriaCsoport | null {
+  return KATEGORIA_FA.find(c => azonosito(c.nev) === az) ?? null
+}
+
+/** Minden csoport azonosítója — a statikus oldalgeneráláshoz. */
+export function osszesCsoportAzonosito(): string[] {
+  return KATEGORIA_FA.map(c => azonosito(c.nev))
+}
+
+/**
  * A kiválasztott témából szakértői kontextust épít az AI promptokhoz.
  * Enélkül a kategória csak egy címke — ezzel az AI az adott terület
  * szakértőjeként értékel: releváns szabályozás, versenytársak, buktatók.
