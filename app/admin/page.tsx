@@ -206,20 +206,20 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-400">Loading...</div>
+      <main className="min-h-screen bg-[var(--v-bg)] flex items-center justify-center">
+        <div className="text-[var(--v-szoveg-2)]">Loading...</div>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-800">
+    <main className="min-h-screen bg-[var(--v-bg)] text-white">
+      <nav className="flex items-center justify-between px-8 py-5 border-b border-[var(--v-vonal)]">
         <a href="/" className="text-2xl font-bold tracking-tight">
-          Bid<span className="text-violet-500">Vip</span>
+          Bid<span className="text-[var(--v-lila-2)]">Vip</span>
           <span className="ml-3 text-xs bg-amber-900/40 text-amber-400 border border-amber-800 px-2 py-1 rounded-full font-normal">Admin</span>
         </a>
-        <a href="/dashboard" className="text-gray-400 text-sm hover:text-white transition">Dashboard</a>
+        <a href="/dashboard" className="text-[var(--v-szoveg-2)] text-sm hover:text-white transition">Dashboard</a>
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
@@ -228,9 +228,9 @@ export default function AdminPage() {
         <Attekintes projektek={projektek} feliratkozok={feliratkozokSzam} />
         <UzemiAllapot allapot={allapot} />
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 mb-8 flex flex-col gap-4">
+        <div className="bg-[var(--v-bg-2)] border border-[var(--v-vonal)] rounded-2xl p-4 mb-8 flex flex-col gap-4">
           <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Pages</p>
+            <p className="text-xs text-[var(--v-szoveg-3)] font-semibold uppercase tracking-wide mb-3">Pages</p>
             <div className="flex flex-wrap gap-2">
               {[
                 { label: '🏠 Home', href: '/' },
@@ -240,14 +240,14 @@ export default function AdminPage() {
                 { label: '🔐 Auth', href: '/auth' },
               ].map(link => (
                 <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition text-sm">
+                  className="px-3 py-1.5 rounded-lg bg-[var(--v-bg-3)] border border-[var(--v-vonal-2)] text-[var(--v-szoveg-2)] hover:text-white hover:border-[var(--v-lila)] transition text-sm">
                   {link.label}
                 </a>
               ))}
             </div>
           </div>
           <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Submit Flow</p>
+            <p className="text-xs text-[var(--v-szoveg-3)] font-semibold uppercase tracking-wide mb-3">Submit Flow</p>
             <div className="flex flex-wrap gap-2">
               <a href="/submit" target="_blank" rel="noopener noreferrer"
                 className="px-3 py-1.5 rounded-lg bg-blue-900/30 border border-blue-800 text-blue-300 hover:text-white hover:border-blue-500 transition text-sm">
@@ -265,21 +265,21 @@ export default function AdminPage() {
                     title={`Step 3 — ${p.nev}`}>
                     💸 Step 3
                   </a>
-                  <span className="text-xs text-gray-500 max-w-[120px] truncate">{p.nev || 'Unnamed'}</span>
+                  <span className="text-xs text-[var(--v-szoveg-3)] max-w-[120px] truncate">{p.nev || 'Unnamed'}</span>
                 </div>
               ))}
               {projektek.filter(p => p.statusz === 'draft').length === 0 && (
-                <span className="text-xs text-gray-600 py-1.5">No drafts in progress</span>
+                <span className="text-xs text-[var(--v-szoveg-3)] py-1.5">No drafts in progress</span>
               )}
             </div>
           </div>
         </div>
 
         {/* Launch notification */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
+        <div className="bg-[var(--v-bg-2)] border border-[var(--v-vonal)] rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
           <div>
             <p className="font-semibold text-sm">Launch Notification</p>
-            <p className="text-gray-400 text-xs mt-0.5">{feliratkozokSzam} subscriber{feliratkozokSzam !== 1 ? 's' : ''} waiting — send the launch email when BidVip goes live</p>
+            <p className="text-[var(--v-szoveg-2)] text-xs mt-0.5">{feliratkozokSzam} subscriber{feliratkozokSzam !== 1 ? 's' : ''} waiting — send the launch email when BidVip goes live</p>
             {launchAllapot === 'siker' && launchEredmeny && (
               <p className="text-green-400 text-xs mt-1">Sent to {launchEredmeny.sent} subscribers{launchEredmeny.failed > 0 ? `, ${launchEredmeny.failed} failed` : ''}</p>
             )}
@@ -288,20 +288,20 @@ export default function AdminPage() {
           <button
             onClick={launchKuldes}
             disabled={launchAllapot === 'loading' || feliratkozokSzam === 0}
-            className="shrink-0 px-4 py-2 rounded-full text-sm font-semibold bg-violet-600 hover:bg-violet-700 disabled:opacity-40 transition"
+            className="shrink-0 px-4 py-2 rounded-full text-sm font-semibold bg-[var(--v-lila)] hover:bg-violet-700 disabled:opacity-40 transition"
           >
             {launchAllapot === 'loading' ? 'Sending...' : launchAllapot === 'siker' ? 'Sent ✓' : 'Send Launch Email'}
           </button>
         </div>
 
         <div className="flex gap-2 mb-8">
-          <button onClick={() => setTab('projektek')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'projektek' ? 'bg-violet-600 border-violet-600 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+          <button onClick={() => setTab('projektek')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'projektek' ? 'bg-[var(--v-lila)] border-[var(--v-lila)] text-white' : 'border-[var(--v-vonal-2)] text-[var(--v-szoveg-2)] hover:border-[var(--v-lila)]'}`}>
             Projects ({projektek.length})
           </button>
-          <button onClick={() => setTab('reportok')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'reportok' ? 'bg-red-700 border-red-700 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+          <button onClick={() => setTab('reportok')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'reportok' ? 'bg-red-700 border-red-700 text-white' : 'border-[var(--v-vonal-2)] text-[var(--v-szoveg-2)] hover:border-[var(--v-lila)]'}`}>
             Reports {reportok.filter(r => r.statusz === 'pending').length > 0 && <span className="ml-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">{reportok.filter(r => r.statusz === 'pending').length}</span>}
           </button>
-          <button onClick={() => setTab('tranzakciok')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'tranzakciok' ? 'bg-amber-700 border-amber-700 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+          <button onClick={() => setTab('tranzakciok')} className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${tab === 'tranzakciok' ? 'bg-amber-700 border-amber-700 text-white' : 'border-[var(--v-vonal-2)] text-[var(--v-szoveg-2)] hover:border-[var(--v-lila)]'}`}>
             Transactions ({projektek.filter(p => p.statusz === 'sold').length})
             {projektek.filter(p => p.statusz === 'sold' && p.kikialtasi_ar > (GYANUS_AR[p.badge] ?? 5000)).length > 0 && (
               <span className="ml-1 bg-amber-600 text-white text-xs px-1.5 py-0.5 rounded-full">
@@ -314,23 +314,23 @@ export default function AdminPage() {
         {tab === 'reportok' && (
           <div className="flex flex-col gap-6">
             {reportok.length === 0 ? (
-              <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
+              <div className="bg-[var(--v-bg-2)] border border-dashed border-[var(--v-vonal-2)] rounded-2xl p-16 text-center">
                 <div className="text-5xl mb-4">✅</div>
-                <p className="text-gray-400">No reports yet.</p>
+                <p className="text-[var(--v-szoveg-2)]">No reports yet.</p>
               </div>
             ) : reportok.map(r => (
-              <div key={r.id} className={`bg-gray-900 border rounded-2xl p-6 ${r.statusz === 'pending' ? 'border-red-800' : 'border-gray-800 opacity-70'}`}>
+              <div key={r.id} className={`bg-[var(--v-bg-2)] border rounded-2xl p-6 ${r.statusz === 'pending' ? 'border-red-800' : 'border-[var(--v-vonal)] opacity-70'}`}>
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex-1">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${r.statusz === 'pending' ? 'bg-red-900/40 text-red-400' : r.statusz === 'feloldva' ? 'bg-green-900/40 text-green-400' : 'bg-gray-800 text-gray-500'}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${r.statusz === 'pending' ? 'bg-red-900/40 text-red-400' : r.statusz === 'feloldva' ? 'bg-green-900/40 text-green-400' : 'bg-[var(--v-bg-3)] text-[var(--v-szoveg-3)]'}`}>
                       {r.statusz === 'pending' ? '⚠️ Pending review' : r.statusz === 'feloldva' ? '✓ Lifted' : '🚫 Permanently banned'}
                     </span>
                     <h2 className="text-lg font-bold mt-2">{r.nev || '(no name)'}</h2>
                     <div className="flex flex-col gap-0.5 mt-1">
-                      <p className="text-xs text-gray-500">👤 {r.user_email} · {new Date(r.created_at).toLocaleString()}</p>
-                      <p className="text-xs text-gray-600 font-mono">🆔 Report ID: {r.id}</p>
-                      {r.ip_cim && <p className="text-xs text-gray-600 font-mono">🌐 IP: {r.ip_cim}</p>}
-                      {r.user_agent && <p className="text-xs text-gray-600 font-mono truncate">💻 {r.user_agent}</p>}
+                      <p className="text-xs text-[var(--v-szoveg-3)]">👤 {r.user_email} · {new Date(r.created_at).toLocaleString()}</p>
+                      <p className="text-xs text-[var(--v-szoveg-3)] font-mono">🆔 Report ID: {r.id}</p>
+                      {r.ip_cim && <p className="text-xs text-[var(--v-szoveg-3)] font-mono">🌐 IP: {r.ip_cim}</p>}
+                      {r.user_agent && <p className="text-xs text-[var(--v-szoveg-3)] font-mono truncate">💻 {r.user_agent}</p>}
                     </div>
                   </div>
                 </div>
@@ -339,19 +339,19 @@ export default function AdminPage() {
                   <strong>Block reason:</strong> {r.block_reason}
                 </div>
 
-                {r.rovid_leiras && <p className="text-gray-300 text-sm mb-1"><span className="text-gray-500">Short:</span> {r.rovid_leiras}</p>}
+                {r.rovid_leiras && <p className="text-[var(--v-szoveg-2)] text-sm mb-1"><span className="text-[var(--v-szoveg-3)]">Short:</span> {r.rovid_leiras}</p>}
                 {r.reszletes_leiras && (
-                  <p className="text-gray-400 text-sm leading-relaxed mb-3 border-l-2 border-gray-700 pl-4 whitespace-pre-line">
+                  <p className="text-[var(--v-szoveg-2)] text-sm leading-relaxed mb-3 border-l-2 border-[var(--v-vonal-2)] pl-4 whitespace-pre-line">
                     {r.reszletes_leiras}
                   </p>
                 )}
 
                 {r.fajlok?.length > 0 && (
                   <div className="flex flex-col gap-1 mb-4">
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Evidence files</p>
+                    <p className="text-xs text-[var(--v-szoveg-3)] font-semibold uppercase tracking-wide mb-1">Evidence files</p>
                     {r.fajlok.map((f, i) => (
                       <a key={i} href={f.url} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition">
+                        className="flex items-center gap-2 text-sm text-[var(--v-lila-2)] hover:text-violet-300 transition">
                         <span>{f.tipus?.startsWith('image/') ? '🖼️' : f.tipus === 'application/pdf' ? '📄' : '📊'}</span>
                         <span className="underline">{f.nev}</span>
                       </a>
@@ -390,8 +390,8 @@ export default function AdminPage() {
           return (
             <div className="flex flex-col gap-4">
               {eladt.length === 0 ? (
-                <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
-                  <p className="text-gray-400">No completed transactions yet.</p>
+                <div className="bg-[var(--v-bg-2)] border border-dashed border-[var(--v-vonal-2)] rounded-2xl p-16 text-center">
+                  <p className="text-[var(--v-szoveg-2)]">No completed transactions yet.</p>
                 </div>
               ) : eladt.map(p => {
                 const sellerEmail = userEmailek[p.user_id]
@@ -401,28 +401,28 @@ export default function AdminPage() {
                 const ismetlo_par = par && parok[par] > 1
                 const gyanus = magas_ar || ismetlo_par
                 return (
-                  <div key={p.id} className={`bg-gray-900 border rounded-2xl p-5 ${gyanus ? 'border-amber-700' : 'border-gray-800'}`}>
+                  <div key={p.id} className={`bg-[var(--v-bg-2)] border rounded-2xl p-5 ${gyanus ? 'border-amber-700' : 'border-[var(--v-vonal)]'}`}>
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           {gyanus && <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800 px-2 py-0.5 rounded-full font-semibold">⚠️ Suspicious</span>}
-                          <span className="text-xs text-gray-500">{p.badge}</span>
+                          <span className="text-xs text-[var(--v-szoveg-3)]">{p.badge}</span>
                         </div>
                         <h2 className="font-bold text-lg">{p.nev}</h2>
-                        <p className="text-gray-400 text-sm mt-0.5">{p.kategoria}</p>
+                        <p className="text-[var(--v-szoveg-2)] text-sm mt-0.5">{p.kategoria}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className={`text-2xl font-bold ${magas_ar ? 'text-amber-400' : 'text-green-400'}`}>€{p.kikialtasi_ar.toLocaleString()}</p>
-                        {p.ai_ertekeles && <p className="text-xs text-gray-500 mt-0.5">AI value: €{p.ai_ertekeles.toLocaleString()} · max: €{max_ar.toLocaleString()}</p>}
+                        {p.ai_ertekeles && <p className="text-xs text-[var(--v-szoveg-3)] mt-0.5">AI value: €{p.ai_ertekeles.toLocaleString()} · max: €{max_ar.toLocaleString()}</p>}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-gray-800 rounded-xl px-4 py-3">
-                        <p className="text-gray-500 text-xs mb-1">Seller</p>
+                      <div className="bg-[var(--v-bg-3)] rounded-xl px-4 py-3">
+                        <p className="text-[var(--v-szoveg-3)] text-xs mb-1">Seller</p>
                         <p className="text-white truncate">{sellerEmail || '—'}</p>
                       </div>
-                      <div className="bg-gray-800 rounded-xl px-4 py-3">
-                        <p className="text-gray-500 text-xs mb-1">Buyer</p>
+                      <div className="bg-[var(--v-bg-3)] rounded-xl px-4 py-3">
+                        <p className="text-[var(--v-szoveg-3)] text-xs mb-1">Buyer</p>
                         <p className="text-white truncate">{p.vevo_email || '—'}</p>
                       </div>
                     </div>
@@ -440,41 +440,41 @@ export default function AdminPage() {
         })()}
 
         {tab === 'projektek' && projektek.length === 0 && (
-          <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-16 text-center">
+          <div className="bg-[var(--v-bg-2)] border border-dashed border-[var(--v-vonal-2)] rounded-2xl p-16 text-center">
             <div className="text-5xl mb-4">✅</div>
-            <p className="text-gray-400">All caught up — no projects pending review.</p>
+            <p className="text-[var(--v-szoveg-2)]">All caught up — no projects pending review.</p>
           </div>
         )}
 
         {tab === 'projektek' && projektek.length > 0 && (
           <div className="flex flex-col gap-6">
             {projektek.map(p => (
-              <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+              <div key={p.id} className="bg-[var(--v-bg-2)] border border-[var(--v-vonal)] rounded-2xl p-6">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs text-gray-500">{badge_info[p.badge]}</span>
-                      <span className="text-xs text-gray-600">·</span>
-                      <span className="text-xs text-gray-500">{p.kategoria}</span>
+                      <span className="text-xs text-[var(--v-szoveg-3)]">{badge_info[p.badge]}</span>
+                      <span className="text-xs text-[var(--v-szoveg-3)]">·</span>
+                      <span className="text-xs text-[var(--v-szoveg-3)]">{p.kategoria}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.statusz === 'aktiv' ? 'bg-green-900/40 text-green-400' : p.statusz === 'felulvizsgalat' ? 'bg-amber-900/40 text-amber-400' : 'bg-red-900/40 text-red-400'}`}>
-                        {p.statusz}
+                        {STATUSZ_NEV[p.statusz] ?? p.statusz}
                       </span>
                     </div>
                     <h2 className="text-xl font-bold">{p.nev}</h2>
-                    <p className="text-gray-400 text-sm mt-1">{p.rovid_leiras}</p>
+                    <p className="text-[var(--v-szoveg-2)] text-sm mt-1">{p.rovid_leiras}</p>
                   </div>
-                  <span className="text-violet-400 font-bold text-lg shrink-0">€{p.kikialtasi_ar.toLocaleString()}</span>
+                  <span className="text-[var(--v-lila-2)] font-bold text-lg shrink-0">€{p.kikialtasi_ar.toLocaleString()}</span>
                 </div>
 
-                <p className="text-gray-400 text-sm leading-relaxed mb-4 border-l-2 border-gray-700 pl-4">
+                <p className="text-[var(--v-szoveg-2)] text-sm leading-relaxed mb-4 border-l-2 border-[var(--v-vonal-2)] pl-4">
                   {p.reszletes_leiras}
                 </p>
 
                 <div className="flex gap-2 flex-wrap mb-5">
-                  {p.van_domain && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">🌐 Domain</span>}
-                  {p.van_kod && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💻 Source Code</span>}
-                  {p.van_feliratkozok && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">📧 Email List</span>}
-                  {p.van_bevetel && <span className="text-xs bg-gray-800 px-2 py-1 rounded-full text-gray-300">💰 Revenue</span>}
+                  {p.van_domain && <span className="text-xs bg-[var(--v-bg-3)] px-2 py-1 rounded-full text-[var(--v-szoveg-2)]">🌐 Domain</span>}
+                  {p.van_kod && <span className="text-xs bg-[var(--v-bg-3)] px-2 py-1 rounded-full text-[var(--v-szoveg-2)]">💻 Source Code</span>}
+                  {p.van_feliratkozok && <span className="text-xs bg-[var(--v-bg-3)] px-2 py-1 rounded-full text-[var(--v-szoveg-2)]">📧 Email List</span>}
+                  {p.van_bevetel && <span className="text-xs bg-[var(--v-bg-3)] px-2 py-1 rounded-full text-[var(--v-szoveg-2)]">💰 Revenue</span>}
                 </div>
 
                 <div className="flex gap-3">
@@ -503,7 +503,7 @@ export default function AdminPage() {
                   )}
                   <a
                     href={`/project/${p.id}`}
-                    className="border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition px-5 py-2 rounded-full text-sm"
+                    className="border border-[var(--v-vonal-2)] text-[var(--v-szoveg-2)] hover:text-white hover:border-[var(--v-lila)] transition px-5 py-2 rounded-full text-sm"
                     target="_blank"
                   >
                     Preview →
@@ -511,7 +511,7 @@ export default function AdminPage() {
                   <button
                     onClick={() => torles(p.id)}
                     disabled={aktiv === p.id}
-                    className="border border-gray-800 text-gray-600 hover:text-red-400 hover:border-red-900 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm"
+                    className="border border-[var(--v-vonal)] text-[var(--v-szoveg-3)] hover:text-red-400 hover:border-red-900 disabled:opacity-60 transition px-5 py-2 rounded-full text-sm"
                   >
                     🗑 Delete
                   </button>
