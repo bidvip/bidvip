@@ -609,6 +609,14 @@ function Teruletek() {
                   </span>
                 ))}
               </div>
+
+              {/* Belső hivatkozás a szakterületi aloldalra — a keresők így
+                  bejárják, az olvasó pedig részletesebb leírást talál. */}
+              <a href={`/terulet/${azonosito(valasztott.nev)}`}
+                className="inline-block mt-4 text-xs font-bold"
+                style={{ color: valasztott.szin }}>
+                Bővebben a(z) {valasztott.nev.toLowerCase()} területről →
+              </a>
             </div>
           )}
         </div>
