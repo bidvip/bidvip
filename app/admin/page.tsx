@@ -223,7 +223,10 @@ export default function AdminPage() {
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-4">Admin Panel</h1>
+        <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
+
+        <Attekintes projektek={projektek} feliratkozok={feliratkozokSzam} />
+        <UzemiAllapot allapot={allapot} />
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 mb-8 flex flex-col gap-4">
           <div>
