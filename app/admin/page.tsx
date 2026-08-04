@@ -525,3 +525,135 @@ export default function AdminPage() {
     </main>
   )
 }
+
+/* ═══════════════════════  áttekintés  ═══════════════════════ */
+
+function Attekintes({ projektek, feliratkozok }: { projektek: Projekt[]; feliratkozok: number }) {
+  const db = (sz: string) => projektek.filter(p => p.statusz === sz).length
+
+  const eladott = projektek.filter(p => p.statusz === 'sold')
+  const bevetel = eladott.reduce((sum, p) => sum + (p.kikialtasi_ar || 0), 0)
+  const jutalek = Math.round(bevetel * 0.1)
+
+  // Likviditás: a meghirdetett tételekből mennyi kelt el ténylegesen.
+  // Egy piactérnél ez az egyetlen szám, ami elárulja hogy működik-e.
+  const meghirdetett = db('sold') + db('lezart')
+  const likviditas = meghirdetett > 0 ? Math.round((db('sold') / meghirdetett) * 100) : null
+
+  const fo = [
+    { cim: 'Sorban', ertek: db('varakozas'), szin: '#A78BFA' },
+    { cim: 'Élő aukció', ertek: db('aktiv'), szin: '#34D399' },
+    { cim: 'Eladva', ertek: db('sold'), szin: '#FBBF24' },
+    { cim: 'Feliratkozó', ertek: feliratkozok, szin: '#38BDF8' },
+  ]
+
+  const masodlagos = [
+    { cim: 'Vázlat', ertek: db('draft') },
+    { cim: 'Lezárt, eladatlan', ertek: db('lezart') },
+    { cim: 'Elutasítva', ertek: db('elutasitva') },
+    { cim: 'Bevétel', ertek: `${bevetel.toLocaleString('hu-HU')} €` },
+    { cim: 'Ebből jutalék', ertek: `${jutalek.toLocaleString('hu-HU')} €` },
+    { cim: 'Likviditás', ertek: likviditas === null ? '—' : `${likviditas}%` },
+  ]
+
+  return (
+    <div className="mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+        {fo.map(s => (
+          <div key={s.cim} className="rounded-2xl px-5 py-4"
+            style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }}>
+            <p className="text-3xl font-black mb-1" style={{ color: s.szin, fontVariantNumeric: 'tabular-nums' }}>
+              {s.ertek}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--v-szoveg-3)' }}>{s.cim}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-2xl px-5 py-4 flex flex-wrap gap-x-8 gap-y-3"
+        style={{ background: 'var(--v-bg-2)', border: '1px solid var(--v-vonal)' }}>
+        {masodlagos.map(s => (
+          <div key={s.cim}>
+            <p className="text-sm font-bold" style={{ color: 'var(--v-szoveg)', fontVariantNumeric: 'tabular-nums' }}>
+              {s.ertek}
+            </p>
+            <p className="text-[11px]" style={{ color: 'var(--v-szoveg-3)' }}>{s.cim}</p>
+          </div>
+        ))}
+      </div>
+
+      {likviditas === null && (
+        <p className="text-[11px] mt-2" style={{ color: 'var(--v-szoveg-3)' }}>
+          A likviditás — a meghirdetett tételek hány százaléka kel el — az első lezárult aukció után jelenik meg.
+          Piactérnél ez a legfontosabb mérőszám; a regisztrációk száma önmagában semmit nem mond.
+        </p>
+      )}
+    </div>
+  )
+}
+
+/* ═══════════════════════  üzemi állapot  ═══════════════════════ */
+
+function UzemiAllapot({ allapot }: { allapot: AllapotValasz | null }) {
+  const [nyitva, setNyitva] = useState(true)
+  if (!allapot) return null
+
+  const { ellenorzesek, blokkolok, hianyok } = allapot
+
+  return (
+    <div className="rounded-2xl mb-6 overflow-hidden"
+      style={{
+        background: 'var(--v-bg-2)',
+        border: `1px solid ${blokkolok > 0 ? 'rgba(244,63,94,.45)' : 'var(--v-vonal)'}`,
+      }}>
+      <button onClick={() => setNyitva(n => !n)} aria-expanded={nyitva}
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left">
+        <div>
+          <p className="font-semibold text-sm" style={{ color: 'var(--v-szoveg)' }}>Üzemi állapot</p>
+          <p className="text-xs mt-0.5" style={{ color: blokkolok > 0 ? 'var(--v-rozsa)' : 'var(--v-szoveg-3)' }}>
+            {blokkolok > 0
+              ? `${blokkolok} olyan hiányosság, ami megakadályozza a pénzmozgást`
+              : hianyok > 0
+                ? `${hianyok} nyitott elem, de egyik sem blokkoló`
+                : 'Minden beállítás rendben'}
+          </p>
+        </div>
+        <span className="shrink-0 text-lg font-black leading-none"
+          style={{ color: 'var(--v-szoveg-3)', transform: nyitva ? 'rotate(180deg)' : 'none', transition: 'transform .3s' }}>
+          ⌄
+        </span>
+      </button>
+
+      {nyitva && (
+        <div className="px-5 pb-5 flex flex-col gap-2">
+          {ellenorzesek.map(e => (
+            <div key={e.kulcs} className="rounded-xl px-4 py-3"
+              style={{
+                background: 'var(--v-bg)',
+                border: `1px solid ${e.rendben ? 'var(--v-vonal)' : e.blokkolo ? 'rgba(244,63,94,.35)' : 'rgba(251,191,36,.28)'}`,
+              }}>
+              <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span aria-hidden="true" style={{ color: e.rendben ? 'var(--v-zold)' : e.blokkolo ? 'var(--v-rozsa)' : 'var(--v-arany)' }}>
+                    {e.rendben ? '✓' : e.blokkolo ? '✕' : '!'}
+                  </span>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--v-szoveg)' }}>{e.cim}</span>
+                  {e.blokkolo && !e.rendben && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                      style={{ background: 'rgba(244,63,94,.16)', color: 'var(--v-rozsa)' }}>
+                      blokkoló
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs font-mono" style={{ color: 'var(--v-szoveg-2)' }}>{e.ertek}</span>
+              </div>
+              <p className="text-xs leading-relaxed mt-1.5" style={{ color: 'var(--v-szoveg-3)' }}>
+                {e.magyarazat}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
