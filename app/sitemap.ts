@@ -24,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...teruletek,
     { url: `${ALAP}/`,             lastModified: most, changeFrequency: 'daily',   priority: 1 },
     { url: `${ALAP}/aukciosHaz`,   lastModified: most, changeFrequency: 'hourly',  priority: 0.9 },
+    { url: `${ALAP}/terulet`,      lastModified: most, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${ALAP}/submit`,       lastModified: most, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${ALAP}/auth`,         lastModified: most, changeFrequency: 'yearly',  priority: 0.3 },
     { url: `${ALAP}/aszf`,         lastModified: most, changeFrequency: 'yearly',  priority: 0.2 },
