@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { ALAP_URL } from '@/lib/beallitasok'
+import { osszesCsoportAzonosito } from '@/lib/kategoriak'
 
 const ALAP = ALAP_URL
 
