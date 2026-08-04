@@ -103,6 +103,12 @@ export default function AdminPage() {
       setReportok(Array.isArray(rep) ? rep : [])
       setFeliratkozokSzam(felCount ?? 0)
 
+      // Üzemi állapot: mi hiányzik még az éles működéshez
+      apiHivas('/api/admin/allapot')
+        .then(r => r.json())
+        .then(setAllapot)
+        .catch(() => {})
+
       // Fetch seller emails for all projects
       const uniqueUserIds = [...new Set(ujProjektek.map((p: Projekt) => p.user_id).filter(Boolean))]
       if (uniqueUserIds.length > 0) {
