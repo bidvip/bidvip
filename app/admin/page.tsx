@@ -15,6 +15,23 @@ const badge_info: Record<string, string> = {
 
 const GYANUS_AR: Record<string, number> = { idea: 5000, prototype: 20000, proven: 100000 }
 
+type Ellenorzes = {
+  kulcs: string; cim: string; rendben: boolean
+  ertek: string; magyarazat: string; blokkolo: boolean
+}
+type AllapotValasz = { ellenorzesek: Ellenorzes[]; blokkolok: number; hianyok: number }
+
+/** A státuszok emberi neve, hogy ne nyers adatbázis-kulcsok legyenek kiírva. */
+const STATUSZ_NEV: Record<string, string> = {
+  draft: 'Vázlat',
+  varakozas: 'Sorban',
+  aktiv: 'Élő aukció',
+  lezart: 'Lezárt',
+  sold: 'Eladva',
+  elutasitva: 'Elutasítva',
+  felulvizsgalat: 'Felülvizsgálat',
+}
+
 type Projekt = {
   id: string
   nev: string
